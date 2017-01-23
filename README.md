@@ -5,7 +5,9 @@ You need to have redis installed and running.
 
 Boostrap your .env file
 ```
-PUBLIC_URL=http://localhost:3000
+PORT=3001
+PUBLIC_URL=http://localhost:3001
+CLIENT_DEV_SERVER_URL=http://localhost:3002
 MAIL_URL=smtp://postmaster@sandboxc0bfac8e57f84f4880052f8899470727.mailgun.org:PASSWORD@smtp.mailgun.org/
 FROM_MAIL_ADDRESS=test_account@project-r.construction
 SESSION_REDIS_HOST=127.0.0.1
@@ -19,7 +21,7 @@ USERS_DB_URL=postgres://postgres:PASSWORD@172.17.0.1:54321/postgres
 ### Run it
 ```
 npm install
-npm start       # <- runs npm start in client/ and nodemon index.js
+npm start       # <- starts react-scripts for client and nodemon for server
 ```
 
 ## Production
