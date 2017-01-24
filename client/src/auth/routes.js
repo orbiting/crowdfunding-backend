@@ -1,18 +1,21 @@
 import SignInPage from './containers/SignInPage'
-import User from './User'
+import Session from './session'
 
 const routes = [
   {
     path: '/signin',
-    component: SignInPage
+    component: SignInPage,
+    onEnter: Session.redirectIfAuth
   },
   {
-    path: '/logout',
+    path: '/signout',
     onEnter: (nextState, replace) => {
-      const xhr = new XMLHttpRequest()
-      xhr.open('post', '/auth/logout')
-      xhr.send()
-      User.remove()
+      const session = new Session()
+      //TODO replace with requireAuth
+      if(!session._session.isLoggedIn) {
+        replace('/signin')
+      }
+      session.signout()
       replace('/')
     }
   }

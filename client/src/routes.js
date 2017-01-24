@@ -1,27 +1,23 @@
-import Base from './components/Base'
+import App from './App'
 import DashboardPage from './containers/DashboardPage'
 import authRoutes from './auth/routes'
-import User from './auth/User'
-
+import Session from './auth/session'
 
 const routes = {
   // base component (wrapper for the whole application).
-  component: Base,
+  component: App,
   childRoutes: [
     {
       path: '/',
-      indexRoute: { component: DashboardPage },
-      onEnter: ({ params }, replace) => {
-        if(User.get())
-          replace('/dashboard')
-        else
-          replace('/signin')
+	    onEnter: (nextState, replace) => {
+        replace('/dashboard')
       }
     },
 
     {
       path: '/dashboard',
-      component: DashboardPage
+      component: DashboardPage,
+      onEnter: Session.requireAuth
     }
   ]
 }

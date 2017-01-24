@@ -1,74 +1,83 @@
 import React, { PropTypes } from 'react'
 import SignInForm from '../components/SignInForm'
+import { Container } from 'semantic-ui-react'
+import Session from '../session'
 
 class SignInPage extends React.Component {
 
   constructor(props, context) {
     super(props, context)
-
-    // set the initial component state
     this.state = {
-      validationResult: {},
       errors: [],
-      user: { email: '' }
+      email: '',
+      waitingForSignin: false,
+      sessionPollCounter: 0,
+      session: new Session()
     }
     this.onSubmit = this.onSubmit.bind(this)
   }
 
-  /**
-   * Process the form.
-   *
-   * @param {object} event - the JavaScript event object
-   */
-  onSubmit(user) {
-    const xhr = new XMLHttpRequest()
-    xhr.open('post', '/auth/signin')
-    xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
-    xhr.responseType = 'json'
-    xhr.addEventListener('load', () => {
-      if (xhr.status === 200) {
-        // change the component-container state
-        this.setState({
-          user,
-          errors: [],
-          validationResult: {},
-        })
+  onSubmit(email) {
+    const { session } = this.state
+    this.setState({email})
+    session.signin(email).then( () => {
+      var intervalId = setInterval(this.pollSession.bind(this), 600)
+      this.setState({
+        intervalId: intervalId,
+        waitingForSignin: true
+      })
+    }).catch( (error) => {
+      this.setState({
+        errors: [ error.toString() ]
+      })
+    })
+  }
 
-        // set a message
-        //localStorage.setItem('successMessage', xhr.response.message)
+  componentWillUnmount() {
+    const { intervalId } = this.state
+    if(intervalId)
+      clearInterval(intervalId)
+  }
 
-        // make a redirect
-        //this.context.router.replace('/login')
-      } else {
-        console.log(xhr.response)
-
-        const validationResult = xhr.response.validationResult ? xhr.response.validationResult : {}
-        const errors = xhr.response.errors ? xhr.response.errors : []
-
-        this.setState({
-          user,
-          errors,
-          validationResult
-        })
+  pollSession() {
+    const { router } = this.context
+    const { session, intervalId, sessionPollCounter } = this.state
+    session.getSession().then( () => {
+      clearInterval(intervalId)
+      router.replace('/dashboard')
+    }).catch( (error) => {
+      //session not yet ready
+      this.setState({sessionPollCounter: sessionPollCounter+1})
+      //reset after enough of polling: 0.6s*400=4min
+      if(sessionPollCounter>400) {
+        clearInterval(intervalId)
+        this.setState({waitingForSignin: false})
       }
     })
-    xhr.send(JSON.stringify({user: user.email}))
   }
 
   render() {
+    const { waitingForSignin, email } = this.state
     return (
-      <SignInForm
-        onSubmit={this.onSubmit}
-        errors={this.state.errors}
-        validationResult={this.state.validationResult}
-        user={this.state.user}
-      />
+      <div>
+      { waitingForSignin ? (
+        <Container textAlign='center'>
+          <p>We sent an email to {email}. Please follow the link inside and come back here.</p>
+        </Container>
+      ) : (
+        <SignInForm
+          onSubmit={this.onSubmit}
+          errors={this.state.errors}
+          email={this.state.email}
+        />
+      )}
+      </div>
     )
   }
 }
 
 SignInPage.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
 }
 
 export default SignInPage

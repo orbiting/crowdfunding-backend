@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
-import { Link } from 'react-router'
-import { Card, Input, Message, Button, Image } from 'semantic-ui-react'
+import { Card, Message, Button, Image } from 'semantic-ui-react'
 import t from '../lib/tcomb-form'
 
 const Form = t.form.Form
@@ -9,48 +8,18 @@ const Signin = t.struct({
 })
 
 
-//https://github.com/gcanti/tcomb-form/issues/234
-function getOptionsFromValidationResult(_options, result) {
-  let options = _options || {
-    fields: {}
-  }
-  if(!result || !result.errors) {
-    return options
-  }
-  result.errors.forEach( (error) => {
-    options.fields[error.path[0]] = {
-      hasError: true,
-      error: error.message
-    }
-  })
-  console.log(options)
-  return options
-}
-
-/*
-const SignInForm = ({
-  onSubmit,
-  onChange,
-  errors,
-  user,
-}) => (
-*/
 class SignInForm extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.onSubmit = this.onSubmit.bind(this)
   }
   onSubmit() {
-    // validate a field on every change
-    const validationResult = this.refs.form.validate()
-    if(validationResult.isValid()) {
-      const user = this.refs.form.getValue()
-      this.props.onSubmit(user)
-    }
+    const values = this.refs.form.getValue()
+    this.props.onSubmit(values.email)
   }
   render() {
-    const { user, errors, validationResult } = this.props
-    const options = {}//getOptionsFromValidationResult(SigninOptions, validationResult)
+    const { email, errors } = this.props
+    const options = {}
     return (
       <Card className="container">
       <Image src='https://assets.project-r.construction/images/balkon.jpg' size='medium' />
@@ -58,7 +27,7 @@ class SignInForm extends React.Component {
       ref="form"
       type={Signin}
       options={options}
-      value={user}
+      value={email}
       />
 
       {errors.length>0 &&
@@ -81,8 +50,7 @@ class SignInForm extends React.Component {
 SignInForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   errors: PropTypes.array.isRequired,
-  validationResult: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired
+  email: PropTypes.string.isRequired,
 }
 
 export default SignInForm

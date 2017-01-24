@@ -1,27 +1,23 @@
 import React, { PropTypes } from 'react'
-import { Button, Dropdown } from 'semantic-ui-react'
+import { Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router'
+import Session from '../session'
 
 class AuthButton extends React.Component {
 
   constructor(props, context) {
     super(props, context)
-    this.state = {
-    }
+    this.state = { }
   }
 
   render() {
+    const session = Session.getSessionStore()
 
-    let session = { isLoggedIn: false }
-    if(this.context.session) {
-      session = this.context.session._session
-    }
-
-    if(session.isLoggedIn) {
+    if(session && session.isLoggedIn) {
       return (
         <Dropdown text={session.user.email}>
           <Dropdown.Menu>
-            <Dropdown.Item><Link to="/logout">Logout</Link></Dropdown.Item>
+            <Dropdown.Item><Link to="/signout">Logout</Link></Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       )
@@ -37,7 +33,6 @@ class AuthButton extends React.Component {
 
 AuthButton.contextTypes = {
   router: PropTypes.object.isRequired,
-  session: PropTypes.object
 }
 
 export default AuthButton

@@ -1,24 +1,11 @@
 import React, { PropTypes } from 'react'
-import { Link, IndexLink } from 'react-router'
-import { Header, Image, Button } from 'semantic-ui-react'
-import AuthButton from '../auth/containers/AuthButton'
-import Session from '../auth/session'
+import { Header, Image } from 'semantic-ui-react'
+import AuthButton from './auth/containers/AuthButton'
 
-class Base extends React.Component {
+class App extends React.Component {
   constructor(props, context) {
     super(props, context)
-    this.state = {
-      session: null
-    }
-  }
-
-  componentDidMount() {
-    let session = new Session()
-    session.getSession()
-    this.setState( {session} )
-  }
-  getChildContext() {
-    return {session: this.state.session }
+    this.state = { }
   }
 
   render() {
@@ -42,12 +29,8 @@ class Base extends React.Component {
   }
 }
 
-Base.propTypes = {
+App.propTypes = {
   children: PropTypes.object.isRequired
 }
 
-Base.childContextTypes = {
-  session: PropTypes.object
-}
-
-export default Base
+export default App
