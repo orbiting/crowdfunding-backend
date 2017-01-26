@@ -18,6 +18,18 @@ SESSION_SECRET='asdf'
 USERS_DB_URL=postgres://postgres:PASSWORD@172.17.0.1:54321/postgres
 ```
 
+### Dependencies
+This project uses the @project-r/auth-server and @project-r/auth-gui packages. You have to be part of the @project-r npmjs.org team to be able to `npm install` them. You can also use them locally via `npm link`
+```
+cd auth-server
+npm link
+cd ../auth-gui
+npm link
+cd ../users-and-roles
+npm link @project-r/auth-server
+npm link @project-r/auth-gui
+```
+
 ### Run it
 ```
 npm install
