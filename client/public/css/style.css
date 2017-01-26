@@ -18,6 +18,7 @@ a:hover {
   text-align: center;
 }
 
+/* auth-gui */
 .top-bar {
   padding: 10px 15px;
   margin-bottom: 50px;
@@ -47,25 +48,3 @@ a:hover {
   width: 700px;
 }
 
-.card-heading {
-  padding: 16px;
-}
-
-.field-line, .button-line {
-  padding: 16px;
-}
-
-.error-message {
-  padding: 0 16px;
-  color: tomato;
-}
-
-.success-message {
-  padding: 0 16px;
-  color: green;
-}
-
-/* override semenatic ui */
-fieldset {
-  border: none !important;
-}

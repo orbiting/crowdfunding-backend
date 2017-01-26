@@ -13,7 +13,7 @@
     "semantic-ui-react": "^0.64.3",
     "tcomb-form": "^0.9.10",
     "tcomb-form-templates-semantic": "^0.2.0",
-    "validator": "^6.2.1"
+    "@project-r/auth-gui": "*"
   },
   "scripts": {
     "start": "react-scripts start",

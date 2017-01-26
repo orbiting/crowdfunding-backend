@@ -1,7 +1,6 @@
 import App from './App'
 import DashboardPage from './containers/DashboardPage'
-import authRoutes from './auth/routes'
-import Session from './auth/session'
+import { Session, routes as authRoutes } from '@project-r/auth-gui'
 
 const routes = {
   // base component (wrapper for the whole application).

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import { Header, Image } from 'semantic-ui-react'
-import AuthButton from './auth/containers/AuthButton'
+import { AuthButton } from '@project-r/auth-gui'
 
 class App extends React.Component {
   constructor(props, context) {
