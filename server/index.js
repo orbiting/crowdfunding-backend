@@ -1,14 +1,15 @@
 const express = require('express')
 const authServer = require('@project-r/auth-server')
+const graphql = require('./graphql')
 require('dotenv').config()
 
 process.env.PORT = process.env.PORT || 3001
 
 //setup express
-const app = express()
+const server = express()
 
 /*
-app.use(function(req, res, next) {
+server.use(function(req, res, next) {
   console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
   console.log("new request")
   console.log(req)
@@ -19,7 +20,7 @@ app.use(function(req, res, next) {
 
 // Express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('dist/client_build'));
+  server.use(express.static('dist/client_build'));
 }
 
 authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
@@ -44,9 +45,9 @@ ${link}
 Your R-Crew`
     }
   }
-  const { ensureLoggedIn, withUser } = authServer.configure(app, authConfig)
+  const { ensureLoggedIn, withUser } = authServer.configure(server, authConfig)
 
-  app.get('/test', ensureLoggedIn, withUser, function(req, res) {
+  server.get('/test', ensureLoggedIn, withUser, function(req, res) {
     console.log("/test")
     console.log(res.locals.user)
     res.end("you are logged in")
@@ -59,7 +60,7 @@ Your R-Crew`
     const httpProxy = require('http-proxy')
     var proxy = httpProxy.createProxyServer({target: process.env.CLIENT_DEV_SERVER_URL, ws: true});
     //proxy request
-    app.use(function(req, res, next) {
+    server.use(function(req, res, next) {
       console.log("proxy request to CREATE-REACT-APP for: "+req.originalUrl)
       proxy.web(req, res)//, { target: 'http://localhost:3002' })
     })
@@ -67,14 +68,14 @@ Your R-Crew`
 		// (we don't use websockets for anything else than hot code reloading so far...)
     // DOESN'T WORK :(
     /*
-		app.on('upgrade', function (req, socket, head) {
+		server.on('upgrade', function (req, socket, head) {
 			proxy.ws(req, socket, head);
 		})
     */
   }
 
   // start the server
-  app.listen(3001, () => {
+  server.listen(3001, () => {
     console.log('new server is running on http://localhost:3001')
   })
 })
