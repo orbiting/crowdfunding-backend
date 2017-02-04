@@ -1,7 +1,7 @@
 const express = require('express')
 const authServer = require('@project-r/auth-server')
-const graphql = require('./graphql')
 require('dotenv').config()
+const graphql = require('./graphql')
 
 process.env.PORT = process.env.PORT || 3001
 
@@ -23,10 +23,14 @@ if (process.env.NODE_ENV === 'production') {
   server.use(express.static('dist/client_build'));
 }
 
-authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
+// TODO cleanup
+//authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
+const {User} = require('./graphql/connectors')
+Promise.resolve(true)
 .then((db) => {
   const authConfig = {
-    db: db,
+    //db: db,
+    userModel: User,
     serverUrl: process.env.PUBLIC_URL,
     sessionRedisHost: process.env.SESSION_REDIS_HOST,
     sessionRedisPort: process.env.SESSION_REDIS_PORT,
@@ -46,6 +50,8 @@ Your R-Crew`
     }
   }
   const { ensureLoggedIn, withUser } = authServer.configure(server, authConfig)
+
+  graphql(server)
 
   server.get('/test', ensureLoggedIn, withUser, function(req, res) {
     console.log("/test")
