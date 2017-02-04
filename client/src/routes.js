@@ -1,5 +1,6 @@
 import App from './App'
 import DashboardPage from './containers/DashboardPage'
+import UsersPage from './containers/UsersPage'
 import { Session, routes as authRoutes } from '@project-r/auth-gui'
 
 const routes = {
@@ -16,6 +17,12 @@ const routes = {
     {
       path: '/dashboard',
       component: DashboardPage,
+      onEnter: Session.requireAuth
+    },
+
+    {
+      path: '/users',
+      component: UsersPage,
       onEnter: Session.requireAuth
     }
   ]
