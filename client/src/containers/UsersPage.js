@@ -25,13 +25,17 @@ class UsersPage extends React.Component {
 
     const columns = [{
       header: 'ID',
-      accessor: 'id' // String-based value accessors !
+      accessor: 'id'
     }, {
       header: 'email',
       accessor: 'email',
     }, {
       header: 'createdAt',
       accessor: 'createdAt',
+    }, {
+      header: 'roles',
+      id: 'roles',
+      accessor: row => row.roles.map( r => r.name).join(', ')
     }]
 
     return <ReactTable
