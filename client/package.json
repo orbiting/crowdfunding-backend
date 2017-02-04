@@ -11,8 +11,6 @@
     "react-router": "^3.0.2",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.64.3",
-    "tcomb-form": "^0.9.10",
-    "tcomb-form-templates-semantic": "^0.2.0",
     "@project-r/auth-gui": "*"
   },
   "scripts": {
