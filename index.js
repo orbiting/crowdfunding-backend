@@ -55,7 +55,7 @@ Your R-Crew`
 
   server.get('/test', ensureLoggedIn, withUser, function(req, res) {
     console.log("/test")
-    console.log(res.locals.user)
+    //console.log(res.locals.user)
     res.end("you are logged in")
   })
 
