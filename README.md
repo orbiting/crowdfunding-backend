@@ -1,4 +1,4 @@
-# Users & Roles - Project R
+# Crowdfunding Server - Project R
 
 ## Development
 You need to have redis installed and running.
@@ -19,21 +19,18 @@ USERS_DB_URL=postgres://postgres:PASSWORD@172.17.0.1:54321/postgres
 ```
 
 ### Dependencies
-This project uses the @project-r/auth-server and @project-r/auth-gui packages. You have to be part of the @project-r npmjs.org team to be able to `npm install` them. You can also use them locally via `npm link`
+This project uses the @project-r/auth-server package. You have to be part of the @project-r npmjs.org team to be able to `npm install` it. You can also use them locally via `npm link`
 ```
 cd auth-server
 npm link
-cd ../auth-gui
-npm link
-cd ../users-and-roles
+cd ../cf_server
 npm link @project-r/auth-server
-npm link @project-r/auth-gui
 ```
 
 ### Run it
 ```
 npm install
-npm start       # <- starts react-scripts for client and nodemon for server
+npm start
 ```
 
 ## Production
@@ -41,6 +38,6 @@ TODO
 
 
 ## Setup
-This repo hold a client (with create-react-app) and a server (with babel-node). The setup is inspired by these docs:
+This server proxies requests to the cf_admin client (create-react-app). The setup is inspired by these docs:
 - https://www.fullstackreact.com/articles/using-create-react-app-with-a-server/
 - https://github.com/babel/example-node-server
