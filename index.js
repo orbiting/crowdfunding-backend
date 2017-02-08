@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // TODO cleanup
 //authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
-const {User} = require('./graphql/connectors')
+const User = require('./models/user')
 Promise.resolve(true)
 .then((db) => {
   const authConfig = {
