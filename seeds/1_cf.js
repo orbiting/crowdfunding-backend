@@ -18,8 +18,6 @@ exports.seed = function(knex, Promise) {
     crowdfundingId = parseInt(crowdfundingId)
     return knex('users').where('email', 'patrick.recher@project-r.construction').select('id').then( (userId) => {
       userId = parseInt(userId[0].id)
-      console.log("crowdfundingId", crowdfundingId)
-      console.log("userId", userId)
       return knex('pledges').insert({
         crowdfunding_id: crowdfundingId,
         user_id: userId,
@@ -52,14 +50,14 @@ exports.seed = function(knex, Promise) {
             knex('items_pledges').insert({
               item_id: itemIds[0],
               pledge_id: pledgeId,
-              numItems: 1,
+              num_items: 1,
               created_at: new Date(),
               updated_at: new Date()
             }),
             knex('items_pledges').insert({
               item_id: itemIds[1],
               pledge_id: pledgeId,
-              numItems: 2,
+              num_items: 2,
               created_at: new Date(),
               updated_at: new Date()
             })

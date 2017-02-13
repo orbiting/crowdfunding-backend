@@ -38,7 +38,7 @@ exports.up = function(knex) {
         .onUpdate('CASCADE').onDelete('CASCADE').notNullable()
       table.integer('pledge_id').references('id').inTable('pledges')
         .onUpdate('CASCADE').onDelete('CASCADE').notNullable()
-      table.integer('numItems')
+      table.integer('num_items')
       table.timestamps()
     })
   }).then(function() {
