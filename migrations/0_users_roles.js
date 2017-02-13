@@ -13,8 +13,10 @@ exports.up = function(knex) {
       }).then( function() {
         return knex.schema.createTable('roles_users', function(table) {
           table.increments('id').primary()
-          table.integer('user_id').references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE')
-          table.integer('role_id').references('id').inTable('roles').onUpdate('CASCADE').onDelete('CASCADE')
+          table.integer('user_id').references('id').inTable('users')
+            .onUpdate('CASCADE').onDelete('CASCADE').notNullable()
+          table.integer('role_id').references('id').inTable('roles')
+            .onUpdate('CASCADE').onDelete('CASCADE').notNullable()
           table.timestamps()
         })
       })
