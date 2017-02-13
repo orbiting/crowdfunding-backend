@@ -11,6 +11,7 @@
     "babel-preset-stage-0": "6.5.0",
     "body-parser": "^1.15.2",
     "bookshelf": "^0.10.3",
+    "bookshelf-camelcase": "^1.1.4",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",

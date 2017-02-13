@@ -4,16 +4,16 @@ type User {
   name: String
   email: String
   roles: [Role]
-  created_at: String
-  updated_at: String
+  createdAt: String
+  updatedAt: String
 }
 type Role {
   id: Int
   name: String
   description: String
   users: [User]
-  created_at: String
-  updated_at: String
+  createdAt: String
+  updatedAt: String
 }
 
 type RootQuery {
