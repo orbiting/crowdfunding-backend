@@ -14,7 +14,7 @@ type RootQuery {
   roles(id: Int): [Role]
   users(id: Int, email: String): [User]
 
-  crowdfundings(id: Int): [Crowdfunding]
+  crowdfundings(ids: [Int]): [Crowdfunding]
   pledges(id: Int, user_id: Int): [Pledge]
 }
 

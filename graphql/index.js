@@ -10,12 +10,22 @@ const executableSchema = makeExecutableSchema({
   resolvers: Resolvers
 })
 
-module.exports = server => {
-  server.use(
-    '/graphql',
+const createLoaders = require('./loaders')
+
+//#graphqlExpress(request => ({
+//#      schema: executableSchema,
+//#    }))
+module.exports = (server, pgdb) => {
+
+
+
+  server.use('/graphql',
     bodyParser.json(),
     graphqlExpress({
-      schema: executableSchema
+      schema: executableSchema,
+      context: {
+        loaders: createLoaders(pgdb)
+      }
     })
   )
 

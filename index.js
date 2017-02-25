@@ -25,39 +25,42 @@ if (process.env.NODE_ENV === 'production') {
 
 // TODO cleanup
 //authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
-const User = require('./models/user')
-Promise.resolve(true)
-.then((db) => {
-  const authConfig = {
-    //db: db,
-    userModel: User,
-    serverUrl: process.env.PUBLIC_URL,
-    sessionRedisHost: process.env.SESSION_REDIS_HOST,
-    sessionRedisPort: process.env.SESSION_REDIS_PORT,
-    passwordlessRedisHost: process.env.PASSWORDLESS_REDIS_HOST,
-    passwordlessRedisPort: process.env.PASSWORDLESS_REDIS_PORT,
-    secret: process.env.SESSION_SECRET,
-    mailUrl: process.env.MAIL_URL,
-    mailFromAddress: process.env.MAIL_FROM_ADDRESS,
-    mailSubject: 'Login to Project R',
-    mailContent: function(link) {
-      return `Ma’am, Sir,
+//const User = require('./models/user')
 
-you can now access your account here:
-${link}
+//Promise.resolve(true).then((db) => {
+import {PgDb} from "pogi";
+PgDb.connect({connectionString: process.env.USERS_DB_URL}).then( pgdb  => {
 
-Your R-Crew`
-    }
-  }
-  const { ensureLoggedIn, withUser } = authServer.configure(server, authConfig)
+//  const authConfig = {
+//    //db: db,
+//    userModel: User,
+//    serverUrl: process.env.PUBLIC_URL,
+//    sessionRedisHost: process.env.SESSION_REDIS_HOST,
+//    sessionRedisPort: process.env.SESSION_REDIS_PORT,
+//    passwordlessRedisHost: process.env.PASSWORDLESS_REDIS_HOST,
+//    passwordlessRedisPort: process.env.PASSWORDLESS_REDIS_PORT,
+//    secret: process.env.SESSION_SECRET,
+//    mailUrl: process.env.MAIL_URL,
+//    mailFromAddress: process.env.MAIL_FROM_ADDRESS,
+//    mailSubject: 'Login to Project R',
+//    mailContent: function(link) {
+//      return `Ma’am, Sir,
+//
+//you can now access your account here:
+//${link}
+//
+//Your R-Crew`
+//    }
+//  }
+//  const { ensureLoggedIn, withUser } = authServer.configure(server, authConfig)
 
-  graphql(server)
+  graphql(server, pgdb)
 
-  server.get('/test', ensureLoggedIn, withUser, function(req, res) {
-    console.log("/test")
-    //console.log(res.locals.user)
-    res.end("you are logged in")
-  })
+  //server.get('/test', ensureLoggedIn, withUser, function(req, res) {
+  //  console.log("/test")
+  //  //console.log(res.locals.user)
+  //  res.end("you are logged in")
+  //})
 
 
 	// in DEV the client is run via react-scripts via a separate server
