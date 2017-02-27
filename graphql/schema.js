@@ -16,7 +16,10 @@ type RootQuery {
 
   crowdfundings(ids: [Int]): [Crowdfunding]
   pledges(id: Int, user_id: Int): [Pledge]
+
+  packages: [Package]
 }
+
 
 type User {
   id: Int
@@ -35,6 +38,7 @@ type Role {
   updatedAt: String
 }
 
+
 type Crowdfunding {
   id: Int
   name: String
@@ -42,35 +46,65 @@ type Crowdfunding {
   endDate: Date
   goalPeople: Int
   goalMoney: Int
-  items: [Item]
-  createdAt: String
-  updatedAt: String
-}
-type Item {
-  id: Int
-  name: String
-  description: String
-  price: Int
-  itemPledges: [ItemPledge]
-  createdAt: String
-  updatedAt: String
-}
-type ItemPledge {
-  id: Int
-  item: Item
-  pledge: Pledge
-  numItems: Int
-}
-type Pledge {
-  id: Int
-  user: User
-  itemPledges: [ItemPledge]
-  brutto: Int
-  payed: Boolean
   createdAt: String
   updatedAt: String
 }
 
+type Package {
+  id: ID!
+  name: String!
+  options: [PackageOption!]!
+
+  templateId: ID
+}
+type PackageOption {
+  id: ID!
+  package: Package!
+  reward: Reward!
+  minAmount: Int!
+  maxAmount: Int
+  defaultAmount: Int!
+  price: Int!
+  userPrice: Boolean!
+
+  amount: Int
+  templateId: ID
+}
+type Goodie {
+  id: ID!
+  name: String
+}
+type MembershipType {
+  id: ID!
+  name: String
+  duration: Int
+}
+union Reward = Goodie | MembershipType
+
+enum PledgeStatus {
+  DRAFT
+  PAID
+  REFUNDED
+}
+
+type Pledge {
+  id: ID!
+  crowdfunding: Crowdfunding!
+  status: PledgeStatus!
+  package: Package!
+  total: Int!
+  payments: [PledgePayment!]!
+  user: User!
+}
+
+
+type PledgePayment {
+  id: ID!
+  user: User!
+  pledge: Pledge!
+  total
+  status
+}
 `
 
 module.exports = [typeDefinitions]
