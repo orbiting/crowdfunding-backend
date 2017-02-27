@@ -1,27 +1,27 @@
-exports.seed = function(knex, Promise) {
-  return Promise.all([
-    knex('roles_users').del(),
-    knex('roles').del(),
-    knex('users').del()
-  ]).then( () => {
-    return knex('roles').insert({
-      name: "admin",
-      description: "admins are kind",
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('id')
-  }).then( (roleId) => {
-    return knex('users').insert({
-      email: 'patrick.recher@project-r.construction',
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('id').then( (userId) => {
-      return knex('roles_users').insert({
-        user_id: parseInt(userId),
-        role_id: parseInt(roleId),
-        created_at: new Date(),
-        updated_at: new Date()
-      })
-    })
+exports.seed = async function(knex, Promise) {
+  await knex('cf.users_roles').del()
+  await knex('cf.roles').del()
+  await knex('cf.users').del()
+
+  let adminsId = await knex('cf.roles').insert({
+    name: "admin",
+    description: "admins are kind",
+    created_at: new Date(),
+    updated_at: new Date()
+  }).returning('id')
+  adminsId = parseInt(adminsId)
+
+  let userId = await knex('cf.users').insert({
+    email: 'patrick.recher@project-r.construction',
+    created_at: new Date(),
+    updated_at: new Date()
+  }).returning('id')
+  userId = parseInt(userId)
+
+  await knex('cf.users_roles').insert({
+    user_id: userId,
+    role_id: adminsId,
+    created_at: new Date(),
+    updated_at: new Date()
   })
 }

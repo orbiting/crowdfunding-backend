@@ -1,0 +1,12 @@
+begin;
+drop table cf.pledge_options;
+drop table cf.pledges;
+drop table cf.membership_types;
+drop table cf.goodies;
+drop table cf.package_options;
+drop table cf.rewards;
+drop table cf.packages;
+drop table cf.crowdfundings;
+drop type cf.reward_type;
+drop type cf.pledge_status;
+commit;
