@@ -42,17 +42,7 @@ const resolveFunctions = {
         .then( roles => { return roles.toJSON() })
     },
     async crowdfundings(_, args, context) {
-      console.log(context)
-      console.log(args)
       return await context.loaders.crowdfundings.load(args.ids)
-      console.log("----------")
-      console.log(crowdfunding)
-      console.log("----------")
-
-      //return Crowdfunding
-      //  .where(args)
-      //  .fetchAll()
-      //  .then( cfs => { return cfs.toJSON() })
     },
     pledges(_, args) {
       return Pledge
