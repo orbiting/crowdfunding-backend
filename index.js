@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'production') {
 
 //Promise.resolve(true).then((db) => {
 import {PgDb} from "pogi";
-PgDb.connect({connectionString: process.env.USERS_DB_URL}).then( pgdb  => {
+PgDb.connect({connectionString: process.env.DATABASE_URL}).then( pgdb  => {
 
 //  const authConfig = {
 //    //db: db,
