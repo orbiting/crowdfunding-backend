@@ -102,8 +102,8 @@ type PledgePayment {
   id: ID!
   user: User!
   pledge: Pledge!
-  total
-  status
+  total: Int!
+  status: String
 }
 `
 
