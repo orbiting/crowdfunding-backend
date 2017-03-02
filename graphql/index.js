@@ -18,7 +18,8 @@ module.exports = (server, pgdb) => {
     graphqlExpress({
       schema: executableSchema,
       context: {
-        loaders: createLoaders(pgdb)
+        loaders: createLoaders(pgdb),
+        pgdb
       }
     })
   )
