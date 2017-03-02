@@ -10,8 +10,6 @@
     "babel-preset-es2015": "6.22.0",
     "babel-preset-stage-0": "6.22.0",
     "body-parser": "^1.16.1",
-    "bookshelf": "^0.10.3",
-    "bookshelf-camelcase": "^1.1.4",
     "cookie-parser": "^1.4.3",
     "dataloader": "^1.3.0",
     "db-migrate": "^0.10.0-beta.20",

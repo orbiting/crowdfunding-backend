@@ -14,46 +14,46 @@ type RootQuery {
   roles(id: Int): [Role]
   users(id: Int, email: String): [User]
 
-  crowdfundings(ids: [Int]): [Crowdfunding]
-  pledges(id: Int, user_id: Int): [Pledge]
-
-  packages: [Package]
+  crowdfundings(id: [Int]): [Crowdfunding]
 }
 
 
 type User {
-  id: Int
+  id: ID!
   name: String
-  email: String
+  email: String!
   roles: [Role]
-  createdAt: String
-  updatedAt: String
+  createdAt: Date!
+  updatedAt: Date!
 }
 type Role {
-  id: Int
+  id: ID!
   name: String
   description: String
   users: [User]
-  createdAt: String
-  updatedAt: String
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 
 type Crowdfunding {
-  id: Int
-  name: String
-  beginDate: Date
-  endDate: Date
-  goalPeople: Int
-  goalMoney: Int
-  createdAt: String
-  updatedAt: String
+  id: Int!
+  name: String!
+  beginDate: Date!
+  endDate: Date!
+  goalPeople: Int!
+  goalMoney: Int!
+  packages: [Package!]!
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type Package {
   id: ID!
   name: String!
   options: [PackageOption!]!
+  createdAt: Date!
+  updatedAt: Date!
 
   templateId: ID
 }
@@ -66,18 +66,24 @@ type PackageOption {
   defaultAmount: Int!
   price: Int!
   userPrice: Boolean!
+  createdAt: Date!
+  updatedAt: Date!
 
   amount: Int
   templateId: ID
 }
 type Goodie {
   id: ID!
-  name: String
+  name: String!
+  createdAt: Date!
+  updatedAt: Date!
 }
 type MembershipType {
   id: ID!
-  name: String
-  duration: Int
+  name: String!
+  duration: Int!
+  createdAt: Date!
+  updatedAt: Date!
 }
 union Reward = Goodie | MembershipType
 
@@ -95,6 +101,8 @@ type Pledge {
   total: Int!
   payments: [PledgePayment!]!
   user: User!
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 
@@ -104,7 +112,8 @@ type PledgePayment {
   pledge: Pledge!
   total: Int!
   status: String
+  createdAt: Date!
+  updatedAt: Date!
 }
 `
-
 module.exports = [typeDefinitions]

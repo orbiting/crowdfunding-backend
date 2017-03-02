@@ -1,14 +1,21 @@
-require('dotenv').config()
 const DataLoader = require('dataloader')
 
 module.exports = (pgdb) => {
   return {
-    crowdfundings: new DataLoader(async (keys) => {
-      return Promise.all(keys.map(async () => {
-        let table = pgdb['cf']['crowdfundings']
-        const response = await table.find( {id: keys[0]} )
-        return response
-      }));
-    })
+    users: new DataLoader( (keys) => {
+      return pgdb.public.users.find( {id: keys} )
+    }),
+    usersRolesForUserIds: new DataLoader( (keys) => {
+      return pgdb.public.usersRoles.find( {userId: keys} )
+    }),
+    usersRolesForRoleIds: new DataLoader( (keys) => {
+      return pgdb.public.usersRoles.find( {roleId: keys} )
+    }),
+    roles: new DataLoader( (keys) => {
+      return pgdb.public.roles.find( {id: keys} )
+    }),
+    rewards: new DataLoader( (keys) => {
+      return pgdb.public.rewards.find( {id: keys} )
+    }),
   }
 }

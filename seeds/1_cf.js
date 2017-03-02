@@ -1,193 +1,193 @@
 exports.seed = async function(knex, Promise) {
-  await knex('cf.pledge_options').del()
-  await knex('cf.pledges').del()
-  await knex('cf.package_options').del()
-  await knex('cf.packages').del()
-  await knex('cf.membership_types').del()
-  await knex('cf.goodies').del()
-  await knex('cf.rewards').del()
-  await knex('cf.crowdfundings').del()
+  await knex('pledgeOptions').del()
+  await knex('pledges').del()
+  await knex('packageOptions').del()
+  await knex('packages').del()
+  await knex('membershipTypes').del()
+  await knex('goodies').del()
+  await knex('rewards').del()
+  await knex('crowdfundings').del()
 
-  let crowdfundingId = await knex('cf.crowdfundings').insert({
+  let crowdfundingId = await knex('crowdfundings').insert({
     name: "all or nothing",
-    begin_date: new Date("2017-02-13T17:28:14.740Z"),
-    end_date: new Date("2017-03-13T23:59:59.000Z"),
-    goal_people: 3000,
-    goal_money: 75000000,
-    created_at: new Date(),
-    updated_at: new Date()
+    beginDate: new Date("2017-02-13T17:28:14.740Z"),
+    endDate: new Date("2017-03-13T23:59:59.000Z"),
+    goalPeople: 3000,
+    goalMoney: 75000000,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   crowdfundingId = parseInt(crowdfundingId)
 
   ///////////////////////////////////////////////////////////
 
-  let rewardPosterId = await knex('cf.rewards').insert({
-    type: "GOODIE",
-    created_at: new Date(),
-    updated_at: new Date()
+  let rewardPosterId = await knex('rewards').insert({
+    type: "Goodie",
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   rewardPosterId = parseInt(rewardPosterId)
 
-  let goodiePosterId = await knex('cf.goodies').insert({
-    reward_id: rewardPosterId,
-    reward_type: "GOODIE",
+  let goodiePosterId = await knex('goodies').insert({
+    rewardId: rewardPosterId,
+    rewardType: "Goodie",
     name: "poster",
-    created_at: new Date(),
-    updated_at: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   goodiePosterId = parseInt(goodiePosterId)
 
 
-  let rewardLetterId = await knex('cf.rewards').insert({
-    type: "GOODIE",
-    created_at: new Date(),
-    updated_at: new Date()
+  let rewardLetterId = await knex('rewards').insert({
+    type: "Goodie",
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   rewardLetterId = parseInt(rewardLetterId)
 
-  let goodieLetterId = await knex('cf.goodies').insert({
-    reward_id: rewardLetterId,
-    reward_type: "GOODIE",
+  let goodieLetterId = await knex('goodies').insert({
+    rewardId: rewardLetterId,
+    rewardType: "Goodie",
     name: "letter",
-    created_at: new Date(),
-    updated_at: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   goodieLetterId = parseInt(goodieLetterId)
 
 
-  let rewardMembership0Id = await knex('cf.rewards').insert({
-    type: "MEMBERSHIP",
-    created_at: new Date(),
-    updated_at: new Date()
+  let rewardMembership0Id = await knex('rewards').insert({
+    type: "MembershipType",
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   rewardMembership0Id = parseInt(rewardMembership0Id)
 
-  let membershipType0Id = await knex('cf.membership_types').insert({
-    reward_id: rewardMembership0Id,
-    reward_type: "MEMBERSHIP",
+  let membershipType0Id = await knex('membershipTypes').insert({
+    rewardId: rewardMembership0Id,
+    rewardType: "MembershipType",
     name: "awesome 1 year membership",
     duration: 360,
     price: 24000,
-    created_at: new Date(),
-    updated_at: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   membershipType0Id = parseInt(membershipType0Id)
 
   ///////////////////////////////////////////////////////////
 
-  let package0Id = await knex('cf.packages').insert({
+  let package0Id = await knex('packages').insert({
     name: "no satisfaction",
-    crowdfunding_id: crowdfundingId,
-    created_at: new Date(),
-    updated_at: new Date()
+    crowdfundingId: crowdfundingId,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package0Id = parseInt(package0Id)
 
-  let package0Option0Id = await knex('cf.package_options').insert({
-    package_id: package0Id,
-    reward_id: rewardLetterId,
-    min_amount: 1,
-    max_amount: 1,
-    default_amount: 1,
+  let package0Option0Id = await knex('packageOptions').insert({
+    packageId: package0Id,
+    rewardId: rewardLetterId,
+    minAmount: 1,
+    maxAmount: 1,
+    defaultAmount: 1,
     price: 7000,
-    user_price: false,
-    created_at: new Date(),
-    updated_at: new Date()
+    userPrice: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package0Option0Id = parseInt(package0Option0Id)
 
 
-  let package1Id = await knex('cf.packages').insert({
+  let package1Id = await knex('packages').insert({
     name: "feel good",
-    crowdfunding_id: crowdfundingId,
-    created_at: new Date(),
-    updated_at: new Date()
+    crowdfundingId: crowdfundingId,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package1Id = parseInt(package1Id)
 
-  let package1Option0Id = await knex('cf.package_options').insert({
-    package_id: package0Id,
-    reward_id: rewardPosterId,
-    min_amount: 1,
-    max_amount: 20,
-    default_amount: 1,
+  let package1Option0Id = await knex('packageOptions').insert({
+    packageId: package1Id,
+    rewardId: rewardPosterId,
+    minAmount: 1,
+    maxAmount: 20,
+    defaultAmount: 1,
     price: 2000,
-    user_price: false,
-    created_at: new Date(),
-    updated_at: new Date()
+    userPrice: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package1Option0Id = parseInt(package1Option0Id)
 
-  let package1Option1Id = await knex('cf.package_options').insert({
-    package_id: package0Id,
-    reward_id: rewardMembership0Id,
-    min_amount: 1,
-    max_amount: 20,
-    default_amount: 1,
+  let package1Option1Id = await knex('packageOptions').insert({
+    packageId: package1Id,
+    rewardId: rewardMembership0Id,
+    minAmount: 1,
+    maxAmount: 20,
+    defaultAmount: 1,
     price: 22000,
-    user_price: true,
-    created_at: new Date(),
-    updated_at: new Date()
+    userPrice: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package1Option1Id = parseInt(package1Option1Id)
 
 
-  let package2Id = await knex('cf.packages').insert({
+  let package2Id = await knex('packages').insert({
     name: "buy one give n",
-    crowdfunding_id: crowdfundingId,
-    created_at: new Date(),
-    updated_at: new Date()
+    crowdfundingId: crowdfundingId,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package2Id = parseInt(package2Id)
 
-  let package2Option0Id = await knex('cf.package_options').insert({
-    package_id: package0Id,
-    reward_id: rewardMembership0Id,
-    min_amount: 1,
-    max_amount: 1,
-    default_amount: 1,
+  let package2Option0Id = await knex('packageOptions').insert({
+    packageId: package2Id,
+    rewardId: rewardMembership0Id,
+    minAmount: 1,
+    maxAmount: 1,
+    defaultAmount: 1,
     price: 24000,
-    user_price: false,
-    created_at: new Date(),
-    updated_at: new Date()
+    userPrice: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package2Option0Id = parseInt(package2Option0Id)
 
-  let package2Option1Id = await knex('cf.package_options').insert({
-    package_id: package0Id,
-    reward_id: rewardMembership0Id,
-    min_amount: 1,
-    max_amount: 20,
-    default_amount: 1,
+  let package2Option1Id = await knex('packageOptions').insert({
+    packageId: package2Id,
+    rewardId: rewardMembership0Id,
+    minAmount: 1,
+    maxAmount: 20,
+    defaultAmount: 1,
     price: 24000,
-    user_price: false,
-    created_at: new Date(),
-    updated_at: new Date()
+    userPrice: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   package2Option1Id = parseInt(package2Option1Id)
 
   ///////////////////////////////////////////////////////////
 
-  let user0 = await knex('cf.users').where('email', 'patrick.recher@project-r.construction')
+  let user0 = await knex('users').where('email', 'patrick.recher@project-r.construction')
   user0 = user0[0]
 
-  let pledge0Id = await knex('cf.pledges').insert({
-    package_id: package0Id,
-    user_id: user0.id,
+  let pledge0Id = await knex('pledges').insert({
+    packageId: package0Id,
+    userId: user0.id,
     status: 'DRAFT',
     total: 7000,
-    created_at: new Date(),
-    updated_at: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }).returning('id')
   pledge0Id = parseInt(pledge0Id)
 
-  let pledge0Option0Id = await knex('cf.pledge_options').insert({
-    template_id: package0Option0Id,
-    pledge_id: pledge0Id,
+  let pledge0Option0Id = await knex('pledgeOptions').insert({
+    templateId: package0Option0Id,
+    pledgeId: pledge0Id,
     amount: 1,
     price: 7000,
-    created_at: new Date(),
-    updated_at: new Date()
+    createdAt: new Date(),
+    updatedAt: new Date()
   })
   pledge0Option0Id = parseInt(pledge0Option0Id)
 
