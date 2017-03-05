@@ -11,6 +11,7 @@ type RootQuery {
   users(id: ID, email: String): [User]
 
   crowdfundings(id: [ID]): [Crowdfunding]
+  pledges: [Pledge]
 }
 
 type RootMutation {

@@ -29,6 +29,11 @@ const resolveFunctions = {
     async crowdfundings(_, args, {loaders, pgdb}) {
       return pgdb.public.crowdfundings.find( args )
     },
+    async pledges(_, args, {loaders, pgdb}) {
+      //dummy user
+      const user = await pgdb.public.users.findOne( {email: 'patrick.recher@project-r.construction'} )
+      return pgdb.public.pledges.find( {userId: user.id} )
+    }
   },
 
   User: {
@@ -69,6 +74,23 @@ const resolveFunctions = {
     __resolveType(obj, context, info) {
       // obj is the entity from the DB and thus has the "rewardType" column used as FK
       return obj.rewardType;
+    }
+  },
+  Pledge: {
+    async options(pledge, args, {loaders, pgdb}) {
+      const pledgeOptions = await pgdb.public.pledgeOptions.find( {pledgeId: pledge.id} )
+      const pledgeOptionTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
+      const packageOptions = await pgdb.public.packageOptions.find( {id: pledgeOptionTemplateIds} )
+
+      return packageOptions.map( (pko) => {
+        const plo = pledgeOptions.find( (plo) => plo.templateId==pko.id )
+        if(!plo) throw new Error("this should not happen")
+        pko.id = plo.pledgeId+'-'+plo.templateId //combinded primary key
+        pko.amount = plo.amount
+        pko.templateId = plo.templateId
+        pko.price = plo.price
+        return pko
+      })
     }
   },
 
