@@ -1,3 +1,4 @@
+import {PgDb} from "pogi";
 import cors from 'cors';
 const express = require('express')
 const authServer = require('@project-r/auth-server')
@@ -33,7 +34,6 @@ server.use('*', cors())
 //const User = require('./models/user')
 
 //Promise.resolve(true).then((db) => {
-import {PgDb} from "pogi";
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( pgdb  => {
 
 //  const authConfig = {
