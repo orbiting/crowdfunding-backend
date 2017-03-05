@@ -1,3 +1,4 @@
+import cors from 'cors';
 const express = require('express')
 const authServer = require('@project-r/auth-server')
 require('dotenv').config()
@@ -22,6 +23,9 @@ server.use(function(req, res, next) {
 if (process.env.NODE_ENV === 'production') {
   server.use(express.static('dist/client_build'));
 }
+
+//FIXME
+server.use('*', cors())
 
 // TODO cleanup
 //authServer.prepareDB( {dbUrl: process.env.USERS_DB_URL} )
