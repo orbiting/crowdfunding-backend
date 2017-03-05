@@ -17,7 +17,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  crowdfundingId = parseInt(crowdfundingId)
+  crowdfundingId = crowdfundingId[0]
 
   ///////////////////////////////////////////////////////////
 
@@ -26,7 +26,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  rewardPosterId = parseInt(rewardPosterId)
+  rewardPosterId = rewardPosterId[0]
 
   let goodiePosterId = await knex('goodies').insert({
     rewardId: rewardPosterId,
@@ -35,7 +35,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  goodiePosterId = parseInt(goodiePosterId)
+  goodiePosterId = goodiePosterId[0]
 
 
   let rewardLetterId = await knex('rewards').insert({
@@ -43,7 +43,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  rewardLetterId = parseInt(rewardLetterId)
+  rewardLetterId = rewardLetterId[0]
 
   let goodieLetterId = await knex('goodies').insert({
     rewardId: rewardLetterId,
@@ -52,7 +52,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  goodieLetterId = parseInt(goodieLetterId)
+  goodieLetterId = goodieLetterId[0]
 
 
   let rewardMembership0Id = await knex('rewards').insert({
@@ -60,7 +60,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  rewardMembership0Id = parseInt(rewardMembership0Id)
+  rewardMembership0Id = rewardMembership0Id[0]
 
   let membershipType0Id = await knex('membershipTypes').insert({
     rewardId: rewardMembership0Id,
@@ -71,7 +71,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  membershipType0Id = parseInt(membershipType0Id)
+  membershipType0Id = membershipType0Id[0]
 
   ///////////////////////////////////////////////////////////
 
@@ -81,7 +81,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package0Id = parseInt(package0Id)
+  package0Id = package0Id[0]
 
   let package0Option0Id = await knex('packageOptions').insert({
     packageId: package0Id,
@@ -94,7 +94,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package0Option0Id = parseInt(package0Option0Id)
+  package0Option0Id = package0Option0Id[0]
 
 
   let package1Id = await knex('packages').insert({
@@ -103,7 +103,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package1Id = parseInt(package1Id)
+  package1Id = package1Id[0]
 
   let package1Option0Id = await knex('packageOptions').insert({
     packageId: package1Id,
@@ -116,7 +116,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package1Option0Id = parseInt(package1Option0Id)
+  package1Option0Id = package1Option0Id[0]
 
   let package1Option1Id = await knex('packageOptions').insert({
     packageId: package1Id,
@@ -129,7 +129,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package1Option1Id = parseInt(package1Option1Id)
+  package1Option1Id = package1Option1Id[0]
 
 
   let package2Id = await knex('packages').insert({
@@ -138,7 +138,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package2Id = parseInt(package2Id)
+  package2Id = package2Id[0]
 
   let package2Option0Id = await knex('packageOptions').insert({
     packageId: package2Id,
@@ -151,7 +151,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package2Option0Id = parseInt(package2Option0Id)
+  package2Option0Id = package2Option0Id[0]
 
   let package2Option1Id = await knex('packageOptions').insert({
     packageId: package2Id,
@@ -164,7 +164,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  package2Option1Id = parseInt(package2Option1Id)
+  package2Option1Id = package2Option1Id[0]
 
   ///////////////////////////////////////////////////////////
 
@@ -179,7 +179,7 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  pledge0Id = parseInt(pledge0Id)
+  pledge0Id = pledge0Id[0]
 
   let pledge0Option0Id = await knex('pledgeOptions').insert({
     templateId: package0Option0Id,
@@ -189,6 +189,6 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   })
-  pledge0Option0Id = parseInt(pledge0Option0Id)
+  pledge0Option0Id = pledge0Option0Id[0]
 
 }

@@ -7,10 +7,10 @@ schema {
 }
 
 type RootQuery {
-  roles(id: Int): [Role]
-  users(id: Int, email: String): [User]
+  roles(id: ID): [Role]
+  users(id: ID, email: String): [User]
 
-  crowdfundings(id: [Int]): [Crowdfunding]
+  crowdfundings(id: [ID]): [Crowdfunding]
 }
 
 type RootMutation {
@@ -38,7 +38,7 @@ type Role {
 
 
 type Crowdfunding {
-  id: Int!
+  id: ID!
   name: String!
   beginDate: Date!
   endDate: Date!
@@ -75,7 +75,7 @@ type PackageOption {
 input PackageOptionInput {
   amount: Int!
   price: Int!
-  templateId: Int!
+  templateId: ID!
 }
 
 type Goodie {

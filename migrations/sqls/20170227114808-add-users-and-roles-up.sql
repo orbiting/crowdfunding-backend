@@ -1,12 +1,14 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 create table "users" (
-  "id"          serial primary key,
+  "id"          uuid primary key not null default uuid_generate_v4(),
   "email"       text not null unique check ("email" ~* '^.+@.+\..+$'),
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );
 
 create table "roles" (
-  "id"          serial primary key,
+  "id"          uuid primary key not null default uuid_generate_v4(),
   "name"        varchar not null,
   "description" text not null,
   "createdAt"   timestamptz default now(),
@@ -14,8 +16,8 @@ create table "roles" (
 );
 
 create table "usersRoles" (
-  "userId"      integer not null references "users"(id) on update cascade on delete cascade,
-  "roleId"      integer not null references "roles"(id) on update cascade on delete cascade,
+  "userId"      uuid not null references "users"(id) on update cascade on delete cascade,
+  "roleId"      uuid not null references "roles"(id) on update cascade on delete cascade,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );

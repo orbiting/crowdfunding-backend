@@ -9,14 +9,14 @@ exports.seed = async function(knex, Promise) {
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  adminsId = parseInt(adminsId)
+  adminsId = adminsId[0]
 
   let userId = await knex('users').insert({
     email: 'patrick.recher@project-r.construction',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
-  userId = parseInt(userId)
+  userId = userId[0]
 
   await knex('usersRoles').insert({
     userId: userId,
