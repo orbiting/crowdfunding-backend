@@ -73,35 +73,74 @@ const resolveFunctions = {
   },
 
   RootMutation: {
-    submitPledge(numItems) {
-      //FIXME numItems is undefined
-      //console.log("numItems", numItems)
-      //const _numItems = 20;
-      //return User.where({email: 'patrick.recher@project-r.construction'}).fetch().then( user => {
-      //  return Crowdfunding.where({name: 'all or nothing'}).fetch().then( cf => {
-      //    return Item.where({name: 'one membership'}).fetch().then( item => {
-      //      user = user.toJSON()
-      //      cf = cf.toJSON()
-      //      item = item.toJSON()
-      //      return new Pledge({
-      //        crowdfunding_id: cf.id,
-      //        user_id: user.id,
-      //        brutto: (item.price*_numItems),
-      //        payed: false
-      //      }).save().then( pledge => {
-      //        pledge = pledge.toJSON()
-      //        new ItemPledge({
-      //          pledge_id: pledge.id,
-      //          item_id: item.id,
-      //          numItems: _numItems
-      //        }).save().then( itemPledge => {
-      //          //pledge.itemPledges = [itemPledge]
-      //          return pledge
-      //        })
-      //      })
-      //    })
-      //  })
-      //})
+    async submitPledge(_, args, {loaders, pgdb}) {
+      console.log("submitPledge")
+      const transaction = await pgdb.transactionBegin()
+      let newPledge = null
+      try {
+        //dummy user
+        const user = await transaction.public.users.findOne( {email: 'patrick.recher@project-r.construction'} )
+
+        const { pledge } = args
+        const { packageOptions } = pledge
+        //console.log(pledge)
+
+        // load original of chosen packageOptions
+        let packageOptionTemplateIds = packageOptions.map( (po) => { return parseInt(po.templateId) } )
+        const ourPackageOptions = await transaction.public.packageOptions.find({id: packageOptionTemplateIds})
+
+        // check if all templateIds are valid
+        if(ourPackageOptions.length<packageOptions.length)
+          throw new Error("one or more of the claimed templateIds are/became invalid")
+
+        // check if packageOptions are all from the same package
+        let packageId = ourPackageOptions[0].id
+        ourPackageOptions.forEach( (opo) => {
+          if(packageId!==opo.packageId)
+            throw new Error("packageOptions must all be part of the same package!")
+        })
+
+        // check if amount > 0
+        // check if prices are correct / still the same
+        packageOptions.forEach( (po) => {
+          const opo = ourPackageOptions.find( (opo) => opo.id===po.templateId)
+          if(!opo) throw new Error("this should not happen")
+          if(po.amount <= 0)
+            throw new Error(`amount in packageOption (templateId: ${po.templateId}) must be > 0`)
+          if(po.price !== opo.price && !opo.userPrice)
+            throw new Error(`price in packageOption (templateId: ${po.templateId}) invalid/changed!`)
+        })
+
+        // check total
+        let total = 0
+        packageOptions.forEach( (po) => {
+          total += (po.amount * po.price)
+        })
+        if(total !== pledge.total)
+          throw new Error(`pledge.total (${pledge.total}) should be (${total})`)
+
+        //insert pledge
+        let newPledge = {
+          userId: user.id, //FIXME
+          packageId,
+          total
+        }
+        newPledge = await transaction.public.pledges.insertAndGet(newPledge)
+
+        //insert pledgeOptions
+        const newPackageOptions = await Promise.all(packageOptions.map( (po) => {
+          po.pledgeId = newPledge.id
+          return transaction.public.pledgeOptions.insertAndGet(po)
+        }))
+        newPledge.packageOptions = newPackageOptions
+        console.log(newPledge)
+
+        await transaction.transactionCommit()
+        return newPledge;
+      } catch(e) {
+        await transaction.transactionRollback()
+        throw e
+      }
     }
   }
 }

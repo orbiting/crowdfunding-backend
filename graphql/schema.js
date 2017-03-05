@@ -6,15 +6,15 @@ schema {
   mutation: RootMutation
 }
 
-type RootMutation {
-  submitPledge(numItems: Int!): Pledge
-}
-
 type RootQuery {
   roles(id: Int): [Role]
   users(id: Int, email: String): [User]
 
   crowdfundings(id: [Int]): [Crowdfunding]
+}
+
+type RootMutation {
+  submitPledge(pledge: PledgeInput): Pledge
 }
 
 
@@ -26,6 +26,7 @@ type User {
   createdAt: Date!
   updatedAt: Date!
 }
+
 type Role {
   id: ID!
   name: String
@@ -54,9 +55,8 @@ type Package {
   options: [PackageOption!]!
   createdAt: Date!
   updatedAt: Date!
-
-  templateId: ID
 }
+
 type PackageOption {
   id: ID!
   package: Package!
@@ -72,12 +72,19 @@ type PackageOption {
   amount: Int
   templateId: ID
 }
+input PackageOptionInput {
+  amount: Int!
+  price: Int!
+  templateId: Int!
+}
+
 type Goodie {
   id: ID!
   name: String!
   createdAt: Date!
   updatedAt: Date!
 }
+
 type MembershipType {
   id: ID!
   name: String!
@@ -85,6 +92,7 @@ type MembershipType {
   createdAt: Date!
   updatedAt: Date!
 }
+
 union Reward = Goodie | MembershipType
 
 enum PledgeStatus {
@@ -92,19 +100,22 @@ enum PledgeStatus {
   PAID
   REFUNDED
 }
-
 type Pledge {
   id: ID!
+  packageId: ID!
   crowdfunding: Crowdfunding!
   status: PledgeStatus!
-  package: Package!
+  packageOptions: [PackageOption!]!
   total: Int!
-  payments: [PledgePayment!]!
+  payments: [PledgePayment]
   user: User!
   createdAt: Date!
   updatedAt: Date!
 }
-
+input PledgeInput {
+  packageOptions: [PackageOptionInput!]!
+  total: Int!
+}
 
 type PledgePayment {
   id: ID!
