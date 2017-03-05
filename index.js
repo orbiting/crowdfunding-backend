@@ -3,6 +3,7 @@ const express = require('express')
 const authServer = require('@project-r/auth-server')
 require('dotenv').config()
 const graphql = require('./graphql')
+const raisenow = require('./src/raisenow')
 
 process.env.PORT = process.env.PORT || 3001
 
@@ -59,6 +60,8 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( pgdb  => {
 //  const { ensureLoggedIn, withUser } = authServer.configure(server, authConfig)
 
   graphql(server, pgdb)
+
+  raisenow(server, pgdb)
 
   //server.get('/test', ensureLoggedIn, withUser, function(req, res) {
   //  console.log("/test")
