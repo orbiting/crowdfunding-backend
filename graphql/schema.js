@@ -105,7 +105,7 @@ type Pledge {
   packageId: ID!
   crowdfunding: Crowdfunding!
   status: PledgeStatus!
-  packageOptions: [PackageOption!]!
+  options: [PackageOption!]!
   total: Int!
   payments: [PledgePayment]
   user: User!
@@ -113,7 +113,7 @@ type Pledge {
   updatedAt: Date!
 }
 input PledgeInput {
-  packageOptions: [PackageOptionInput!]!
+  options: [PackageOptionInput!]!
   total: Int!
 }
 

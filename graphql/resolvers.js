@@ -82,39 +82,39 @@ const resolveFunctions = {
         const user = await transaction.public.users.findOne( {email: 'patrick.recher@project-r.construction'} )
 
         const { pledge } = args
-        const { packageOptions } = pledge
-        //console.log(pledge)
+        const pledgeOptions = pledge.options
+        console.log(pledge)
 
         // load original of chosen packageOptions
-        let packageOptionTemplateIds = packageOptions.map( (po) => { return parseInt(po.templateId) } )
-        const ourPackageOptions = await transaction.public.packageOptions.find({id: packageOptionTemplateIds})
+        const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
+        const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
 
         // check if all templateIds are valid
-        if(ourPackageOptions.length<packageOptions.length)
+        if(packageOptions.length<pledgeOptions.length)
           throw new Error("one or more of the claimed templateIds are/became invalid")
 
         // check if packageOptions are all from the same package
-        let packageId = ourPackageOptions[0].id
-        ourPackageOptions.forEach( (opo) => {
-          if(packageId!==opo.packageId)
-            throw new Error("packageOptions must all be part of the same package!")
+        let packageId = packageOptions[0].packageId
+        packageOptions.forEach( (pko) => {
+          if(packageId!==pko.packageId)
+            throw new Error("options must all be part of the same package!")
         })
 
         // check if amount > 0
         // check if prices are correct / still the same
-        packageOptions.forEach( (po) => {
-          const opo = ourPackageOptions.find( (opo) => opo.id===po.templateId)
-          if(!opo) throw new Error("this should not happen")
-          if(po.amount <= 0)
-            throw new Error(`amount in packageOption (templateId: ${po.templateId}) must be > 0`)
-          if(po.price !== opo.price && !opo.userPrice)
-            throw new Error(`price in packageOption (templateId: ${po.templateId}) invalid/changed!`)
+        pledgeOptions.forEach( (plo) => {
+          const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
+          if(!pko) throw new Error("this should not happen")
+          if(plo.amount <= 0)
+            throw new Error(`amount in option (templateId: ${plo.templateId}) must be > 0`)
+          if(plo.price !== pko.price && !pko.userPrice)
+            throw new Error(`price in option (templateId: ${plo.templateId}) invalid/changed!`)
         })
 
         // check total
         let total = 0
-        packageOptions.forEach( (po) => {
-          total += (po.amount * po.price)
+        pledgeOptions.forEach( (plo) => {
+          total += (plo.amount * plo.price)
         })
         if(total !== pledge.total)
           throw new Error(`pledge.total (${pledge.total}) should be (${total})`)
@@ -128,11 +128,11 @@ const resolveFunctions = {
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 
         //insert pledgeOptions
-        const newPackageOptions = await Promise.all(packageOptions.map( (po) => {
-          po.pledgeId = newPledge.id
-          return transaction.public.pledgeOptions.insertAndGet(po)
+        const newPledgeOptions = await Promise.all(pledgeOptions.map( (plo) => {
+          plo.pledgeId = newPledge.id
+          return transaction.public.pledgeOptions.insertAndGet(plo)
         }))
-        newPledge.packageOptions = newPackageOptions
+        newPledge.packageOptions = newPledgeOptions
         console.log(newPledge)
 
         await transaction.transactionCommit()
