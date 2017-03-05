@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser')
 const {graphqlExpress, graphiqlExpress} = require('graphql-server-express')
-const {makeExecutableSchema, addMockFunctionsToSchema} = require('graphql-tools')
+const {makeExecutableSchema} = require('graphql-tools')
 
 const Schema = require('./schema')
 const Resolvers = require('./resolvers')
