@@ -1,7 +1,7 @@
 import {PgDb} from "pogi";
 import cors from 'cors';
 const express = require('express')
-const authServer = require('@project-r/auth-server')
+//const authServer = require('@project-r/auth-server')
 require('dotenv').config()
 const graphql = require('./graphql')
 const raisenow = require('./src/raisenow')
