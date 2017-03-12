@@ -75,11 +75,13 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( pgdb  => {
   if(process.env.NODE_ENV !== 'production') {
     const httpProxy = require('http-proxy')
     var proxy = httpProxy.createProxyServer({target: process.env.CLIENT_DEV_SERVER_URL, ws: true});
+
+
     //proxy request
-    server.use(function(req, res, next) {
-      console.log("proxy request to CREATE-REACT-APP for: "+req.originalUrl)
-      proxy.web(req, res)//, { target: 'http://localhost:3002' })
-    })
+    //server.use(function(req, res, next) {
+    //  console.log("proxy request to CREATE-REACT-APP for: "+req.originalUrl)
+    //  proxy.web(req, res)//, { target: 'http://localhost:3002' })
+    //})
 		// proxy WebSocket requests as well (webpackHotDevClient)
 		// (we don't use websockets for anything else than hot code reloading so far...)
     // DOESN'T WORK :(
