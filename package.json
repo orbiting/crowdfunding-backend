@@ -27,12 +27,9 @@
     "pogi": "^2.1.0"
   },
   "scripts": {
-    "start": "nodemon index.js --exec babel-node",
-    "build": "mkdir -p ./dist && npm run build-client && npm run build-server",
-    "build-client": "rm -rf ./dist/client_build && cd ../cf_admin && npm run build && mv ./build ../cf_server/dist/client_build",
-    "build-server": "NODE_ENV=production babel index.js -d dist --presets es2015,stage-2",
-    "start-production": "NODE_ENV=production node dist/index.js",
-    "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1",
+    "dev": "nodemon index.js --exec babel-node",
+    "build": "NODE_ENV=production babel index.js -d dist --presets es2015,stage-3",
+    "start": "NODE_ENV=production node dist/index.js",
     "migrate": "db-migrate up",
     "seed": "knex seed:run"
   },
