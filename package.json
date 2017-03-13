@@ -27,7 +27,7 @@
   },
   "scripts": {
     "dev": "nodemon index.js --exec babel-node",
-    "build": "NODE_ENV=production babel index.js -d dist --presets es2015,stage-3",
+    "build": "NODE_ENV=production babel ./ --ignore 'node_modules' -d dist --presets es2015,stage-3",
     "start": "NODE_ENV=production node dist/index.js",
     "migrate": "db-migrate up",
     "seed": "knex seed:run"
