@@ -4,7 +4,7 @@ const express = require('express')
 //const authServer = require('@project-r/auth-server')
 require('dotenv').config()
 const graphql = require('./graphql')
-const raisenow = require('./src/raisenow')
+const raisenow = require('./raisenow')
 
 process.env.PORT = process.env.PORT || 3001
 

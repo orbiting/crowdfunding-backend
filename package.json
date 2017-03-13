@@ -26,8 +26,8 @@
     "pogi": "^2.1.0"
   },
   "scripts": {
-    "dev": "nodemon index.js --exec babel-node",
-    "build": "NODE_ENV=production babel index.js src graphql migrations seeds -d dist --presets es2015,stage-3",
+    "dev": "nodemon src/index.js --exec babel-node",
+    "build": "NODE_ENV=production babel src/ -d dist --presets es2015,stage-3",
     "start": "NODE_ENV=production node dist/index.js",
     "migrate": "db-migrate up",
     "seed": "knex seed:run"
