@@ -1,5 +1,5 @@
-import { GraphQLScalarType } from 'graphql'
-import { Kind } from 'graphql/language'
+const { GraphQLScalarType } = require('graphql')
+const { Kind } = require('graphql/language')
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({

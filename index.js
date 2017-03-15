@@ -1,10 +1,10 @@
-import {PgDb} from "pogi";
-import cors from 'cors';
+const { PgDb } = require('pogi')
+const cors = require('cors')
 const express = require('express')
 //const authServer = require('@project-r/auth-server')
 require('dotenv').config()
 const graphql = require('./graphql')
-const raisenow = require('./raisenow')
+const raisenow = require('./src/raisenow')
 
 process.env.PORT = process.env.PORT || 3001
 
