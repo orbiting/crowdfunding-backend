@@ -93,7 +93,7 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( pgdb  => {
   }
 
   // start the server
-  server.listen(3001, () => {
-    console.log('new server is running on http://localhost:3001')
+  server.listen(process.env.PORT, () => {
+    console.log('new server is running on http://localhost:'+process.env.PORT)
   })
 })
