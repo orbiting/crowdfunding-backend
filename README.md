@@ -5,8 +5,8 @@ You need to have redis installed and running.
 
 Boostrap your .env file
 ```
-PORT=3003
-PUBLIC_URL=http://localhost:3003
+PORT=3001
+PUBLIC_URL=http://localhost:3001
 SESSION_SECRET=
 DATABASE_URL=postgres://postgres:postgres@172.17.0.1:54321/postgres
 MAILGUN_API_KEY=
