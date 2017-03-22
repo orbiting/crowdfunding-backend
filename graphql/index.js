@@ -16,16 +16,19 @@ const createLoaders = require('./loaders')
 module.exports = (server, pgdb) => {
   server.use('/graphql',
     bodyParser.json(),
-    graphqlExpress({
-      debug: true,
-      formatError: function(error) {
-        console.log(error)
-        return error
-      },
-      schema: executableSchema,
-      context: {
-        loaders: createLoaders(pgdb),
-        pgdb
+    graphqlExpress( (req) => {
+      return {
+        debug: true,
+        formatError: function(error) {
+          console.log(error)
+          return error
+        },
+        schema: executableSchema,
+        context: {
+          loaders: createLoaders(pgdb),
+          pgdb,
+          user: req.user
+        }
       }
     })
   )

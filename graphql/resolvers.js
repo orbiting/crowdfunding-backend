@@ -29,9 +29,9 @@ const resolveFunctions = {
     async crowdfundings(_, args, {loaders, pgdb}) {
       return pgdb.public.crowdfundings.find( args )
     },
-    async pledges(_, args, {loaders, pgdb}) {
-      //dummy user
-      const user = await pgdb.public.users.findOne( {email: 'patrick.recher@project-r.construction'} )
+    async pledges(_, args, {loaders, pgdb, user}) {
+      if(!user)
+        return null
       return pgdb.public.pledges.find( {userId: user.id} )
     }
   },
