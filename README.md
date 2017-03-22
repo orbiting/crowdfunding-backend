@@ -7,6 +7,7 @@ Boostrap your .env file
 ```
 PORT=3001
 PUBLIC_URL=http://localhost:3001
+CORS_WHITELIST_URL=http://localhost:3003
 SESSION_SECRET=
 DATABASE_URL=postgres://postgres:postgres@172.17.0.1:54321/postgres
 MAILGUN_API_KEY=

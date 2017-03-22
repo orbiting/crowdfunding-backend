@@ -13,8 +13,15 @@ const raisenow = require('./src/raisenow')
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   const server = express()
 
-	//FIXME
-  server.use('*', cors())
+  //isomorphic-fetch needs explicit CORS headers otherwise, cookies are not sent
+  if(process.env.CORS_WHITELIST_URL) {
+    const corsOptions = {
+      origin: process.env.CORS_WHITELIST_URL,
+      credentials: true,
+      optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    }
+    server.use('*', cors(corsOptions))
+  }
 
   // Once DB is available, setup sessions and routes for authentication
   auth.configure({
