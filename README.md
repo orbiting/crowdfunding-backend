@@ -18,7 +18,7 @@ MAIL_FROM_ADDRESS=
 This server requires access to a postgres database. Ensure the `DATABASE_URL` is correct.
 Bootstrap the DB like this:
 ```
-db-migrate up
+$(npm bin)/db-migrate up
 npm run seed
 ```
 
