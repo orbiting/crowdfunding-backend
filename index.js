@@ -41,6 +41,7 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     server: server,
     users: pgdb['public']['users'],
     secret: process.env.SESSION_SECRET,
+    dev: DEV
   })
 
   graphql(server, pgdb)

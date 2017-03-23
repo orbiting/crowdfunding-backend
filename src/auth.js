@@ -23,7 +23,7 @@ exports.configure = ({
   // few minutes.
   clientMaxAge = 60000,
   // is the server running in development
-  dev = process.env.NODE_ENV !== 'production'
+  dev = false
 } = {}) => {
   if (server === null) {
     throw new Error('server option must be an express server instance')
@@ -49,6 +49,11 @@ exports.configure = ({
       secure: !dev
     }
   }))
+
+  // trust first proxy
+  if(!dev) {
+    app.set('trust proxy', 1)
+  }
 
   // Tell Passport how to seralize/deseralize user accounts
   passport.serializeUser(function (user, next) {
