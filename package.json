@@ -23,8 +23,8 @@
     "pogi": "^2.1.0"
   },
   "scripts": {
-    "dev": "nodemon -w graphql -w src -w index.js index.js",
-    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon -w graphql -w src -w index.js index.js",
+    "start": "node index.js",
     "migrate": "db-migrate up",
     "seed": "knex seed:run"
   },
