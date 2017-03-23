@@ -23,6 +23,14 @@ $(npm bin)/db-migrate up
 npm run seed
 ```
 
+### basic auth
+provide the following ENV variables to enable HTTP basic auth.
+```
+BASIC_AUTH_USER=
+BASIC_AUTH_PASS=
+BASIC_AUTH_REALM=
+```
+
 ### Run it
 ```
 npm install
