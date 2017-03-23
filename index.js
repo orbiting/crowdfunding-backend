@@ -2,7 +2,11 @@ const { PgDb } = require('pogi')
 const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
-require('dotenv').config()
+
+const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
+if (DEV) {
+  require('dotenv').config()
+}
 
 process.env.PORT = process.env.PORT || 3001
 
