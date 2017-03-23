@@ -52,7 +52,7 @@ exports.configure = ({
 
   // trust first proxy
   if(!dev) {
-    app.set('trust proxy', 1)
+    server.set('trust proxy', 1)
   }
 
   // Tell Passport how to seralize/deseralize user accounts
