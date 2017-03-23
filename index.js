@@ -12,7 +12,7 @@ process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')
-const raisenow = require('./src/raisenow')
+const postfinance = require('./src/postfinance')
 
 
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
@@ -27,6 +27,9 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     }
     server.use('*', cors(corsOptions))
   }
+
+  // postfinance doesn't support basic-auth for webhooks
+  postfinance(server, pgdb)
 
   if (process.env.BASIC_AUTH_PASS) {
     server.use(basicAuth({
@@ -45,8 +48,6 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   })
 
   graphql(server, pgdb)
-
-  raisenow(server, pgdb)
 
   //FIXME remove
   server.get('/test', function(req, res) {
