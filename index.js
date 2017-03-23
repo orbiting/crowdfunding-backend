@@ -1,6 +1,7 @@
 const { PgDb } = require('pogi')
 const cors = require('cors')
 const express = require('express')
+const basicAuth = require('express-basic-auth')
 require('dotenv').config()
 
 process.env.PORT = process.env.PORT || 3001
@@ -21,6 +22,14 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
       optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
     }
     server.use('*', cors(corsOptions))
+  }
+
+  if (process.env.BASIC_AUTH_PASS) {
+    server.use(basicAuth({
+      users: { [process.env.BASIC_AUTH_USER]: process.env.BASIC_AUTH_PASS },
+      challenge: true,
+      realm: process.env.BASIC_AUTH_REALM
+    }))
   }
 
   // Once DB is available, setup sessions and routes for authentication
