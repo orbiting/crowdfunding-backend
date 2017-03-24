@@ -61,7 +61,7 @@ type Package {
 type PackageOption {
   id: ID!
   package: Package!
-  reward: Reward!
+  reward: Reward
   minAmount: Int!
   maxAmount: Int
   defaultAmount: Int!
