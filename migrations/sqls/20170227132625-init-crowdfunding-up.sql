@@ -32,7 +32,7 @@ create table "rewards" (
 create table "packageOptions" (
   "id"              uuid primary key not null default uuid_generate_v4(),
   "packageId"       uuid not null references "packages" on update cascade on delete cascade,
-  "rewardId"        uuid not null references "rewards" on update cascade on delete cascade,
+  "rewardId"        uuid references "rewards" on update cascade on delete cascade,
 --  "name"            varchar not null,
   "minAmount"       integer not null,
   "maxAmount"       integer not null,
