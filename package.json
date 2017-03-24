@@ -25,7 +25,8 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon -w graphql -w src -w index.js index.js",
     "start": "node index.js",
-    "migrate": "db-migrate up",
+    "migrate:up": "db-migrate up",
+    "migrate:down": "db-migrate down",
     "seed": "knex seed:run"
   },
   "devDependencies": {
