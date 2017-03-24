@@ -10,7 +10,8 @@ type RootQuery {
   roles(id: ID): [Role]
   users(id: ID, email: String): [User]
 
-  crowdfundings(id: [ID]): [Crowdfunding]
+  crowdfundings: [Crowdfunding]
+  crowdfunding(name: String!): Crowdfunding!
   pledges: [Pledge]
 }
 

@@ -27,7 +27,10 @@ const resolveFunctions = {
       return pgdb.public.roles.find( args )
     },
     async crowdfundings(_, args, {loaders, pgdb}) {
-      return pgdb.public.crowdfundings.find( args )
+      return pgdb.public.crowdfundings.find()
+    },
+    async crowdfunding(_, args, {loaders, pgdb}) {
+      return pgdb.public.crowdfundings.findOne( args )
     },
     async pledges(_, args, {loaders, pgdb, user}) {
       if(!user)
