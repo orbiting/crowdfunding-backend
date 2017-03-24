@@ -183,9 +183,9 @@ exports.seed = async function(knex, Promise) {
   let packageAboGiveOptionNoteBookId = await knex('packageOptions').insert({
     packageId: packageAboGiveId,
     rewardId: rewardNoteBookId,
-    minAmount: 1,
+    minAmount: 0,
     maxAmount: 20,
-    defaultAmount: 1,
+    defaultAmount: 0,
     price: 3000,
     userPrice: false,
     createdAt: new Date(),
