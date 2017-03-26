@@ -119,14 +119,20 @@ type Pledge {
   createdAt: Date!
   updatedAt: Date!
 }
+
 input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
+  user: PledgeUserInput
+}
+input PledgeUserInput {
+  email: String!
+  name: String!
+}
 }
 
 type PledgePayment {
   id: ID!
-  user: User!
   pledge: Pledge!
   total: Int!
   status: String

@@ -102,17 +102,34 @@ const resolveFunctions = {
   },
 
   RootMutation: {
-    async submitPledge(_, args, {loaders, pgdb}) {
+    async submitPledge(_, args, {loaders, pgdb, user}) {
       console.log("submitPledge")
       const transaction = await pgdb.transactionBegin()
       let newPledge = null
       try {
-        //dummy user
-        const user = await transaction.public.users.findOne( {email: 'patrick.recher@project-r.construction'} )
-
         const { pledge } = args
-        const pledgeOptions = pledge.options
         console.log(pledge)
+
+        let pledgeUser = null
+        if(user) { //user logged in
+          if(pledge.user) {
+            throw new Error('logged in users must no provide pledge.user')
+          }
+          pledgeUser = user
+        } else { //user not logged in
+          if(!pledge.user) {
+            throw new Error('pledge must provide a user if not logged in')
+          }
+          if(await transaction.public.users.findOne( {email: pledge.user.email} )) {
+            throw new Error('a user with the email adress pledge.user.email already exists, login!')
+          }
+          pledgeUser = await transaction.public.users.insertAndGet( {
+            email: pledge.user.email,
+            name: pledge.user.name
+          })
+        }
+
+        const pledgeOptions = pledge.options
 
         // load original of chosen packageOptions
         const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
@@ -150,7 +167,7 @@ const resolveFunctions = {
 
         //insert pledge
         let newPledge = {
-          userId: user.id, //FIXME
+          userId: pledgeUser.id,
           packageId,
           total
         }
