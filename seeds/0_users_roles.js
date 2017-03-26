@@ -13,6 +13,7 @@ exports.seed = async function(knex, Promise) {
 
   let userId = await knex('users').insert({
     email: 'patrick.recher@project-r.construction',
+    name: 'Patrick Recher',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
