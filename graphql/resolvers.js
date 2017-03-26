@@ -36,6 +36,10 @@ const resolveFunctions = {
       if(!user)
         return null
       return pgdb.public.pledges.find( {userId: user.id} )
+    },
+    async checkEmail(_, args, {pgdb}) {
+      const count = await pgdb.public.users.count( args )
+      return { free: !count }
     }
   },
 

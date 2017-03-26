@@ -13,12 +13,17 @@ type RootQuery {
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
   pledges: [Pledge]
+
+  checkEmail(email: String!): CheckMailResult!
 }
 
 type RootMutation {
   submitPledge(pledge: PledgeInput): Pledge
 }
 
+type CheckMailResult {
+  free: Boolean!
+}
 
 type User {
   id: ID!
