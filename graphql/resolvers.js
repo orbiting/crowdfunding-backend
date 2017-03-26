@@ -145,8 +145,8 @@ const resolveFunctions = {
         pledgeOptions.forEach( (plo) => {
           total += (plo.amount * plo.price)
         })
-        if(total !== pledge.total)
-          throw new Error(`pledge.total (${pledge.total}) should be (${total})`)
+        if(total < pledge.total)
+          throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
 
         //insert pledge
         let newPledge = {
