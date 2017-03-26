@@ -20,7 +20,8 @@
     "knex": "^0.12.7",
     "passport": "^0.3.2",
     "pg": "^6.1.2",
-    "pogi": "^2.1.0"
+    "pogi": "^2.1.0",
+    "stripe": "^4.16.0"
   },
   "scripts": {
     "dev": "NODE_ENV=development nodemon -w graphql -w src -w index.js index.js",

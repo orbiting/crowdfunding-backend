@@ -124,16 +124,27 @@ input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
   user: PledgeUserInput
+  payment: PledgePaymentInput!
 }
 input PledgeUserInput {
   email: String!
   name: String!
 }
+input PledgePaymentInput {
+  method: PaymentMethod!
+  stripeSourceId: String
 }
 
+enum PaymentMethod {
+  VISA
+  MASTERCARD
+  PFC
+  EZS
+}
 type PledgePayment {
   id: ID!
   pledge: Pledge!
+  method: PaymentMethod!
   total: Int!
   status: String
   createdAt: Date!

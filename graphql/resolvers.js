@@ -1,5 +1,6 @@
 const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -164,6 +165,28 @@ const resolveFunctions = {
         })
         if(total < pledge.total)
           throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
+        total = pledge.total
+
+        //check payment
+        const {payment} = pledge
+        //TODO support other payment methods
+        if(payment.method == 'VISA' || payment.method !== 'MASTERCARD') {
+          if(!payment.stripeSourceId) {
+            throw new Error('stripeSourceId required')
+          }
+          const charge = await stripe.charges.create({
+            amount: pledge.total,
+            currency: "chf",
+            source: payment.stripeSourceId
+          })
+          //TODO save stripeSourceId to customer
+          //TODO save pledgePayment
+          console.log("charge")
+          console.log(charge)
+        } else {
+          throw new Error('unsupported paymentMethod')
+        }
+
 
         //insert pledge
         let newPledge = {
@@ -180,6 +203,9 @@ const resolveFunctions = {
         }))
         newPledge.packageOptions = newPledgeOptions
         console.log(newPledge)
+
+        //TODO insert payment
+
 
         await transaction.transactionCommit()
         return newPledge;
