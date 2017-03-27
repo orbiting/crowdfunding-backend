@@ -1,6 +1,8 @@
 const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
+const request = require('request')
+
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -106,6 +108,22 @@ const resolveFunctions = {
   },
 
   RootMutation: {
+    async submitQuestion(_, args, {loaders, pgdb, user}) {
+      if(!user) {
+        throw new Error('login required')
+      }
+      const { question } = args
+      request.post(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
+        auth: { user: 'api', pass: process.env.MAILGUN_API_KEY },
+        form: {
+          to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
+          from: user.email,
+          subject: 'new (FA)Question asked!',
+          text: question
+        }
+      })
+      return {success: true}
+    },
     async submitPledge(_, args, {loaders, pgdb, user}) {
       console.log("submitPledge")
       const transaction = await pgdb.transactionBegin()

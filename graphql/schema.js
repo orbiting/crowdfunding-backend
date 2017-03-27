@@ -21,6 +21,11 @@ type RootQuery {
 
 type RootMutation {
   submitPledge(pledge: PledgeInput): Pledge
+  submitQuestion(question: String!): MutationResult
+}
+
+type MutationResult {
+  success: Boolean!
 }
 
 type CheckMailResult {
