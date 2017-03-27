@@ -150,5 +150,19 @@ type PledgePayment {
   createdAt: Date!
   updatedAt: Date!
 }
+
+enum FaqStatus {
+  DRAFT
+  PUBLISHED
+}
+
+type Faq {
+  id: ID!
+  status: FaqStatus!
+  question: String!
+  answer: String!
+  createdAt: Date!
+  updatedAt: Date!
+}
 `
 module.exports = [typeDefinitions]
