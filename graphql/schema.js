@@ -15,6 +15,8 @@ type RootQuery {
   pledges: [Pledge]
 
   checkEmail(email: String!): CheckMailResult!
+
+  faqs(status: FaqStatus): [Faq]
 }
 
 type RootMutation {
