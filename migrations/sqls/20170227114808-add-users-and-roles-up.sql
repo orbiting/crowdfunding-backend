@@ -12,7 +12,7 @@ create table "users" (
 
 create table "roles" (
   "id"          uuid primary key not null default uuid_generate_v4(),
-  "name"        varchar not null,
+  "name"        varchar,
   "description" text not null,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
