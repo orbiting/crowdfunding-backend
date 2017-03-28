@@ -27,7 +27,8 @@ module.exports = (server, pgdb) => {
         context: {
           loaders: createLoaders(pgdb),
           pgdb,
-          user: req.user
+          user: req.user,
+          req
         }
       }
     })

@@ -21,13 +21,18 @@ type RootQuery {
 }
 
 type RootMutation {
-  signIn(email: String!): Boolean!
+  signIn(email: String!): SignInResponse!
+  signOut: Boolean!
   submitPledge(pledge: PledgeInput): Pledge
   submitQuestion(question: String!): MutationResult
 }
 
 type MutationResult {
   success: Boolean!
+}
+
+type SignInResponse {
+  phrase: String!
 }
 
 type CheckMailResult {

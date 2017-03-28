@@ -2,6 +2,7 @@ const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const request = require('request')
+const uuid = require('uuid/v4')
 
 
 const resolveFunctions = {
@@ -23,6 +24,9 @@ const resolveFunctions = {
   }),
 
   RootQuery: {
+    async me(_, args, {loaders, pgdb, user}) {
+      return user
+    },
     async users(_, args, {loaders, pgdb}) {
       return pgdb.public.users.find( args )
     },
@@ -108,6 +112,50 @@ const resolveFunctions = {
   },
 
   RootMutation: {
+    async signIn(_, args, {loaders, pgdb, user, req}) {
+      if(user) {
+        throw new Error('already signed in')
+      }
+
+      const {email} = args
+
+      //TODO check email validity
+      if(!email.match(/^.+@.+\..+$/)) {
+        throw new Error('Email-Adresse nicht gültig.')
+      }
+
+      const token = uuid()
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      const phrase = 'TODO TODO'
+      //TODO geo, secret-words
+
+      req.session.email = email
+      req.session.token = token
+      req.session.ip = ip
+
+      const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+path+'/email/signin/'+token
+
+      request.post(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
+        auth: { user: 'api', pass: process.env.MAILGUN_API_KEY },
+        form: {
+          to: email,
+          from: process.env.AUTH_MAIL_FROM_ADDRESS,
+          subject: 'Your login token',
+          text: 'Use the link below to sign in:\n\n' + verificationUrl + '\n\n'
+        }
+      })
+
+      return {phrase}
+    },
+    async signOut(_, args, {loaders, pgdb, user, req}) {
+      if(!user) {
+        throw new Error('not signed in')
+      }
+      req.session.destroy(function(err) {
+        throw (err)
+      })
+      return true
+    },
     async submitQuestion(_, args, {loaders, pgdb, user}) {
       if(!user) {
         throw new Error('login required')
