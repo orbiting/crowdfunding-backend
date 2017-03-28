@@ -7,6 +7,7 @@ schema {
 }
 
 type RootQuery {
+  me: User
   roles(id: ID): [Role]
   users(id: ID, email: String): [User]
 
@@ -20,6 +21,7 @@ type RootQuery {
 }
 
 type RootMutation {
+  signIn(email: String!): Boolean!
   submitPledge(pledge: PledgeInput): Pledge
   submitQuestion(question: String!): MutationResult
 }
