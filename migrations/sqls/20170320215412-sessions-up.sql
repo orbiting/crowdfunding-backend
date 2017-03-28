@@ -1,6 +1,6 @@
 CREATE TABLE "sessions" (
   "sid" varchar NOT NULL COLLATE "default",
-  "sess" json NOT NULL,
+  "sess" jsonb NOT NULL,
   "expire" timestamp(6) NOT NULL
 )
 WITH (OIDS=FALSE);

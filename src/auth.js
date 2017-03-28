@@ -1,17 +1,12 @@
-const bodyParser = require('body-parser')
 const session = require('express-session')
 const PgSession = require('connect-pg-simple')(session)
 const passport = require('passport')
 
 exports.configure = ({
   server = null, // Express Server
-  users: Users = null, // User model
+  pgdb = null, // pogi connection
   // Secret used to encrypt session data on the server
   secret = null,
-  // Sessions store for express-session (defaults to connect-pg-simple using DATABASE_URL)
-  store = new PgSession({
-    tableName: 'sessions'
-  }),
   // Max session age in ms (default is 4 weeks)
   // NB: With 'rolling: true' passed to session() the session expiry time will
   // be reset every time a user visits the site again before it expires.
@@ -28,13 +23,18 @@ exports.configure = ({
   if (server === null) {
     throw new Error('server option must be an express server instance')
   }
-  if (Users === null) {
-    throw new Error('users option must be a pogi user table')
+  if (secret === null) {
+    throw new Error('session secret option must be provided')
   }
-
-  // Load body parser to handle POST requests
-  server.use(bodyParser.json())
-  server.use(bodyParser.urlencoded({extended: true}))
+  if (pgdb === null) {
+    throw new Error('pgdb option must be a connected pogi instance')
+  }
+  // Sessions store for express-session (defaults to connect-pg-simple using DATABASE_URL)
+  const store = new PgSession({
+    tableName: 'sessions'
+  })
+  const Users = pgdb.public.users
+  const Sessions = pgdb.public.sessions
 
   // Configure sessions
   server.use(session({
@@ -54,6 +54,37 @@ exports.configure = ({
   if(!dev) {
     server.set('trust proxy', 1)
   }
+
+  // authenticate a token sent by email
+  server.get('/auth/email/signin/:token', async (req, res) => {
+    const token = req.params.token
+    if (!token) {
+      return res.status(400).end('token must be provided')
+    }
+
+    // Look up session by token
+    const session = await Sessions.findOne({'sess @>': {token}})
+    if (!session) {
+      return res.status(400).end('token invalid')
+    }
+
+    const {email} = session.sess
+
+    // verify and/or create the user
+    let user = await Users.findOne({email})
+    if (user && user.verified == false) {
+      Users.updateOne({id: user.id}, {verified: true})
+    } else {
+      Users.insert({email, verified: true})
+    }
+
+    //log in the session
+    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{passport}', '${JSON.stringify({user: user.id})}')`)
+    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{token}', 'null')`)
+
+    return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
+  })
+
 
   // Tell Passport how to seralize/deseralize user accounts
   passport.serializeUser(function (user, next) {

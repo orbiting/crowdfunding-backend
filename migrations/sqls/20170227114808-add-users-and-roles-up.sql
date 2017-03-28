@@ -5,7 +5,6 @@ create table "users" (
   "email"       text not null,
   "name"        varchar,
   "verified"    boolean not null default false,
-  "token"       varchar,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );
