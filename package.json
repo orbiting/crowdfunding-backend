@@ -29,6 +29,7 @@
     "start": "node index.js",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
+    "migrate:reset": "db-migrate reset",
     "seed": "knex seed:run"
   },
   "devDependencies": {
