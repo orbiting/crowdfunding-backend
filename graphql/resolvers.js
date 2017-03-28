@@ -3,7 +3,8 @@ const { Kind } = require('graphql/language')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const request = require('request')
 const uuid = require('uuid/v4')
-
+const rndWord = require('random-noun-generator-german')
+const kraut = require('kraut')
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -125,9 +126,10 @@ const resolveFunctions = {
       }
 
       const token = uuid()
-      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-      const phrase = 'TODO TODO'
-      //TODO geo, secret-words
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      const phrase = kraut.adjectives.random()+' '+kraut.verbs.random()+' '+rndWord()
+      const geo = 'Zürich'
+      //TODO geo
 
       req.session.email = email
       req.session.token = token
@@ -140,8 +142,8 @@ const resolveFunctions = {
         form: {
           to: email,
           from: process.env.AUTH_MAIL_FROM_ADDRESS,
-          subject: 'Your login token',
-          text: 'Use the link below to sign in:\n\n' + verificationUrl + '\n\n'
+          subject: 'Login Link',
+          text: `Ma’am, Sir,\n\nLogin Versuch aus: ${geo}.\n\nFalls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
         }
       })
 
