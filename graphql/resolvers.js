@@ -70,7 +70,7 @@ const resolveFunctions = {
       return { free: !count }
     },
     async faqs(_, args, {pgdb}) {
-      return pgdb.public.faqs.find( args );
+      return pgdb.public.faqs.find( args )
     }
   },
 
@@ -111,7 +111,7 @@ const resolveFunctions = {
   Reward: {
     __resolveType(obj, context, info) {
       // obj is the entity from the DB and thus has the "rewardType" column used as FK
-      return obj.rewardType;
+      return obj.rewardType
     }
   },
   Pledge: {
@@ -310,7 +310,7 @@ const resolveFunctions = {
 
 
         await transaction.transactionCommit()
-        return newPledge;
+        return newPledge
       } catch(e) {
         await transaction.transactionRollback()
         throw e
