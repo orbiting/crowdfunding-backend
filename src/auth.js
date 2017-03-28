@@ -73,9 +73,9 @@ exports.configure = ({
     // verify and/or create the user
     let user = await Users.findOne({email})
     if (user && user.verified == false) {
-      Users.updateOne({id: user.id}, {verified: true})
+      await Users.updateOne({id: user.id}, {verified: true})
     } else {
-      Users.insert({email, verified: true})
+      user = await Users.insertAndGet({email, verified: true})
     }
 
     //log in the session
