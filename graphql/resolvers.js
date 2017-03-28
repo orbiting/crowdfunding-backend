@@ -5,6 +5,26 @@ const request = require('request')
 const uuid = require('uuid/v4')
 const rndWord = require('random-noun-generator-german')
 const kraut = require('kraut')
+const geoipDatabase = require('geoip-database')
+const maxmind = require('maxmind')
+const cityLookup = maxmind.openSync(geoipDatabase.city)
+
+
+const getGeoForIp = (ip) => {
+  const geo = cityLookup.get(ip)
+  let country = null
+  try { country = geo.country.names.de } catch(e) { }
+  let city = null
+  try { city = geo.city.names.de } catch(e) { }
+  if(!country && !city) {
+    return null
+  }
+  if(city) {
+    return city+', '+country
+  }
+  return country
+}
+
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -126,14 +146,22 @@ const resolveFunctions = {
       }
 
       const token = uuid()
-      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      const ua = req.headers['user-agent']
       const phrase = kraut.adjectives.random()+' '+kraut.verbs.random()+' '+rndWord()
-      const geo = 'Zürich'
-      //TODO geo
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      const geo = getGeoForIp(ip)
+      let geoString = ''
+      if(geo) {
+        geoString = 'Login Versuch aus: '+geo+'.\n\n'
+      }
 
       req.session.email = email
       req.session.token = token
       req.session.ip = ip
+      req.session.ua = ua
+      if(geo) {
+        req.session.geo = geo
+      }
 
       const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+'/auth/email/signin/'+token
 
@@ -143,7 +171,7 @@ const resolveFunctions = {
           to: email,
           from: process.env.AUTH_MAIL_FROM_ADDRESS,
           subject: 'Login Link',
-          text: `Ma’am, Sir,\n\nLogin Versuch aus: ${geo}.\n\nFalls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
+          text: `Ma’am, Sir,\n\n${geoString}Falls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
         }
       })
 
