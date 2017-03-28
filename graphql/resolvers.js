@@ -133,7 +133,7 @@ const resolveFunctions = {
       req.session.token = token
       req.session.ip = ip
 
-      const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+path+'/email/signin/'+token
+      const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+'/auth/email/signin/'+token
 
       request.post(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
         auth: { user: 'api', pass: process.env.MAILGUN_API_KEY },
