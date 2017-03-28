@@ -135,7 +135,8 @@ const resolveFunctions = {
   RootMutation: {
     async signIn(_, args, {loaders, pgdb, user, req}) {
       if(user) {
-        throw new Error('already signed in')
+        //fail gracefully
+        return {phrase: ''}
       }
 
       const {email} = args
