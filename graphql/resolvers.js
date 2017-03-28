@@ -152,7 +152,9 @@ const resolveFunctions = {
         throw new Error('not signed in')
       }
       req.session.destroy(function(err) {
-        throw (err)
+        if(err) {
+          throw (err)
+        }
       })
       return true
     },

@@ -72,8 +72,10 @@ exports.configure = ({
 
     // verify and/or create the user
     let user = await Users.findOne({email})
-    if (user && user.verified == false) {
-      await Users.updateOne({id: user.id}, {verified: true})
+    if (user) {
+      if(!user.verified) {
+        await Users.updateOne({id: user.id}, {verified: true})
+      }
     } else {
       user = await Users.insertAndGet({email, verified: true})
     }
@@ -81,6 +83,7 @@ exports.configure = ({
     //log in the session
     await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{passport}', '${JSON.stringify({user: user.id})}')`)
     await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{token}', 'null')`)
+    //set authorizer IP, location
 
     return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
   })
