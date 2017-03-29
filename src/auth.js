@@ -42,12 +42,12 @@ exports.configure = ({
   server.use(session({
     secret,
     store,
-    domain,
     resave: false,
     rolling: true,
     saveUninitialized: false,
     httpOnly: true,
     cookie: {
+      domain,
       maxAge: maxAge,
       secure: !dev
     }
