@@ -28,6 +28,12 @@ BASIC_AUTH_PASS=
 BASIC_AUTH_REALM=
 ```
 
+### cookie domain
+provide the following ENV variables to set the cookie on a specific domain
+```
+COOKIE_DOMAIN=
+```
+
 ### Run it
 ```
 npm install

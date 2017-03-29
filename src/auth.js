@@ -7,6 +7,8 @@ exports.configure = ({
   pgdb = null, // pogi connection
   // Secret used to encrypt session data on the server
   secret = null,
+  // Specifies the value for the Domain Set-Cookie attribute
+  domain = undefined,
   // Max session age in ms (default is 4 weeks)
   // NB: With 'rolling: true' passed to session() the session expiry time will
   // be reset every time a user visits the site again before it expires.
@@ -38,8 +40,9 @@ exports.configure = ({
 
   // Configure sessions
   server.use(session({
-    secret: secret,
-    store: store,
+    secret,
+    store,
+    domain,
     resave: false,
     rolling: true,
     saveUninitialized: false,

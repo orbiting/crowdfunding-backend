@@ -43,6 +43,7 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   auth.configure({
     server: server,
     secret: process.env.SESSION_SECRET,
+    domain: process.env.COOKIE_DOMAIN || undefined,
     dev: DEV,
     pgdb: pgdb
   })
