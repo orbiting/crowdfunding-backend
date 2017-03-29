@@ -1,7 +1,7 @@
 const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-const request = require('request')
+const querystring = require('querystring')
 const uuid = require('uuid/v4')
 const rndWord = require('random-noun-generator-german')
 const kraut = require('kraut')
@@ -23,6 +23,21 @@ const getGeoForIp = (ip) => {
     return city+', '+country
   }
   return country
+}
+
+const sendMail = (mail) => {
+  const form = querystring.stringify(mail)
+  const contentLength = form.length
+
+  return fetch(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic '+(new Buffer('api:'+process.env.MAILGUN_API_KEY).toString('base64')),
+      'Content-Length': contentLength,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: form
+  })
 }
 
 
@@ -165,15 +180,11 @@ const resolveFunctions = {
       }
 
       const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+'/auth/email/signin/'+token
-
-      request.post(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
-        auth: { user: 'api', pass: process.env.MAILGUN_API_KEY },
-        form: {
-          to: email,
-          from: process.env.AUTH_MAIL_FROM_ADDRESS,
-          subject: 'Login Link',
-          text: `Ma’am, Sir,\n\n${geoString}Falls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
-        }
+      sendMail({
+        to: email,
+        from: process.env.AUTH_MAIL_FROM_ADDRESS,
+        subject: 'Login Link',
+        text: `Ma’am, Sir,\n\n${geoString}Falls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
       })
 
       return {phrase}
@@ -194,15 +205,13 @@ const resolveFunctions = {
         throw new Error('login required')
       }
       const { question } = args
-      request.post(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
-        auth: { user: 'api', pass: process.env.MAILGUN_API_KEY },
-        form: {
-          to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
-          from: user.email,
-          subject: 'new (FA)Question asked!',
-          text: question
-        }
+      sendMail({
+        to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
+        from: user.email,
+        subject: 'new (FA)Question asked!',
+        text: question
       })
+
       return {success: true}
     },
     async submitPledge(_, args, {loaders, pgdb, user}) {

@@ -1,3 +1,4 @@
+require('isomorphic-fetch')
 const { PgDb } = require('pogi')
 const cors = require('cors')
 const express = require('express')
