@@ -288,7 +288,7 @@ const resolveFunctions = {
         pledgeOptions.forEach( (plo) => {
           total += (plo.amount * plo.price)
         })
-        if(total < pledge.total)
+        if(pledge.total < total)
           throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
         total = pledge.total
 
