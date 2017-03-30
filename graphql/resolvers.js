@@ -314,12 +314,11 @@ const resolveFunctions = {
           throw new Error('unsupported paymentMethod')
         }
 
-
         //insert pledge
         let newPledge = {
           userId: pledgeUser.id,
           packageId,
-          total
+          total,
           status: pledgeStatus
         }
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
