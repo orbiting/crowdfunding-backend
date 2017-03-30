@@ -294,6 +294,7 @@ const resolveFunctions = {
 
         //check payment
         const {payment} = pledge
+        let pledgeStatus = 'DRAFT'
         //TODO support other payment methods
         if(payment.method == 'VISA' || payment.method !== 'MASTERCARD') {
           if(!payment.stripeSourceId) {
@@ -308,6 +309,7 @@ const resolveFunctions = {
           //TODO save pledgePayment
           console.log("charge")
           console.log(charge)
+          pledgeStatus = 'PAYED'
         } else {
           throw new Error('unsupported paymentMethod')
         }
@@ -318,6 +320,7 @@ const resolveFunctions = {
           userId: pledgeUser.id,
           packageId,
           total
+          status: pledgeStatus
         }
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 
