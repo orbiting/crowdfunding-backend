@@ -126,7 +126,7 @@ union Reward = Goodie | MembershipType
 
 enum PledgeStatus {
   DRAFT
-  PAID
+  PAYED
   REFUNDED
 }
 type Pledge {
