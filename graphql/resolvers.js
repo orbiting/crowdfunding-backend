@@ -40,6 +40,45 @@ const sendMail = (mail) => {
   })
 }
 
+const signIn = (email, req) => {
+  if(req.user) {
+    //fail gracefully
+    return {phrase: ''}
+  }
+
+  if(!email.match(/^.+@.+\..+$/)) {
+    throw new Error('Email-Adresse nicht gültig.')
+  }
+
+  const token = uuid()
+  const ua = req.headers['user-agent']
+  const phrase = kraut.adjectives.random()+' '+kraut.verbs.random()+' '+rndWord()
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+  const geo = getGeoForIp(ip)
+  let geoString = ''
+  if(geo) {
+    geoString = 'Login Versuch aus: '+geo+'.\n\n'
+  }
+
+  req.session.email = email
+  req.session.token = token
+  req.session.ip = ip
+  req.session.ua = ua
+  if(geo) {
+    req.session.geo = geo
+  }
+
+  const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+'/auth/email/signin/'+token
+  sendMail({
+    to: email,
+    from: process.env.AUTH_MAIL_FROM_ADDRESS,
+    subject: 'Login Link',
+    text: `Ma’am, Sir,\n\n${geoString}Falls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
+  })
+
+  return {phrase}
+}
+
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -163,45 +202,7 @@ const resolveFunctions = {
 
   RootMutation: {
     async signIn(_, args, {loaders, pgdb, user, req}) {
-      if(user) {
-        //fail gracefully
-        return {phrase: ''}
-      }
-
-      const {email} = args
-
-      //TODO check email validity
-      if(!email.match(/^.+@.+\..+$/)) {
-        throw new Error('Email-Adresse nicht gültig.')
-      }
-
-      const token = uuid()
-      const ua = req.headers['user-agent']
-      const phrase = kraut.adjectives.random()+' '+kraut.verbs.random()+' '+rndWord()
-      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-      const geo = getGeoForIp(ip)
-      let geoString = ''
-      if(geo) {
-        geoString = 'Login Versuch aus: '+geo+'.\n\n'
-      }
-
-      req.session.email = email
-      req.session.token = token
-      req.session.ip = ip
-      req.session.ua = ua
-      if(geo) {
-        req.session.geo = geo
-      }
-
-      const verificationUrl = (process.env.PUBLIC_URL || 'http://'+req.headers.host)+'/auth/email/signin/'+token
-      sendMail({
-        to: email,
-        from: process.env.AUTH_MAIL_FROM_ADDRESS,
-        subject: 'Login Link',
-        text: `Ma’am, Sir,\n\n${geoString}Falls Ihnen dass Ihnen folgende Wörter angezeigt wurden: <${phrase}>,klicken Sie auf den folgenden Link um sich einzuloggen:\n${verificationUrl}\n`
-      })
-
-      return {phrase}
+      return signIn(args.email, req)
     },
     async signOut(_, args, {loaders, pgdb, user, req}) {
       if(!user) {
@@ -228,7 +229,7 @@ const resolveFunctions = {
 
       return {success: true}
     },
-    async submitPledge(_, args, {loaders, pgdb, user}) {
+    async submitPledge(_, args, {loaders, pgdb, user, req}) {
       console.log("submitPledge")
       const transaction = await pgdb.transactionBegin()
       let newPledge = null
@@ -253,6 +254,7 @@ const resolveFunctions = {
             email: pledge.user.email,
             name: pledge.user.name
           })
+          signIn(pledge.user.email, req) //TODO return phrase
         }
 
         const pledgeOptions = pledge.options
