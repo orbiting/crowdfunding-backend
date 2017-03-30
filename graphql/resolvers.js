@@ -106,6 +106,20 @@ const resolveFunctions = {
   Crowdfunding: {
     async packages(crowdfunding, args, {loaders, pgdb}) {
       return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
+    },
+    async goal(crowdfunding) {
+      return {
+        money: crowdfunding.goalMoney,
+        people: crowdfunding.goalPeople
+      }
+    },
+    async status(crowdfunding, args, {loaders, pgdb}) {
+      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAYED', crowdfunding.id]) || 0
+      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAYED', crowdfunding.id])
+      return {
+        money,
+        people
+      }
     }
   },
   Package: {

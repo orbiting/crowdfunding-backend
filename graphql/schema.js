@@ -63,11 +63,19 @@ type Crowdfunding {
   name: String!
   beginDate: Date!
   endDate: Date!
-  goalPeople: Int!
-  goalMoney: Int!
+  goal: CrowdfundingGoal!
+  status: CrowdfundingStatus!
   packages: [Package!]!
   createdAt: Date!
   updatedAt: Date!
+}
+type CrowdfundingGoal {
+  money: Int!
+  people: Int!
+}
+type CrowdfundingStatus {
+  money: Int!
+  people: Int!
 }
 
 type Package {
