@@ -13,9 +13,10 @@ type RootQuery {
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
-  pledges: [Pledge]
+  pledges: [Pledge!]!
+  pledgeDraft(pledge: PledgeInput): Pledge
 
-  checkEmail(email: String!): CheckMailResult!
+  memberships: [Pledge]
 
   faqs(status: FaqStatus): [Faq]
 }
@@ -23,7 +24,10 @@ type RootQuery {
 type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
+
   submitPledge(pledge: PledgeInput): Pledge
+  claimMembership(claimCode: String!): Membership
+
   submitQuestion(question: String!): MutationResult
 }
 
@@ -35,17 +39,19 @@ type SignInResponse {
   phrase: String!
 }
 
-type CheckMailResult {
-  free: Boolean!
-}
 
 type User {
   id: ID!
   name: String
   email: String!
+  address: Address
+  birthday: String
   roles: [Role]
   createdAt: Date!
   updatedAt: Date!
+
+  pledges: [Pledge!]!
+  memberships: [Membership!]!
 }
 
 type Role {
@@ -122,22 +128,73 @@ type MembershipType {
   updatedAt: Date!
 }
 
+type Membership {
+  id: ID!
+  type: MembershipType!
+  startDate: Date
+  pledge: Pledge!
+  user: User!
+  claimCode: String
+  createdAt: Date!
+  updatedAt: Date!
+}
+
 union Reward = Goodie | MembershipType
+
+type Address {
+  name: String
+  line1: String!
+  line2: String
+  postalCode: String!
+  city: String!
+  country: String!
+}
+
+union PledgeUser = User | UserDraft
+type UserDraft {
+  name: String
+  email: String
+  birthday: String
+  emailFree: Boolean
+}
+input UserInput {
+  email: String
+  name: String
+  birthday: String
+}
+union PledgeAddress = Address | AddressDraft
+type AddressDraft {
+  name: String
+  line1: String
+  line2: String
+  postalCode: String
+  city: String
+  country: String
+}
+input AddressInput {
+  name: String
+  line1: String
+  line2: String
+  postalCode: String
+  city: String
+  country: String
+}
 
 enum PledgeStatus {
   DRAFT
-  PAYED
+  COMPLETED
+  PAID
   REFUNDED
 }
 type Pledge {
   id: ID!
-  packageId: ID!
-  crowdfunding: Crowdfunding!
-  status: PledgeStatus!
+  package: Package!
   options: [PackageOption!]!
+  status: PledgeStatus!
   total: Int!
-  payments: [PledgePayment]
-  user: User!
+  payments: [PledgePayment!]!
+  user: PledgeUser!
+  address: PledgeAddress!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -145,23 +202,22 @@ type Pledge {
 input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
-  user: PledgeUserInput
-  payment: PledgePaymentInput!
+  user: UserInput
+  address: AddressInput!
+  payment: PledgePaymentInput
 }
-input PledgeUserInput {
-  email: String!
-  name: String!
-}
+
+
 input PledgePaymentInput {
   method: PaymentMethod!
-  stripeSourceId: String
+  sourceId: String
 }
 
 enum PaymentMethod {
-  VISA
-  MASTERCARD
-  PFC
-  EZS
+  STRIPE
+  POSTFINANCECARD
+  PAYPAL
+  PAYMENTSLIP
 }
 type PledgePayment {
   id: ID!
