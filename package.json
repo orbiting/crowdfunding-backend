@@ -35,7 +35,7 @@
     "start": "node index.js",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
-    "migrate:reset": "db-migrate reset",
+    "db:reset": "db-migrate reset && db-migrate up && knex seed:run",
     "seed": "knex seed:run",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage"
