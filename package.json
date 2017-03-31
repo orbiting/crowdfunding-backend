@@ -36,13 +36,26 @@
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
     "migrate:reset": "db-migrate reset",
-    "seed": "knex seed:run"
+    "seed": "knex seed:run",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage"
   },
   "devDependencies": {
     "concurrently": "^3.3.0",
     "db-migrate": "^0.10.0-beta.20",
     "db-migrate-pg": "^0.1.11",
     "http-proxy": "^1.16.2",
+    "jest": "^19.0.2",
+    "jest-cli": "^19.0.2",
     "nodemon": "^1.11.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coverageReporters": [ "lcov", "html" ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
