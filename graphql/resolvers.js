@@ -201,13 +201,10 @@ const resolveFunctions = {
       return signIn(args.email, req)
     },
     async signOut(_, args, {loaders, pgdb, user, req}) {
-      if(!user) {
-        throw new Error('not signed in')
-      }
+      if(!req.session)
+        return
       req.session.destroy(function(err) {
-        if(err) {
-          throw (err)
-        }
+        if(err) { throw (err) }
       })
       return true
     },
