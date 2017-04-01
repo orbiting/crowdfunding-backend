@@ -149,8 +149,8 @@ const resolveFunctions = {
       }
     },
     async status(crowdfunding, args, {loaders, pgdb}) {
-      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAYED', crowdfunding.id]) || 0
-      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAYED', crowdfunding.id])
+      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAID', crowdfunding.id]) || 0
+      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAID', crowdfunding.id])
       return {
         money,
         people
@@ -304,7 +304,7 @@ const resolveFunctions = {
           //TODO save pledgePayment
           console.log("charge")
           console.log(charge)
-          pledgeStatus = 'PAYED'
+          pledgeStatus = 'PAID'
         } else {
           throw new Error('unsupported paymentMethod')
         }
