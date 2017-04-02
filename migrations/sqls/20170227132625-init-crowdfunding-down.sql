@@ -9,6 +9,7 @@ drop table if exists "packageOptions";
 drop table if exists "rewards";
 drop table if exists "packages";
 drop table if exists "crowdfundings";
+drop function if exists make_hrid(regclass, bigint);
 drop type  if exists "paymentType";
 drop type  if exists "paymentStatus";
 drop type  if exists "paymentMethod";

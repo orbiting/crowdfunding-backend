@@ -364,10 +364,8 @@ const resolveFunctions = {
               currency: "chf",
               source: pledge.payment.sourceId
             })
-            console.log("charge")
-            console.log(charge)
           } catch(e) {
-            //TODO sanitize error
+            //throw to client
             throw e
           }
           pledgeStatus = 'PAID'
@@ -386,6 +384,14 @@ const resolveFunctions = {
             userId: user.id,
             pspId: charge.source.id,
             pspPayload: charge.source
+          })
+        } else if(pledge.payment.method == 'PAYMENTSLIP') {
+          pledgeStatus = 'COMPLETED'
+          payment = await transaction.public.payments.insertAndGet({
+            type: 'PLEDGE',
+            method: 'PAYMENTSLIP',
+            total: pledge.total,
+            status: 'PROCESSING'
           })
         } else {
           throw new Error('unsupported paymentMethod')
