@@ -74,7 +74,6 @@ create table "pledges" (
   "addressId"   uuid references "addresses" on update cascade on delete cascade,
   "status"      "pledgeStatus" not null default 'DRAFT',
   "total"       integer not null,
-  "draft"       jsonb,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );
@@ -87,4 +86,40 @@ create table "pledgeOptions" (
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now(),
   PRIMARY KEY ("templateId", "pledgeId")
+);
+
+
+create type "paymentMethod" as ENUM ('STRIPE', 'POSTFINANCECARD', 'PAYPAL', 'PAYMENTSLIP');
+create type "paymentStatus" as ENUM ('PROCESSING', 'PAID', 'REFUNDED');
+create type "paymentType" as ENUM ('PLEDGE');
+create table "payments" (
+  "id"          uuid primary key not null default uuid_generate_v4(),
+  "type"        "paymentType" not null,
+  "method"      "paymentMethod" not null,
+  "total"       integer not null,
+  "status"      "paymentStatus" not null default 'PROCESSING',
+  "pspPayload"  jsonb,
+  "createdAt"   timestamptz default now(),
+  "updatedAt"   timestamptz default now(),
+  unique ("id", "type")
+);
+
+create table "pledgePayments" (
+  "id"           uuid primary key not null default uuid_generate_v4(),
+  "pledgeId"     uuid not null references "pledges"(id) on update cascade on delete cascade,
+  "paymentId"    uuid not null unique,
+  "paymentType"  "paymentType" not null check ("paymentType" = 'PLEDGE'),
+  "createdAt"    timestamptz default now(),
+  "updatedAt"    timestamptz default now(),
+  foreign key ("paymentId", "paymentType") references "payments" ("id", "type") on update cascade on delete cascade
+);
+
+create table "paymentSources" (
+  "id"          uuid primary key not null default uuid_generate_v4(),
+  "method"      "paymentMethod" not null,
+  "userId"      uuid references "users" on update cascade on delete cascade,
+  "pspId"       varchar,
+  "pspPayload"  jsonb,
+  "createdAt"   timestamptz default now(),
+  "updatedAt"   timestamptz default now()
 );

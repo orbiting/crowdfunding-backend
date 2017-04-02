@@ -7,7 +7,9 @@ create table "addresses" (
   "line2"       varchar,
   "postalCode"  varchar not null,
   "city"        varchar not null,
-  "country"     varchar not null
+  "country"     varchar not null,
+  "createdAt"   timestamptz default now(),
+  "updatedAt"   timestamptz default now()
 );
 
 create table "users" (
