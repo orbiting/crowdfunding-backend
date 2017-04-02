@@ -182,9 +182,9 @@ input AddressInput {
 
 enum PledgeStatus {
   DRAFT
-  COMPLETED
-  PAID
-  REFUNDED
+  WAITING_FOR_PAYMENT
+  SUCCESSFULL
+  CANCELLED
 }
 type Pledge {
   id: ID!
@@ -219,12 +219,18 @@ enum PaymentMethod {
   PAYPAL
   PAYMENTSLIP
 }
+enum PaymentStatus {
+  WAITING
+  PAID
+  REFUNDED
+  CANCELLED
+}
 type PledgePayment {
   id: ID!
   pledge: Pledge!
   method: PaymentMethod!
   total: Int!
-  status: String
+  status: PaymentStatus!
   createdAt: Date!
   updatedAt: Date!
 }

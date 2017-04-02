@@ -221,8 +221,8 @@ const resolveFunctions = {
       }
     },
     async status(crowdfunding, args, {loaders, pgdb}) {
-      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAID', crowdfunding.id]) || 0
-      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['PAID', crowdfunding.id])
+      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['SUCCESSFULL', crowdfunding.id]) || 0
+      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['SUCCESSFULL', crowdfunding.id])
       return {
         money,
         people
@@ -348,12 +348,18 @@ const resolveFunctions = {
         }
         */
 
-        let pledgeStatus = 'COMPLETED'
-
         //check/charge payment
-        let payment = null
-        //TODO support other payment methods
-        if(pledge.payment.method == 'STRIPE') {
+        let pledgeStatus
+        let payment
+        if(pledge.payment.method == 'PAYMENTSLIP') {
+          pledgeStatus = 'WAITING_FOR_PAYMENT'
+          payment = await transaction.public.payments.insertAndGet({
+            type: 'PLEDGE',
+            method: 'PAYMENTSLIP',
+            total: pledge.total,
+            status: 'WAITING'
+          })
+        } else if(pledge.payment.method == 'STRIPE') {
           if(!pledge.payment.sourceId) {
             throw new Error('sourceId required')
           }
@@ -368,7 +374,7 @@ const resolveFunctions = {
             //throw to client
             throw e
           }
-          pledgeStatus = 'PAID'
+          pledgeStatus = 'SUCCESSFULL'
           //save payment (is done outside of transaction,
           //to never loose it again)
           payment = await pgdb.public.payments.insertAndGet({
@@ -385,18 +391,10 @@ const resolveFunctions = {
             pspId: charge.source.id,
             pspPayload: charge.source
           })
-        } else if(pledge.payment.method == 'PAYMENTSLIP') {
-          pledgeStatus = 'COMPLETED'
-          payment = await transaction.public.payments.insertAndGet({
-            type: 'PLEDGE',
-            method: 'PAYMENTSLIP',
-            total: pledge.total,
-            status: 'PROCESSING'
-          })
         } else {
           throw new Error('unsupported paymentMethod')
         }
-        if(!payment) {
+        if(!payment || !pledgeStatus) {
           throw new Error('should not happen')
         }
 
@@ -430,8 +428,16 @@ const resolveFunctions = {
           paymentType: 'PLEDGE'
         })
 
+
+        //commit transaction
         await transaction.transactionCommit()
+
+        //remove cached pledge
+        req.session.pledge = {}
+
+        //signin user
         signIn(user.email, req) //TODO return phrase
+
         console.log(newPledge)
         return newPledge
       } catch(e) {

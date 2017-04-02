@@ -90,7 +90,7 @@ create table "membershipTypes" (
 );
 
 
-create type "pledgeStatus" as ENUM ('DRAFT', 'COMPLETED', 'PAID', 'REFUNDED');
+create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'SUCCESSFULL', 'CANCELLED');
 create table "pledges" (
   "id"          uuid primary key not null default uuid_generate_v4(),
   "packageId"   uuid not null references "packages" on update cascade on delete cascade,
@@ -114,14 +114,14 @@ create table "pledgeOptions" (
 
 
 create type "paymentMethod" as ENUM ('STRIPE', 'POSTFINANCECARD', 'PAYPAL', 'PAYMENTSLIP');
-create type "paymentStatus" as ENUM ('PROCESSING', 'PAID', 'REFUNDED');
+create type "paymentStatus" as ENUM ('WAITING', 'PAID', 'REFUNDED', 'CANCELLED');
 create type "paymentType" as ENUM ('PLEDGE');
 create table "payments" (
   "id"          uuid primary key not null default uuid_generate_v4(),
   "type"        "paymentType" not null,
   "method"      "paymentMethod" not null,
   "total"       integer not null,
-  "status"      "paymentStatus" not null default 'PROCESSING',
+  "status"      "paymentStatus" not null default 'WAITING',
   "hrid"        text unique not null default make_hrid('payments', 6),
   "pspPayload"  jsonb,
   "createdAt"   timestamptz default now(),
