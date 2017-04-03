@@ -227,10 +227,10 @@ const resolveFunctions = {
       return {success: true}
     },
     async submitPledge(_, args, {loaders, pgdb, req}) {
+      console.log(args)
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledge } = args
-        console.log(pledge)
 
         if(req.user) { //user logged in
           if(pledge.user) {
@@ -350,10 +350,10 @@ const resolveFunctions = {
       }
     },
     async payPledge(_, args, {loaders, pgdb, req}) {
+      console.log(args)
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledgePayment } = args
-        console.log(pledgePayment)
 
         //check pledgeId
         let pledge = await transaction.public.pledges.find({id: pledgePayment.pledgeId})
@@ -362,9 +362,9 @@ const resolveFunctions = {
         }
 
         //load user
-        let user = await transaction.public.users.find({id: pledge.userId})
+        let user = await transaction.public.users.findOne({id: pledge.userId})
         if(!user) {
-          throw new Error(`pledge user not found`)
+          throw new Error('pledge user not found, this should not happen')
         }
         if(req.user) { //a user is logged in
           if(req.user.id !== user) {
@@ -452,6 +452,52 @@ const resolveFunctions = {
         throw e
       }
 
+    },
+    async reclaimPledge(_, args, {loaders, pgdb, req}) {
+      console.log(args)
+      const transaction = await pgdb.transactionBegin()
+      try {
+        const { pledgeClaim } = args
+        //check pledgeId
+        let pledge = await transaction.public.pledges.find({id: pledgeClaim.pledgeId})
+        if(!pledge) {
+          throw new Error(`pledge (${pledgeClaim.pledgeId}) not found`)
+        }
+        //TODO do we need to check pledge.status here?
+
+        //load original user of pledge
+        const pledgeUser = await transaction.public.users.find({id: pledge.userId})
+        if(!pledgeUser) {
+          throw new Error('pledge user not found, this should not happen')
+        }
+        if(pledgeUser.email === pledgeClaim.email) {
+          //TODO fail gracefully?
+          throw new Error('pledge already belongs to the claiming email')
+        }
+        if(pledgeUser.verified) {
+          throw new Error('cannot claim pledges of verified users')
+        }
+
+        //check logged in user
+        if(req.user) {
+          if(req.user.email !== pledgeClaim.email) {
+            throw new Error('logged in users can only claim pledges to themselfs')
+          }
+          //transfer pledge to signin user
+          pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {userId: req.user.email})
+        } else {
+          //change email of pledgeUser
+          await transaction.public.users.updateAndGet({id: pledgeUser.id}, {email: pledgeClaim.email})
+        }
+
+        //commit transaction
+        await transaction.transactionCommit()
+
+        return pledge
+      } catch(e) {
+        await transaction.transactionRollback()
+        throw e
+      }
     }
   }
 }

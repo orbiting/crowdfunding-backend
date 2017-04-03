@@ -26,6 +26,8 @@ type RootMutation {
 
   submitPledge(pledge: PledgeInput): Pledge!
   payPledge(pledgePayment: PledgePaymentInput): Pledge!
+  reclaimPledge(pledgeClaim: PledgeClaimInput): Pledge!
+
   claimMembership(claimCode: String!): Membership
 
   submitQuestion(question: String!): MutationResult
@@ -217,6 +219,11 @@ type PledgePayment {
   status: PaymentStatus!
   createdAt: Date!
   updatedAt: Date!
+}
+
+input PledgeClaimInput {
+  pledgeId: ID!
+  email: String!
 }
 
 enum FaqStatus {
