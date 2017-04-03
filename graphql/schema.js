@@ -14,7 +14,6 @@ type RootQuery {
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
   pledges: [Pledge!]!
-  pledgeDraft(pledge: PledgeInput): Pledge
 
   memberships: [Pledge]
 
@@ -25,7 +24,8 @@ type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
 
-  submitPledge(pledge: PledgeInput): Pledge
+  submitPledge(pledge: PledgeInput): Pledge!
+  payPledge(pledgePayment: PledgePaymentInput): Pledge!
   claimMembership(claimCode: String!): Membership
 
   submitQuestion(question: String!): MutationResult
@@ -150,34 +150,18 @@ type Address {
   country: String!
 }
 
-union PledgeUser = User | UserDraft
-type UserDraft {
-  name: String
-  email: String
-  birthday: String
-  emailFree: Boolean
-}
 input UserInput {
-  email: String
-  name: String
-  birthday: String
-}
-union PledgeAddress = Address | AddressDraft
-type AddressDraft {
-  name: String
-  line1: String
-  line2: String
-  postalCode: String
-  city: String
-  country: String
+  email: String!
+  name: String!
+  birthday: String!
 }
 input AddressInput {
-  name: String
-  line1: String
-  line2: String
-  postalCode: String
-  city: String
-  country: String
+  name: String!
+  line1: String!
+  line2: String!
+  postalCode: String!
+  city: String!
+  country: String!
 }
 
 enum PledgeStatus {
@@ -193,8 +177,8 @@ type Pledge {
   status: PledgeStatus!
   total: Int!
   payments: [PledgePayment!]!
-  user: PledgeUser!
-  address: PledgeAddress!
+  user: User!
+  address: Address!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -204,11 +188,11 @@ input PledgeInput {
   total: Int!
   user: UserInput
   address: AddressInput!
-  payment: PledgePaymentInput
 }
 
 
 input PledgePaymentInput {
+  pledgeId: ID!
   method: PaymentMethod!
   sourceId: String
 }

@@ -80,57 +80,8 @@ const signIn = (email, req) => {
   return {phrase}
 }
 
-const validatePledge = async (pledge, pgdb, req) => {
-  if(req.user) { //user logged in
-    if(pledge.user) {
-      throw new Error('logged in users must no provide pledge.user')
-    }
-  } else { //user not logged in
-    if(!pledge.user) {
-      throw new Error('pledge must provide a user if not logged in')
-    }
-  }
-  const pledgeOptions = pledge.options
-
-  // load original of chosen packageOptions
-  const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
-  const packageOptions = await pgdb.public.packageOptions.find({id: pledgeOptionsTemplateIds})
-
-  // check if all templateIds are valid
-  if(packageOptions.length<pledgeOptions.length)
-    throw new Error("one or more of the claimed templateIds are/became invalid")
-
-  // check if packageOptions are all from the same package
-  let packageId = packageOptions[0].packageId
-  packageOptions.forEach( (pko) => {
-    if(packageId!==pko.packageId)
-      throw new Error("options must all be part of the same package!")
-  })
-
-  // check if amount > 0
-  // check if prices are correct / still the same
-  pledgeOptions.forEach( (plo) => {
-    const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
-    if(!pko) throw new Error("this should not happen")
-    if(plo.amount <= 0)
-      throw new Error(`amount in option (templateId: ${plo.templateId}) must be > 0`)
-    if(plo.price !== pko.price && !pko.userPrice)
-      throw new Error(`price in option (templateId: ${plo.templateId}) invalid/changed!`)
-  })
-
-  // check total
-  let total = 0
-  pledgeOptions.forEach( (plo) => {
-    total += (plo.amount * plo.price)
-  })
-  if(pledge.total < total)
-    throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
-
-  return
-}
-
-const isEmailFree = (email, pgdb) => {
-  return true//!(await pgdb.public.users.count({email: pledge.user.email}))
+const isEmailFree = async (email, pgdb) => {
+  return !(await pgdb.public.users.count({email: pledge.user.email}))
 }
 
 const resolveFunctions = {
@@ -174,25 +125,6 @@ const resolveFunctions = {
     },
     async faqs(_, args, {pgdb}) {
       return pgdb.public.faqs.find( args )
-    },
-    async pledgeDraft(_, args, {loaders, pgdb, req}) {
-      const {pledge} = args.pledge
-
-      if(!pledge) {
-        if(!req.session)
-          return null
-        return req.session.pledge
-      }
-
-      await validatePledge(pledge, pgdb, req)
-
-      //set emailFree
-      if(pledge.user && pledge.user.email) { //user not logged in
-        pledge.user.emailFree = isEmailFree(pledge.user.email, pgdb)
-      }
-
-      req.session.pledge = pledge
-      return pledge
     }
   },
 
@@ -299,7 +231,51 @@ const resolveFunctions = {
       try {
         const { pledge } = args
         console.log(pledge)
-        await validatePledge(pledge, transaction, req)
+
+        if(req.user) { //user logged in
+          if(pledge.user) {
+            throw new Error('logged in users must no provide pledge.user')
+          }
+        } else { //user not logged in
+          if(!pledge.user) {
+            throw new Error('pledge must provide a user if not logged in')
+          }
+        }
+        const pledgeOptions = pledge.options
+
+        // load original of chosen packageOptions
+        const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
+        const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
+
+        // check if all templateIds are valid
+        if(packageOptions.length<pledgeOptions.length)
+          throw new Error("one or more of the claimed templateIds are/became invalid")
+
+        // check if packageOptions are all from the same package
+        let packageId = packageOptions[0].packageId
+        packageOptions.forEach( (pko) => {
+          if(packageId!==pko.packageId)
+            throw new Error("options must all be part of the same package!")
+        })
+
+        // check if amount > 0
+        // check if prices are correct / still the same
+        pledgeOptions.forEach( (plo) => {
+          const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
+          if(!pko) throw new Error("this should not happen")
+          if(plo.amount <= 0)
+            throw new Error(`amount in option (templateId: ${plo.templateId}) must be > 0`)
+          if(plo.price !== pko.price && !pko.userPrice)
+            throw new Error(`price in option (templateId: ${plo.templateId}) invalid/changed!`)
+        })
+
+        // check total
+        let total = 0
+        pledgeOptions.forEach( (plo) => {
+          total += (plo.amount * plo.price)
+        })
+        if(pledge.total < total)
+          throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
 
         //check address
         const AddressInput = t.struct({
@@ -332,7 +308,8 @@ const resolveFunctions = {
           user = await transaction.public.users.insertAndGet({
             email: pledge.user.email,
             name: pledge.user.name,
-            birthday: pledge.user.birthday
+            birthday: pledge.user.birthday,
+            verified: false
           })
         }
         if(!user.addressId) { //user has no address yet
@@ -342,10 +319,65 @@ const resolveFunctions = {
           })
         }
 
+        //insert address
+        const pledgeAddress = await transaction.public.addresses.insertAndGet(pledge.address)
+
+        //insert pledge
+        let newPledge = {
+          userId: user.id,
+          packageId,
+          total: pledge.total,
+          status: 'DRAFT',
+          addressId: pledgeAddress.id
+        }
+        newPledge = await transaction.public.pledges.insertAndGet(newPledge)
+
+        //insert pledgeOptions
+        const newPledgeOptions = await Promise.all(pledge.options.map( (plo) => {
+          plo.pledgeId = newPledge.id
+          return transaction.public.pledgeOptions.insertAndGet(plo)
+        }))
+        newPledge.packageOptions = newPledgeOptions
+
+        //commit transaction
+        await transaction.transactionCommit()
+
+        console.log(newPledge)
+        return newPledge
+      } catch(e) {
+        await transaction.transactionRollback()
+        throw e
+      }
+    },
+    async payPledge(_, args, {loaders, pgdb, req}) {
+      const transaction = await pgdb.transactionBegin()
+      try {
+        const { pledgePayment } = args
+        console.log(pledgePayment)
+
+        //check pledgeId
+        let pledge = await transaction.public.pledges.find({id: pledgePayment.pledgeId})
+        if(!pledge) {
+          throw new Error(`pledge (${pledgePayment.pledgeId}) not found`)
+        }
+
+        //load user
+        let user = await transaction.public.users.find({id: pledge.userId})
+        if(!user) {
+          throw new Error(`pledge user not found`)
+        }
+        if(req.user) { //a user is logged in
+          if(req.user.id !== user) {
+            console.log("pledge doesn't belong to signed in user, transfering...")
+            user = req.user
+            pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {userId: user.id})
+          }
+        }
+
         //check/charge payment
         let pledgeStatus
         let payment
-        if(pledge.payment.method == 'PAYMENTSLIP') {
+        if(pledgePayment.method == 'PAYMENTSLIP') {
           pledgeStatus = 'WAITING_FOR_PAYMENT'
           payment = await transaction.public.payments.insertAndGet({
             type: 'PLEDGE',
@@ -353,8 +385,8 @@ const resolveFunctions = {
             total: pledge.total,
             status: 'WAITING'
           })
-        } else if(pledge.payment.method == 'STRIPE') {
-          if(!pledge.payment.sourceId) {
+        } else if(pledgePayment.method == 'STRIPE') {
+          if(!pledgePayment.sourceId) {
             throw new Error('sourceId required')
           }
           let charge = null
@@ -392,52 +424,34 @@ const resolveFunctions = {
           throw new Error('should not happen')
         }
 
-        //insert address
-        const pledgeAddress = await transaction.public.addresses.insertAndGet(pledge.address)
-
-        // load packageId
-        const packageId = (await pgdb.public.packageOptions.findFirst({id: pledge.options[0].templateId})).packageId
-
-        //insert pledge
-        let newPledge = {
-          userId: user.id,
-          packageId,
-          total: pledge.total,
-          status: pledgeStatus,
-          addressId: pledgeAddress.id
+        if(pledge.status !== pledgeStatus) {
+          pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {status: pledgeStatus})
         }
-        newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 
-        //insert pledgeOptions
-        const newPledgeOptions = await Promise.all(pledge.options.map( (plo) => {
-          plo.pledgeId = newPledge.id
-          return transaction.public.pledgeOptions.insertAndGet(plo)
-        }))
-        newPledge.packageOptions = newPledgeOptions
+        //TODO generate Memberships
 
         //insert pledgePayment
         await transaction.public.pledgePayments.insert({
-          pledgeId: newPledge.id,
+          pledgeId: pledge.id,
           paymentId: payment.id,
           paymentType: 'PLEDGE'
         })
 
-
         //commit transaction
         await transaction.transactionCommit()
 
-        //remove cached pledge
-        req.session.pledge = {}
-
         //signin user
-        signIn(user.email, req) //TODO return phrase
+        //if(!req.user) {
+        //  signIn(user.email, req) //TODO return phrase
+        //}
 
-        console.log(newPledge)
-        return newPledge
+        console.log(pledge)
+        return pledge
       } catch(e) {
         await transaction.transactionRollback()
         throw e
       }
+
     }
   }
 }
