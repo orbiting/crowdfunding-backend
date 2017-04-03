@@ -356,7 +356,7 @@ const resolveFunctions = {
         const { pledgePayment } = args
 
         //check pledgeId
-        let pledge = await transaction.public.pledges.find({id: pledgePayment.pledgeId})
+        let pledge = await transaction.public.pledges.findOne({id: pledgePayment.pledgeId})
         if(!pledge) {
           throw new Error(`pledge (${pledgePayment.pledgeId}) not found`)
         }
@@ -459,14 +459,14 @@ const resolveFunctions = {
       try {
         const { pledgeClaim } = args
         //check pledgeId
-        let pledge = await transaction.public.pledges.find({id: pledgeClaim.pledgeId})
+        let pledge = await transaction.public.pledges.findOne({id: pledgeClaim.pledgeId})
         if(!pledge) {
           throw new Error(`pledge (${pledgeClaim.pledgeId}) not found`)
         }
         //TODO do we need to check pledge.status here?
 
         //load original user of pledge
-        const pledgeUser = await transaction.public.users.find({id: pledge.userId})
+        const pledgeUser = await transaction.public.users.findOne({id: pledge.userId})
         if(!pledgeUser) {
           throw new Error('pledge user not found, this should not happen')
         }
