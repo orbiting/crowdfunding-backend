@@ -302,15 +302,26 @@ const resolveFunctions = {
           if(!t.validate(pledge.user, UserInput).isValid()) {
             throw new Error('pledge.user incomplete')
           }
-          if(!isEmailFree(pledge.user.email)) {
-            throw new Error('a user with the email adress pledge.user.email already exists, login!')
+          //try to load existing user by email
+          user = await transaction.public.users.findOne({email: pledge.user.email})
+          if(user) {
+            if(user.verified) {
+              throw new Error('a user with the email adress pledge.user.email already exists, login!')
+            } else { //user not verified
+              //update user with new details
+              user = await transaction.public.users.updateAndGet({id: user.id}, {
+                name: pledge.user.name,
+                birthday: pledge.user.birthday,
+              })
+            }
+          } else {
+            user = await transaction.public.users.insertAndGet({
+              email: pledge.user.email,
+              name: pledge.user.name,
+              birthday: pledge.user.birthday,
+              verified: false
+            })
           }
-          user = await transaction.public.users.insertAndGet({
-            email: pledge.user.email,
-            name: pledge.user.name,
-            birthday: pledge.user.birthday,
-            verified: false
-          })
         }
         if(!user.addressId) { //user has no address yet
           const userAddress = await transaction.public.addresses.insertAndGet(pledge.address)
