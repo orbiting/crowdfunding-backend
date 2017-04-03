@@ -231,16 +231,6 @@ const resolveFunctions = {
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledge } = args
-
-        if(req.user) { //user logged in
-          if(pledge.user) {
-            throw new Error('logged in users must no provide pledge.user')
-          }
-        } else { //user not logged in
-          if(!pledge.user) {
-            throw new Error('pledge must provide a user if not logged in')
-          }
-        }
         const pledgeOptions = pledge.options
 
         // load original of chosen packageOptions
@@ -292,8 +282,14 @@ const resolveFunctions = {
 
         let user = null
         if(req.user) { //user logged in
+          if(pledge.user) {
+            throw new Error('logged in users must no provide pledge.user')
+          }
           user = req.user
         } else { //user not logged in
+          if(!pledge.user) {
+            throw new Error('pledge must provide a user if not logged in')
+          }
           const UserInput = t.struct({
             email: t.String,
             name: t.String,
