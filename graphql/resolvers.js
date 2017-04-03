@@ -9,7 +9,7 @@ const geoipDatabase = require('geoip-database')
 const maxmind = require('maxmind')
 const cityLookup = maxmind.openSync(geoipDatabase.city)
 const t = require('tcomb-validation')
-
+const crypto = require('crypto')
 
 const getGeoForIp = (ip) => {
   const geo = cityLookup.get(ip)
@@ -421,6 +421,57 @@ const resolveFunctions = {
             pspId: charge.source.id,
             pspPayload: charge.source
           })
+        } else if(pledgePayment.method == 'POSTFINANCECARD') {
+          const pspPayload = JSON.parse(pledgePayment.pspPayload)
+          if(!pspPayload)
+            throw new Error('pspPayload required')
+          //check SHA of postfinance
+          const SHASIGN = pspPayload.SHASIGN
+          delete pspPayload.SHASIGN
+          //sort params based on upper case order (urgh!)
+          const pspPayloadKeys = Object.keys(pspPayload).sort(function(a, b){
+            if(a.toUpperCase() < b.toUpperCase()) return -1;
+            if(a.toUpperCase() > b.toUpperCase()) return 1;
+            return 0;
+          })
+          let paramsString = ''
+          const secret = process.env.PF_SHA_OUT_SECRET
+          pspPayloadKeys.forEach( function(key) {
+            let value = pspPayload[key]
+            if(value)
+              paramsString += `${key.toUpperCase()}=${value}${secret}`
+          })
+          const shasum = crypto.createHash('sha1')
+          shasum.update(paramsString)
+          if(SHASIGN!==shasum.digest('hex').toUpperCase())
+            throw new Error('SHASIGN not correct!')
+
+          //save payment no matter what
+          //PF amount is suddendly in franken
+          payment = await pgdb.public.payments.insertAndGet({
+            type: 'PLEDGE',
+            method: 'POSTFINANCECARD',
+            total: pspPayload.amount*100,
+            status: 'PAID',
+            pspPayload: pspPayload
+          })
+          pledgeStatus = 'SUCCESSFULL'
+
+          //check if amount is correct
+          //PF amount is suddendly in franken
+          if(pspPayload.amount*100 !== pledge.total) {
+            throw new Error('payed amount !== pledge.total')
+          }
+
+          //save alias to user
+          if(pspPayload.ALIAS) {
+            await transaction.public.paymentSources.insert({
+              method: 'POSTFINANCECARD',
+              userId: user.id,
+              pspId: pspPayload.ALIAS
+            })
+          }
+
         } else {
           throw new Error('unsupported paymentMethod')
         }

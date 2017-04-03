@@ -197,6 +197,7 @@ input PledgePaymentInput {
   pledgeId: ID!
   method: PaymentMethod!
   sourceId: String
+  pspPayload: String
 }
 
 enum PaymentMethod {
