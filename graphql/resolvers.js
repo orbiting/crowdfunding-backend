@@ -80,10 +80,6 @@ const signIn = (email, req) => {
   return {phrase}
 }
 
-const isEmailFree = async (email, pgdb) => {
-  return !(await pgdb.public.users.count({email: pledge.user.email}))
-}
-
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -404,6 +400,7 @@ const resolveFunctions = {
               source: pledge.payment.sourceId
             })
           } catch(e) {
+            //TODO log payment try?
             //throw to client
             throw e
           }
