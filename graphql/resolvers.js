@@ -301,7 +301,6 @@ const resolveFunctions = {
         console.log(pledge)
         await validatePledge(pledge, transaction, req)
 
-        /*
         //check address
         const AddressInput = t.struct({
           name: t.String,
@@ -314,13 +313,11 @@ const resolveFunctions = {
         if(!t.validate(pledge.address, AddressInput).isValid()) {
           throw new Error('pledge.address incomplete')
         }
-      */
 
         let user = null
         if(req.user) { //user logged in
           user = req.user
         } else { //user not logged in
-          /*
           const UserInput = t.struct({
             email: t.String,
             name: t.String,
@@ -332,21 +329,18 @@ const resolveFunctions = {
           if(!isEmailFree(pledge.user.email)) {
             throw new Error('a user with the email adress pledge.user.email already exists, login!')
           }
-          */
           user = await transaction.public.users.insertAndGet({
             email: pledge.user.email,
             name: pledge.user.name,
-            //birthday: pledge.user.birthday
+            birthday: pledge.user.birthday
           })
         }
-        /*
         if(!user.addressId) { //user has no address yet
           const userAddress = await transaction.public.addresses.insertAndGet(pledge.address)
           await transaction.public.users.update({id: user.id}, {
             addressId: userAddress.id
           })
         }
-        */
 
         //check/charge payment
         let pledgeStatus
@@ -399,7 +393,7 @@ const resolveFunctions = {
         }
 
         //insert address
-        //const pledgeAddress = await transaction.public.addresses.insertAndGet(pledge.address)
+        const pledgeAddress = await transaction.public.addresses.insertAndGet(pledge.address)
 
         // load packageId
         const packageId = (await pgdb.public.packageOptions.findFirst({id: pledge.options[0].templateId})).packageId
@@ -410,7 +404,7 @@ const resolveFunctions = {
           packageId,
           total: pledge.total,
           status: pledgeStatus,
-          //addressId: pledgeAddress.id
+          addressId: pledgeAddress.id
         }
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 

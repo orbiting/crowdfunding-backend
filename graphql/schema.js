@@ -203,7 +203,7 @@ input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
   user: UserInput
-  address: AddressInput
+  address: AddressInput!
   payment: PledgePaymentInput
 }
 
