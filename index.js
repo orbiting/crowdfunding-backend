@@ -16,6 +16,7 @@ const graphql = require('./graphql')
 const postfinance = require('./src/postfinance')
 
 
+
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   const server = express()
 
