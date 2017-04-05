@@ -63,6 +63,7 @@ create table "packageOptions" (
   "defaultAmount"   integer not null,
   "price"           integer not null,
   "userPrice"       boolean not null default false,
+  "minUserPrice"    integer not null default 0,
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now()
 );
@@ -96,7 +97,9 @@ create table "pledges" (
   "packageId"   uuid not null references "packages" on update cascade on delete cascade,
   "userId"      uuid references "users" on update cascade on delete cascade,
   "status"      "pledgeStatus" not null default 'DRAFT',
+  "reason"      text,
   "total"       integer not null,
+  "donation"    integer not null,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );

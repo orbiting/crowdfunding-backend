@@ -253,6 +253,7 @@ const resolveFunctions = {
         const { pledge } = args
         const pledgeOptions = pledge.options
 
+
         // load original of chosen packageOptions
         const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
         const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
@@ -262,30 +263,45 @@ const resolveFunctions = {
           throw new Error("one or more of the claimed templateIds are/became invalid")
 
         // check if packageOptions are all from the same package
+        // check if minAmount <= amount <= maxAmount
         let packageId = packageOptions[0].packageId
-        packageOptions.forEach( (pko) => {
-          if(packageId!==pko.packageId)
-            throw new Error("options must all be part of the same package!")
-        })
-
-        // check if amount > 0
-        // check if prices are correct / still the same
         pledgeOptions.forEach( (plo) => {
           const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
           if(!pko) throw new Error("this should not happen")
-          if(plo.amount <= 0)
-            throw new Error(`amount in option (templateId: ${plo.templateId}) must be > 0`)
-          if(plo.price !== pko.price && !pko.userPrice)
-            throw new Error(`price in option (templateId: ${plo.templateId}) invalid/changed!`)
+          if(packageId!==pko.packageId)
+            throw new Error("options must all be part of the same package!")
+          if(!(pko.minAmount <= plo.amount <= pko.maxAmount))
+            throw new Error(`amount in option (templateId: ${plo.templateId}) out of range`)
         })
 
-        // check total
-        let total = 0
-        pledgeOptions.forEach( (plo) => {
-          total += (plo.amount * plo.price)
-        })
-        if(pledge.total < total)
+        //check total
+        const minTotal = Math.max(pledgeOptions.reduce(
+          (amount, plo) => {
+            const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
+            return amount + (pko.userPrice
+              ? (pko.minUserPrice * plo.amount)
+              : (pko.price * plo.amount))
+          }
+          , 0
+        ), 100)
+
+        if(pledge.total < minTotal)
           throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
+
+        //calculate donation
+        const regularTotal = Math.max(pledgeOptions.reduce(
+          (amount, plo) => {
+            const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
+            return amount + (pko.price * plo.amount)
+          }
+          , 0
+        ), 100)
+
+        const donation = pledge.total - regularTotal
+        // check reason
+        if(donation < 0 && !pledge.reason)
+          throw new Error('you must provide a reason for reduced pledges')
+
 
         let user = null
         if(req.user) { //user logged in
@@ -324,7 +340,9 @@ const resolveFunctions = {
           userId: user.id,
           packageId,
           total: pledge.total,
-          status: 'DRAFT',
+          donation: donation,
+          reason: pledge.reason,
+          status: 'DRAFT'
         }
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 

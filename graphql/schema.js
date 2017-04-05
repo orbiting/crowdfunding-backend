@@ -103,6 +103,7 @@ type PackageOption {
   maxAmount: Int
   defaultAmount: Int!
   price: Int!
+  minUserPrice: Int!
   userPrice: Boolean!
   createdAt: Date!
   updatedAt: Date!
@@ -179,8 +180,10 @@ type Pledge {
   options: [PackageOption!]!
   status: PledgeStatus!
   total: Int!
+  donation: Int!
   payments: [PledgePayment!]!
   user: User!
+  reason: String
   createdAt: Date!
   updatedAt: Date!
 }
