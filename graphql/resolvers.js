@@ -408,7 +408,7 @@ const resolveFunctions = {
             charge = await stripe.charges.create({
               amount: pledge.total,
               currency: "chf",
-              source: pledge.payment.sourceId
+              source: pledgePayment.sourceId
             })
           } catch(e) {
             //TODO log payment try?
@@ -491,7 +491,7 @@ const resolveFunctions = {
         }
 
         if(pledge.status !== pledgeStatus) {
-          pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {status: pledgeStatus})
+          pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
         }
 
         //TODO generate Memberships
