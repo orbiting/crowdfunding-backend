@@ -28,6 +28,7 @@ type RootMutation {
   payPledge(pledgePayment: PledgePaymentInput): Pledge!
   reclaimPledge(pledgeClaim: PledgeClaimInput): Pledge!
 
+  updateAddress(address: AddressInput!): User!
   claimMembership(claimCode: String!): Membership
 
   submitQuestion(question: String!): MutationResult
@@ -180,7 +181,6 @@ type Pledge {
   total: Int!
   payments: [PledgePayment!]!
   user: User!
-  address: Address!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -189,7 +189,6 @@ input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
   user: UserInput
-  address: AddressInput!
 }
 
 

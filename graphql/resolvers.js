@@ -128,6 +128,11 @@ const resolveFunctions = {
       const userRoles = await loaders.usersRolesForUserIds.load(user.id)
       const roleIds = usersRoles.map( (ur) => { return ur.roleId } )
       return loaders.roles.load(roleIds)
+    },
+    async address(user, args, {loaders, pgdb}) {
+      if(!user.addressId)
+        return null
+      return pgdb.public.addresses.findOne({id: user.addressId})
     }
   },
   Role: {
@@ -206,6 +211,26 @@ const resolveFunctions = {
         if(err) { throw (err) }
       })
       return true
+    },
+    async updateAddress(_, args, {loaders, pgdb, req, user}) {
+      if(!user)
+        throw new Error('unauthorized')
+      const {address} = args
+      if(!user.addressId) { //user has no address yet
+        const transaction = await pgdb.transactionBegin()
+        try {
+          const userAddress = await transaction.public.addresses.insertAndGet(address)
+          await transaction.public.users.update({id: user.id}, {
+            addressId: userAddress.id
+          })
+          return transaction.transactionCommit()
+        } catch(e) {
+          await transaction.transactionRollback()
+          throw e
+        }
+      } else { //update address of user
+        return pgdb.public.addresses.update({id: user.addressId}, address)
+      }
     },
     async submitQuestion(_, args, {loaders, pgdb, user}) {
       if(!user) {
@@ -293,15 +318,6 @@ const resolveFunctions = {
             })
           }
         }
-        if(!user.addressId) { //user has no address yet
-          const userAddress = await transaction.public.addresses.insertAndGet(pledge.address)
-          await transaction.public.users.update({id: user.id}, {
-            addressId: userAddress.id
-          })
-        }
-
-        //insert address
-        const pledgeAddress = await transaction.public.addresses.insertAndGet(pledge.address)
 
         //insert pledge
         let newPledge = {
@@ -309,7 +325,6 @@ const resolveFunctions = {
           packageId,
           total: pledge.total,
           status: 'DRAFT',
-          addressId: pledgeAddress.id
         }
         newPledge = await transaction.public.pledges.insertAndGet(newPledge)
 

@@ -95,7 +95,6 @@ create table "pledges" (
   "id"          uuid primary key not null default uuid_generate_v4(),
   "packageId"   uuid not null references "packages" on update cascade on delete cascade,
   "userId"      uuid references "users" on update cascade on delete cascade,
-  "addressId"   uuid references "addresses" on update cascade on delete cascade,
   "status"      "pledgeStatus" not null default 'DRAFT',
   "total"       integer not null,
   "createdAt"   timestamptz default now(),
