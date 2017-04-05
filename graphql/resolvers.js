@@ -115,7 +115,7 @@ const resolveFunctions = {
     },
     async pledges(_, args, {loaders, pgdb, user}) {
       if(!user)
-        return null
+        return []
       return pgdb.public.pledges.find( {userId: user.id} )
     },
     async faqs(_, args, {pgdb}) {
