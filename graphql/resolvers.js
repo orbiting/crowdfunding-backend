@@ -8,7 +8,6 @@ const kraut = require('kraut')
 const geoipDatabase = require('geoip-database')
 const maxmind = require('maxmind')
 const cityLookup = maxmind.openSync(geoipDatabase.city)
-const t = require('tcomb-validation')
 const crypto = require('crypto')
 
 const getGeoForIp = (ip) => {
@@ -263,19 +262,6 @@ const resolveFunctions = {
         if(pledge.total < total)
           throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
 
-        //check address
-        const AddressInput = t.struct({
-          name: t.String,
-          line1: t.String,
-          line2: t.String,
-          postalCode: t.String,
-          city: t.String,
-          country: t.String
-        })
-        if(!t.validate(pledge.address, AddressInput).isValid()) {
-          throw new Error('pledge.address incomplete')
-        }
-
         let user = null
         if(req.user) { //user logged in
           if(pledge.user) {
@@ -285,14 +271,6 @@ const resolveFunctions = {
         } else { //user not logged in
           if(!pledge.user) {
             throw new Error('pledge must provide a user if not logged in')
-          }
-          const UserInput = t.struct({
-            email: t.String,
-            name: t.String,
-            birthday: t.String
-          })
-          if(!t.validate(pledge.user, UserInput).isValid()) {
-            throw new Error('pledge.user incomplete')
           }
           //try to load existing user by email
           user = await transaction.public.users.findOne({email: pledge.user.email})

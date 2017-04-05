@@ -160,7 +160,7 @@ input UserInput {
 input AddressInput {
   name: String!
   line1: String!
-  line2: String!
+  line2: String
   postalCode: String!
   city: String!
   country: String!
