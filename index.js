@@ -16,6 +16,10 @@ const graphql = require('./graphql')
 const postfinance = require('./src/postfinance')
 
 
+console.log('starting server...')
+process.on('uncaughtException', function (err) {
+  console.log('Caught exception: ' + err)
+})
 
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   const server = express()
