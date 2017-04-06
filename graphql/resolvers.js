@@ -397,6 +397,7 @@ const resolveFunctions = {
             total: pledge.total,
             status: 'WAITING'
           })
+
         } else if(pledgePayment.method == 'STRIPE') {
           if(!pledgePayment.sourceId) {
             throw new Error('sourceId required')
@@ -459,7 +460,7 @@ const resolveFunctions = {
 
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
-            throw new Error('this PAYID was used already 😲😒😢 ')
+            throw new Error('this PAYID was used already 😲😒😢')
           }
 
           //save payment no matter what
