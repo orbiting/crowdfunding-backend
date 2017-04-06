@@ -320,16 +320,14 @@ const resolveFunctions = {
               throw new Error('a user with the email adress pledge.user.email already exists, login!')
             } else { //user not verified
               //update user with new details
-              user = await transaction.public.users.updateAndGet({id: user.id}, {
-                name: pledge.user.name,
-                birthday: pledge.user.birthday,
+              user = await transaction.public.users.updateAndGetOne({id: user.id}, {
+                name: pledge.user.name
               })
             }
           } else {
             user = await transaction.public.users.insertAndGet({
               email: pledge.user.email,
               name: pledge.user.name,
-              birthday: pledge.user.birthday,
               verified: false
             })
           }
@@ -550,10 +548,10 @@ const resolveFunctions = {
             throw new Error('logged in users can only claim pledges to themselfs')
           }
           //transfer pledge to signin user
-          pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {userId: req.user.email})
+          pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {userId: req.user.email})
         } else {
           //change email of pledgeUser
-          await transaction.public.users.updateAndGet({id: pledgeUser.id}, {email: pledgeClaim.email})
+          await transaction.public.users.update({id: pledgeUser.id}, {email: pledgeClaim.email})
         }
 
         //commit transaction

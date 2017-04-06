@@ -157,7 +157,6 @@ type Address {
 input UserInput {
   email: String!
   name: String!
-  birthday: String!
 }
 input AddressInput {
   name: String!

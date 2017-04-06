@@ -95,7 +95,7 @@ create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'SUCCESSFULL
 create table "pledges" (
   "id"          uuid primary key not null default uuid_generate_v4(),
   "packageId"   uuid not null references "packages" on update cascade on delete cascade,
-  "userId"      uuid references "users" on update cascade on delete cascade,
+  "userId"      uuid not null references "users" on update cascade on delete cascade,
   "status"      "pledgeStatus" not null default 'DRAFT',
   "reason"      text,
   "total"       integer not null,
