@@ -381,10 +381,10 @@ const resolveFunctions = {
           throw new Error('pledge user not found, this should not happen')
         }
         if(req.user) { //a user is logged in
-          if(req.user.id !== user) {
+          if(req.user.id !== user.id) {
             console.log("pledge doesn't belong to signed in user, transfering...")
             user = req.user
-            pledge = await transaction.public.pledges.updateAndGet({id: pledge.id}, {userId: user.id})
+            pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {userId: user.id})
           }
         }
 
