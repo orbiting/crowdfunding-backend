@@ -468,6 +468,7 @@ const resolveFunctions = {
 
           //check if amount is correct
           //PF amount is suddendly in franken
+          //TODO really throw here?
           if(pspPayload.amount*100 !== pledge.total) {
             throw new Error('payed amount !== pledge.total')
           }
@@ -480,7 +481,51 @@ const resolveFunctions = {
               pspId: pspPayload.ALIAS
             })
           }
+        } else if(pledgePayment.method == 'PAYPAL') {
+          const pspPayload = JSON.parse(pledgePayment.pspPayload)
+          if(!pspPayload || !pspPayload.tx)
+            throw new Error('pspPayload(.tx) required')
 
+          const transactionDetails = {
+            'METHOD': 'GetTransactionDetails',
+            'TRANSACTIONID': pspPayload.tx,
+            'VERSION': '204.0',
+            'USER': process.env.PAYPAL_USER,
+            'PWD': process.env.PAYPAL_PWD,
+            'SIGNATURE': process.env.PAYPAL_SIGNATURE
+          }
+          const form = querystring.stringify(transactionDetails)
+          const contentLength = form.length
+          const response = await fetch(process.env.PAYPAL_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Length': contentLength,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: form
+          })
+          const responseDict = querystring.parse(await response.text())
+          if(responseDict.ACK !== 'Success')
+            throw new Error('paypal transaction invalid')
+
+          //get paypal amount (is decimal)
+          const amount = parseFloat(responseDict.AMT)*100
+
+          //save payment no matter what
+          payment = await pgdb.public.payments.insertAndGet({
+            type: 'PLEDGE',
+            method: 'PAYPAL',
+            total: amount,
+            status: 'PAID',
+            pspPayload: responseDict
+          })
+          pledgeStatus = 'SUCCESSFULL'
+
+          //check if amount is correct
+          //TODO really throw here?
+          if(amount !== pledge.total) {
+            throw new Error('payed amount !== pledge.total')
+          }
         } else {
           throw new Error('unsupported paymentMethod')
         }
