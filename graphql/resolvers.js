@@ -118,6 +118,21 @@ const resolveFunctions = {
         return []
       return pgdb.public.pledges.find( {userId: user.id} )
     },
+    async pledge(_, args, {loaders, pgdb, req}) {
+      if(req.user) {
+        return pgdb.public.pledges.findOne({
+          id: args.id,
+          userId: req.user.id
+        })
+      } else {
+        const pledge = await pgdb.public.pledges.findOne({id: args.id})
+        const user = await pgdb.public.users.findOne({id: pledge.userId})
+        if(!user.verified) {
+          return pledge
+        }
+      }
+      return null
+    },
     async faqs(_, args, {pgdb}) {
       return pgdb.public.faqs.find( args )
     }
