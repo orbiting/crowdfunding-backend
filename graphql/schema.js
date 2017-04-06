@@ -191,6 +191,7 @@ input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
   user: UserInput
+  reason: String
 }
 
 
