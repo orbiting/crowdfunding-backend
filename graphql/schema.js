@@ -25,9 +25,9 @@ type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
 
-  submitPledge(pledge: PledgeInput): Pledge!
-  payPledge(pledgePayment: PledgePaymentInput): Pledge!
-  reclaimPledge(pledgeClaim: PledgeClaimInput): Pledge!
+  submitPledge(pledge: PledgeInput): PledgeResponse!
+  payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
+  reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
 
   updateAddress(address: AddressInput!): User!
   claimMembership(claimCode: String!): Membership
@@ -195,6 +195,11 @@ input PledgeInput {
   reason: String
 }
 
+type PledgeResponse {
+  pledgeId: ID
+  userId: ID
+  emailVerify: Boolean
+}
 
 input PledgePaymentInput {
   pledgeId: ID!

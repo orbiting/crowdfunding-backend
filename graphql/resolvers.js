@@ -332,7 +332,10 @@ const resolveFunctions = {
           user = await transaction.public.users.findOne({email: pledge.user.email})
           if(user) {
             if(user.verified) {
-              throw new Error('a user with the email adress pledge.user.email already exists, login!')
+              //a user with the email adress pledge.user.email already exists, login!
+              return {
+                emailVerify: true
+              }
             } else { //user not verified
               //update user with new details
               user = await transaction.public.users.updateAndGetOne({id: user.id}, {
@@ -370,7 +373,10 @@ const resolveFunctions = {
         await transaction.transactionCommit()
 
         console.log(newPledge)
-        return newPledge
+        return {
+          pledgeId: newPledge.id,
+          userId: user.id
+        }
       } catch(e) {
         await transaction.transactionRollback()
         throw e
@@ -580,13 +586,11 @@ const resolveFunctions = {
         //commit transaction
         await transaction.transactionCommit()
 
-        //signin user
-        //if(!req.user) {
-        //  signIn(user.email, req) //TODO return phrase
-        //}
-
         console.log(pledge)
-        return pledge
+        return {
+          pledgeId: pledge.id,
+          userId: user.id
+        }
       } catch(e) {
         await transaction.transactionRollback()
         throw e
@@ -633,7 +637,10 @@ const resolveFunctions = {
         //commit transaction
         await transaction.transactionCommit()
 
-        return pledge
+        return {
+          pledgeId: pledge.id,
+          userId: pledge.userId
+        }
       } catch(e) {
         await transaction.transactionRollback()
         throw e
