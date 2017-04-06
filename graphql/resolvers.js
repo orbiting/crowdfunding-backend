@@ -421,15 +421,17 @@ const resolveFunctions = {
             method: 'STRIPE',
             total: charge.amount,
             status: 'PAID',
+            pspId: charge.id,
             pspPayload: charge
           })
-          //save stripeSourceId to user
+          //save sourceId to user
           await transaction.public.paymentSources.insert({
             method: 'STRIPE',
             userId: user.id,
             pspId: charge.source.id,
             pspPayload: charge.source
           })
+
         } else if(pledgePayment.method == 'POSTFINANCECARD') {
           const pspPayload = JSON.parse(pledgePayment.pspPayload)
           if(!pspPayload)
@@ -455,6 +457,11 @@ const resolveFunctions = {
           if(SHASIGN!==shasum.digest('hex').toUpperCase())
             throw new Error('SHASIGN not correct!')
 
+          //check for replay attacks
+          if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
+            throw new Error('this PAYID was used already 😲😒😢 ')
+          }
+
           //save payment no matter what
           //PF amount is suddendly in franken
           payment = await pgdb.public.payments.insertAndGet({
@@ -462,6 +469,7 @@ const resolveFunctions = {
             method: 'POSTFINANCECARD',
             total: pspPayload.amount*100,
             status: 'PAID',
+            pspId: pspPayload.PAYID,
             pspPayload: pspPayload
           })
           pledgeStatus = 'SUCCESSFULL'
@@ -481,10 +489,16 @@ const resolveFunctions = {
               pspId: pspPayload.ALIAS
             })
           }
+
         } else if(pledgePayment.method == 'PAYPAL') {
           const pspPayload = JSON.parse(pledgePayment.pspPayload)
           if(!pspPayload || !pspPayload.tx)
             throw new Error('pspPayload(.tx) required')
+
+          //check for replay attacks
+          if(await pgdb.public.payments.count({pspId: pspPayload.tx})) {
+            throw new Error('this transaction was used already 😲😒😢')
+          }
 
           const transactionDetails = {
             'METHOD': 'GetTransactionDetails',
@@ -517,6 +531,7 @@ const resolveFunctions = {
             method: 'PAYPAL',
             total: amount,
             status: 'PAID',
+            pspId: pspPayload.tx,
             pspPayload: responseDict
           })
           pledgeStatus = 'SUCCESSFULL'

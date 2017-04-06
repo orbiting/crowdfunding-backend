@@ -125,6 +125,7 @@ create table "payments" (
   "total"       integer not null,
   "status"      "paymentStatus" not null default 'WAITING',
   "hrid"        text unique not null default make_hrid('payments', 6),
+  "pspId"       text,
   "pspPayload"  jsonb,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now(),
