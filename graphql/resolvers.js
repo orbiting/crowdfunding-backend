@@ -212,6 +212,12 @@ const resolveFunctions = {
         pko.price = plo.price
         return pko
       })
+    },
+    async package(pledge, args, {loaders, pgdb}) {
+      return pgdb.public.packages.findOne({id: pledge.packageId})
+    },
+    async user(pledge, args, {loaders, pgdb}) {
+      return pgdb.public.users.findOne({id: pledge.userId})
     }
   },
 
