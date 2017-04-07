@@ -396,6 +396,9 @@ const resolveFunctions = {
         if(!pledge) {
           throw new Error(`pledge (${pledgePayment.pledgeId}) not found`)
         }
+        if(pledge.status === 'SUCCESSFULL') {
+          throw new Error('plede is paid already')
+        }
 
         //load user
         let user = await transaction.public.users.findOne({id: pledge.userId})
