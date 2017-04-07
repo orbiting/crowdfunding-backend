@@ -414,7 +414,12 @@ const resolveFunctions = {
         let pledgeStatus
         let payment
         if(pledgePayment.method == 'PAYMENTSLIP') {
-          pledgeStatus = 'WAITING_FOR_PAYMENT'
+          //only count PAYMENTSLIP payments up to CHF 10'000 immediately
+          if(pledge.total > 1000000) {
+            pledgeStatus = 'WAITING_FOR_PAYMENT'
+          } else {
+            pledgeStatus = 'SUCCESSFULL'
+          }
           payment = await transaction.public.payments.insertAndGet({
             type: 'PLEDGE',
             method: 'PAYMENTSLIP',
