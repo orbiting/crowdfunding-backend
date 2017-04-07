@@ -262,7 +262,6 @@ const resolveFunctions = {
       return {success: true}
     },
     async submitPledge(_, args, {loaders, pgdb, req}) {
-      console.log(args)
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledge } = args
@@ -372,7 +371,6 @@ const resolveFunctions = {
         //commit transaction
         await transaction.transactionCommit()
 
-        console.log(newPledge)
         return {
           pledgeId: newPledge.id,
           userId: user.id
@@ -383,7 +381,6 @@ const resolveFunctions = {
       }
     },
     async payPledge(_, args, {loaders, pgdb, req}) {
-      console.log(args)
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledgePayment } = args
@@ -586,7 +583,6 @@ const resolveFunctions = {
         //commit transaction
         await transaction.transactionCommit()
 
-        console.log(pledge)
         return {
           pledgeId: pledge.id,
           userId: user.id
@@ -598,7 +594,6 @@ const resolveFunctions = {
 
     },
     async reclaimPledge(_, args, {loaders, pgdb, req}) {
-      console.log(args)
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledgeClaim } = args
