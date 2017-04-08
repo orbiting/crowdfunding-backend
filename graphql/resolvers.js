@@ -417,8 +417,8 @@ const resolveFunctions = {
         let pledgeStatus
         let payment
         if(pledgePayment.method == 'PAYMENTSLIP') {
-          //only count PAYMENTSLIP payments up to CHF 10'000 immediately
-          if(pledge.total > 1000000) {
+          //only count PAYMENTSLIP payments up to CHF 1000.- immediately
+          if(pledge.total > 100000) {
             pledgeStatus = 'WAITING_FOR_PAYMENT'
           } else {
             pledgeStatus = 'SUCCESSFULL'
