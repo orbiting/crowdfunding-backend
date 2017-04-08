@@ -621,6 +621,7 @@ const resolveFunctions = {
             // 1) it's a one membership pledge
             // 2) this membership was bought for a reduced price
             // 3) this membership is not voucherable
+            // voucherCodes get generated inside the db, but not for reducedPrice
             const reducedPrice = pledge.donation < 0
 
             const memberships = []

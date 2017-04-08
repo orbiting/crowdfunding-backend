@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- http://stackoverflow.com/questions/19530736/how-can-i-generate-a-unique-string-per-record-in-a-table-in-postgres
 -- http://stackoverflow.com/questions/5997241/postgresql-is-there-a-function-that-will-convert-a-base-10-int-into-a-base-36-s
 -- https://www.techonthenet.com/postgresql/functions/random.php
-CREATE FUNCTION make_hrid(IN _tbl regclass, IN digits bigint) RETURNS text AS $$
+CREATE FUNCTION make_hrid(IN _tbl regclass, IN _column text, IN digits bigint) RETURNS text AS $$
 DECLARE
 chars char[];
 new_hrid text;
@@ -19,7 +19,7 @@ BEGIN
     WHILE char_length(new_hrid) < digits LOOP
       new_hrid := new_hrid || chars[floor(random()*(array_length(chars, 1)-1+1))+1];
     END LOOP hridloop;
-    EXECUTE format('SELECT (NOT EXISTS (SELECT 1 FROM %s WHERE hrid = %L))::bool', _tbl, new_hrid) INTO done;
+    EXECUTE format('SELECT (NOT EXISTS (SELECT 1 FROM "%s" WHERE "%s" = %L))::bool', _tbl, _column, new_hrid) INTO done;
   END LOOP doneloop;
   RETURN new_hrid;
 END;
@@ -123,7 +123,7 @@ create table "payments" (
   "method"      "paymentMethod" not null,
   "total"       integer not null,
   "status"      "paymentStatus" not null default 'WAITING',
-  "hrid"        text unique not null default make_hrid('payments', 6),
+  "hrid"        text unique not null default make_hrid('payments', 'hrid', 6),
   "pspId"       text,
   "pspPayload"  jsonb,
   "createdAt"   timestamptz default now(),
@@ -163,3 +163,19 @@ create table "memberships" (
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now()
 );
+
+
+CREATE FUNCTION voucher_code_trigger_function()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW."reducedPrice" IS false THEN
+    NEW."voucherCode" := make_hrid('memberships', 'voucherCode', 6);
+  END IF;
+  RETURN NEW;
+END
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_voucher_code
+BEFORE INSERT ON memberships
+FOR EACH ROW
+EXECUTE PROCEDURE voucher_code_trigger_function();
