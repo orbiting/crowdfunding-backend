@@ -461,6 +461,13 @@ const resolveFunctions = {
         let pledgeStatus
         let payment
         if(pledgePayment.method == 'PAYMENTSLIP') {
+          if(!pledge.address)
+            throw new Error('PAYMENTSLIP payments must include an address')
+
+          //insert address
+          const address = await transaction.public.addresses.insertAndGetOne(pledge.address)
+          user = await transaction.public.users.updateAndGetOne({id: user.id}, {addressId: address.id})
+
           //only count PAYMENTSLIP payments up to CHF 1000.- immediately
           if(pledge.total > 100000) {
             pledgeStatus = 'WAITING_FOR_PAYMENT'
