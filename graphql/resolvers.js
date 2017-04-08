@@ -267,6 +267,38 @@ const resolveFunctions = {
 
       return {success: true}
     },
+    async claimMembership(_, args, {loaders, pgdb, req}) {
+      if(!req.user)
+        throw new Error('login required')
+
+      //if this restriction gets removed, make sure to check if
+      //the membership doesn't already belong to the user, before
+      //making the the transfer and removing the voucherCode
+      if(await pgdb.public.memberships.count({userId: req.user.id}))
+        throw new Error('Sie können keinen Gutscheincode einlösen, weil Sie schon eine Mitgliedschaft haben.')
+
+      const {voucherCode} = args
+      const transaction = await pgdb.transactionBegin()
+      try {
+        const membership = await transaction.public.memberships.findOne({voucherCode})
+        if(!membership)
+          throw new Error('Gutscheincode ungültig')
+
+        //transfer membership and remove voucherCode
+        await transaction.public.memberships.updateOne({id: membership.id}, {
+          userId: req.user.id,
+          voucherCode: null
+        })
+
+        //commit transaction
+        await transaction.transactionCommit()
+
+        return true
+      } catch(e) {
+        await transaction.transactionRollback()
+        throw e
+      }
+    },
     async submitPledge(_, args, {loaders, pgdb, req}) {
       const transaction = await pgdb.transactionBegin()
       try {

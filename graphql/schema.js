@@ -30,7 +30,7 @@ type RootMutation {
   reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
 
   updateAddress(address: AddressInput!): User!
-  claimMembership(claimCode: String!): Membership
+  claimMembership(voucherCode: String!): Boolean!
 
   submitQuestion(question: String!): MutationResult
 }
