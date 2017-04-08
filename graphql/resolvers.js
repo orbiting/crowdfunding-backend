@@ -168,8 +168,11 @@ const resolveFunctions = {
       }
     },
     async status(crowdfunding, args, {loaders, pgdb}) {
-      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE (pl.status = $1 OR pl.status = $2) AND pa."crowdfundingId" = $3', ['SUCCESSFULL', 'WAITING_FOR_PAYMENT', crowdfunding.id]) || 0
-      const people = await pgdb.public.queryOneField('SELECT COUNT(DISTINCT("userId")) FROM pledges pl JOIN packages pa ON pl."packageId"=pa.id WHERE pl.status = $1 AND pa."crowdfundingId" = $2', ['SUCCESSFULL', crowdfunding.id])
+      //HACK speed/complexity optimization: we only have one crowdfunding now, so forget about
+      //joining tables to find out which crowdfunding things belong to just return what we have in total
+      //my boss: "mir möche kei crowdfunding platform!!!"
+      const money = await pgdb.public.queryOneField('SELECT SUM(total) FROM pledges pl WHERE pl.status = $1', ['SUCCESSFULL']) || 0
+      const people = await pgdb.public.queryOneField('SELECT COUNT(id) FROM memberships') || 0
       return {
         money,
         people
