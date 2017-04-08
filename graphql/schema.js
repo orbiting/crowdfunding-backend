@@ -139,7 +139,8 @@ type Membership {
   startDate: Date
   pledge: Pledge!
   user: User!
-  claimCode: String
+  voucherCode: String
+  reducedPrice: Boolean!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -184,6 +185,7 @@ type Pledge {
   payments: [PledgePayment!]!
   user: User!
   reason: String
+  memberships: [Membership!]!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -223,10 +225,10 @@ enum PaymentStatus {
 }
 type PledgePayment {
   id: ID!
-  pledge: Pledge!
   method: PaymentMethod!
   total: Int!
   status: PaymentStatus!
+  hrid: String
   createdAt: Date!
   updatedAt: Date!
 }

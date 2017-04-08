@@ -148,6 +148,12 @@ const resolveFunctions = {
       if(!user.addressId)
         return null
       return pgdb.public.addresses.findOne({id: user.addressId})
+    },
+    async memberships(user, args, {loaders, pgdb}) {
+      return pgdb.public.memberships.find({userId: user.id})
+    },
+    async pledges(user, args, {loaders, pgdb}) {
+      return pgdb.public.pledges.find({userId: user.id})
     }
   },
   Role: {
@@ -221,6 +227,21 @@ const resolveFunctions = {
     },
     async user(pledge, args, {loaders, pgdb}) {
       return pgdb.public.users.findOne({id: pledge.userId})
+    },
+    async payments(pledge, args, {loaders, pgdb}) {
+      const pledgePayments = await pgdb.public.pledgePayments.find({pledgeId: pledge.id})
+      return pgdb.public.payments.find({id: pledgePayments.map( (pp) => { return pp.paymentId })})
+    },
+    async memberships(pledge, args, {loaders, pgdb}) {
+      return pgdb.public.memberships.find({pledgeId: pledge.id})
+    }
+  },
+  Membership: {
+    async type(membership, args, {loaders, pgdb}) {
+      return pgdb.public.membershipTypes.findOne({id: membership.membershipTypeId})
+    },
+    async user(membership, args, {loaders, pgdb}) {
+      return pgdb.public.users.findOne({id: membership.userId})
     }
   },
 

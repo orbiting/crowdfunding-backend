@@ -159,7 +159,7 @@ create table "memberships" (
   "membershipTypeId"  uuid not null references "membershipTypes"(id) on update cascade on delete cascade,
   "beginDate"       timestamptz not null,
   "voucherCode"     text unique,
-  "reducedPrice"    boolean default false,
+  "reducedPrice"    boolean not null default false,
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now()
 );
