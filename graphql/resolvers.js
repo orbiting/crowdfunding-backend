@@ -637,38 +637,40 @@ const resolveFunctions = {
             const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledge.id})
             const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( (plo) => plo.templateId)})
             const rewards = await transaction.public.rewards.find({id: packageOptions.map( (pko) => pko.rewardId)})
-            const membershipTypes = await transaction.public.membershipTypes.find({rewardId: rewards.map( (r) => r.id)})
-            // assemble tree
-            rewards.forEach( (r) => {
-              r.membershipType = membershipTypes.find( (mt) => r.id===mt.rewardId)
-            })
-            packageOptions.forEach( (pko) => {
-              pko.reward = rewards.find( (r) => pko.rewardId===r.id)
-            })
-            pledgeOptions.forEach( (plo) => {
-              plo.packageOption = packageOptions.find( (pko) => plo.templateId===pko.id)
-            })
+            if(rewards.length) { //otherwise it's a donation-only pledge
+              const membershipTypes = await transaction.public.membershipTypes.find({rewardId: rewards.map( (r) => r.id)})
+              // assemble tree
+              rewards.forEach( (r) => {
+                r.membershipType = membershipTypes.find( (mt) => r.id===mt.rewardId)
+              })
+              packageOptions.forEach( (pko) => {
+                pko.reward = rewards.find( (r) => pko.rewardId===r.id)
+              })
+              pledgeOptions.forEach( (plo) => {
+                plo.packageOption = packageOptions.find( (pko) => plo.templateId===pko.id)
+              })
 
-            //HACKHACK if the pledge has a negative donation:
-            // 1) it's a one membership pledge
-            // 2) this membership was bought for a reduced price
-            // 3) this membership is not voucherable
-            // voucherCodes get generated inside the db, but not for reducedPrice
-            const reducedPrice = pledge.donation < 0
+              //HACKHACK if the pledge has a negative donation:
+              // 1) it's a one membership pledge
+              // 2) this membership was bought for a reduced price
+              // 3) this membership is not voucherable
+              // voucherCodes get generated inside the db, but not for reducedPrice
+              const reducedPrice = pledge.donation < 0
 
-            const memberships = []
-            pledgeOptions.forEach( (plo) => {
-              if(plo.packageOption.reward.type === 'MembershipType') {
-                memberships.push({
-                  userId: user.id,
-                  pledgeId: pledge.id,
-                  membershipTypeId: plo.packageOption.reward.membershipType.id,
-                  beginDate: new Date(),
-                  reducedPrice
-                })
-              }
-            })
-            await transaction.public.memberships.insert(memberships)
+              const memberships = []
+              pledgeOptions.forEach( (plo) => {
+                if(plo.packageOption.reward.type === 'MembershipType') {
+                  memberships.push({
+                    userId: user.id,
+                    pledgeId: pledge.id,
+                    membershipTypeId: plo.packageOption.reward.membershipType.id,
+                    beginDate: new Date(),
+                    reducedPrice
+                  })
+                }
+              })
+              await transaction.public.memberships.insert(memberships)
+            }
           }
           // update pledge status
           pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
