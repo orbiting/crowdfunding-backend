@@ -2,6 +2,7 @@ drop table if exists "paymentSources";
 drop table if exists "pledgePayments";
 drop table if exists "payments";
 drop table if exists "pledgeOptions";
+drop table if exists "memberships";
 drop table if exists "pledges";
 drop table if exists "membershipTypes";
 drop table if exists "goodies";

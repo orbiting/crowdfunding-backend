@@ -284,6 +284,9 @@ const resolveFunctions = {
 
         // check if packageOptions are all from the same package
         // check if minAmount <= amount <= maxAmount
+        // we don't check the pledgeOption price here, because the frontend always
+        // sends whats in the templating packageOption, so we always copy the price
+        // into the pledgeOption (for record keeping)
         let packageId = packageOptions[0].packageId
         pledgeOptions.forEach( (plo) => {
           const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
@@ -354,6 +357,12 @@ const resolveFunctions = {
               verified: false
             })
           }
+        }
+
+        //check if user already has a reduced membership
+        //see HACKHACK in payPledge
+        if(donation < 0 && await transaction.public.memberships.count({userId: user.id, reducedPrice: true})) {
+          throw new Error('Sie können nur eine reduzierte Mitgliedschaft kaufen!')
         }
 
         //insert pledge
@@ -608,6 +617,12 @@ const resolveFunctions = {
               plo.packageOption = packageOptions.find( (pko) => plo.templateId===pko.id)
             })
 
+            //HACKHACK if the pledge has a negative donation:
+            // 1) it's a one membership pledge
+            // 2) this membership was bought for a reduced price
+            // 3) this membership is not voucherable
+            const reducedPrice = pledge.donation < 0
+
             const memberships = []
             pledgeOptions.forEach( (plo) => {
               if(plo.packageOption.reward.type === 'MembershipType') {
@@ -615,7 +630,8 @@ const resolveFunctions = {
                   userId: user.id,
                   pledgeId: pledge.id,
                   membershipTypeId: plo.packageOption.reward.membershipType.id,
-                  beginDate: new Date()
+                  beginDate: new Date(),
+                  reducedPrice
                 })
               }
             })
