@@ -660,13 +660,15 @@ const resolveFunctions = {
               const memberships = []
               pledgeOptions.forEach( (plo) => {
                 if(plo.packageOption.reward.type === 'MembershipType') {
-                  memberships.push({
-                    userId: user.id,
-                    pledgeId: pledge.id,
-                    membershipTypeId: plo.packageOption.reward.membershipType.id,
-                    beginDate: new Date(),
-                    reducedPrice
-                  })
+                  for(let c=0; c<plo.amount; c++) {
+                    memberships.push({
+                      userId: user.id,
+                      pledgeId: pledge.id,
+                      membershipTypeId: plo.packageOption.reward.membershipType.id,
+                      beginDate: new Date(),
+                      reducedPrice
+                    })
+                  }
                 }
               })
               await transaction.public.memberships.insert(memberships)
