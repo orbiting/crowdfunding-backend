@@ -90,7 +90,6 @@ create table "membershipTypes" (
   foreign key ("rewardId", "rewardType") references "rewards" ("id", "type") on update cascade on delete cascade
 );
 
-
 create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'SUCCESSFULL', 'CANCELLED');
 create table "pledges" (
   "id"          uuid primary key not null default uuid_generate_v4(),
@@ -150,4 +149,16 @@ create table "paymentSources" (
   "pspPayload"  jsonb,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
+);
+
+
+create table "memberships" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "userId"          uuid references "users" on update cascade on delete cascade,
+  "pledgeId"        uuid not null references "pledges"(id) on update cascade on delete cascade,
+  "membershipTypeId"  uuid not null references "membershipTypes"(id) on update cascade on delete cascade,
+  "beginDate"       timestamptz not null,
+  "voucherCode"     text unique,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now()
 );

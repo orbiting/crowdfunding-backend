@@ -581,12 +581,6 @@ const resolveFunctions = {
           throw new Error('should not happen')
         }
 
-        if(pledge.status !== pledgeStatus) {
-          pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
-        }
-
-        //TODO generate Memberships
-
         //insert pledgePayment
         await transaction.public.pledgePayments.insert({
           pledgeId: pledge.id,
@@ -595,37 +589,41 @@ const resolveFunctions = {
         })
 
         if(pledge.status !== pledgeStatus) {
+          //generate Memberships
+          // TODO extract to function
+          if(pledgeStatus === 'SUCCESSFULL') {
+            // get augmented pledge options
+            const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledge.id})
+            const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( (plo) => plo.templateId)})
+            const rewards = await transaction.public.rewards.find({id: packageOptions.map( (pko) => pko.rewardId)})
+            const membershipTypes = await transaction.public.membershipTypes.find({rewardId: rewards.map( (r) => r.id)})
+            // assemble tree
+            rewards.forEach( (r) => {
+              r.membershipType = membershipTypes.find( (mt) => r.id===mt.rewardId)
+            })
+            packageOptions.forEach( (pko) => {
+              pko.reward = rewards.find( (r) => pko.rewardId===r.id)
+            })
+            pledgeOptions.forEach( (plo) => {
+              plo.packageOption = packageOptions.find( (pko) => plo.templateId===pko.id)
+            })
+
+            const memberships = []
+            pledgeOptions.forEach( (plo) => {
+              if(plo.packageOption.reward.type === 'MembershipType') {
+                memberships.push({
+                  userId: user.id,
+                  pledgeId: pledge.id,
+                  membershipTypeId: plo.packageOption.reward.membershipType.id,
+                  beginDate: new Date()
+                })
+              }
+            })
+            await transaction.public.memberships.insert(memberships)
+          }
+          // update pledge status
           pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
         }
-
-        //generate Memberships
-        if(pledgeStatus === 'SUCCESSFULL') {
-          transaction.public.pledges.insert
-
-          // load pledgeOptions
-          const pledgeOptionsTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
-          const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
-
-          // check if all templateIds are valid
-          if(packageOptions.length<pledgeOptions.length)
-            throw new Error("one or more of the claimed templateIds are/became invalid")
-
-          // check if packageOptions are all from the same package
-          // check if minAmount <= amount <= maxAmount
-          let packageId = packageOptions[0].packageId
-          pledgeOptions.forEach( (plo) => {
-            const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
-            if(!pko) throw new Error("this should not happen")
-            if(packageId!==pko.packageId)
-              throw new Error("options must all be part of the same package!")
-            if(!(pko.minAmount <= plo.amount <= pko.maxAmount))
-              throw new Error(`amount in option (templateId: ${plo.templateId}) out of range`)
-          })
-
-        }
-
-
-
 
         //commit transaction
         await transaction.transactionCommit()
