@@ -465,19 +465,6 @@ const resolveFunctions = {
           throw new Error('plede is paid already')
         }
 
-        //load user
-        let user = await transaction.public.users.findOne({id: pledge.userId})
-        if(!user) {
-          throw new Error('pledge user not found, this should not happen')
-        }
-        if(req.user) { //a user is logged in
-          if(req.user.id !== user.id) {
-            console.log("pledge doesn't belong to signed in user, transfering...")
-            user = req.user
-            pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {userId: user.id})
-          }
-        }
-
         //check/charge payment
         let pledgeStatus
         let payment
