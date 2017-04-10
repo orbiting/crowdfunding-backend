@@ -346,7 +346,6 @@ const resolveFunctions = {
         let packageId = packageOptions[0].packageId
         pledgeOptions.forEach( (plo) => {
           const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
-          if(!pko) throw new Error("this should not happen")
           if(packageId!==pko.packageId)
             throw new Error("options must all be part of the same package!")
           if(!(pko.minAmount <= plo.amount <= pko.maxAmount))
@@ -722,9 +721,6 @@ const resolveFunctions = {
 
         //load original user of pledge
         const pledgeUser = await transaction.public.users.findOne({id: pledge.userId})
-        if(!pledgeUser) {
-          throw new Error('pledge user not found, this should not happen')
-        }
         if(pledgeUser.email === pledgeClaim.email) {
           //TODO fail gracefully?
           throw new Error('pledge already belongs to the claiming email')
