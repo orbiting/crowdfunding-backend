@@ -9,6 +9,7 @@ const geoipDatabase = require('geoip-database')
 const maxmind = require('maxmind')
 const cityLookup = maxmind.openSync(geoipDatabase.city)
 const crypto = require('crypto')
+const {ascending} = require('d3-array')
 
 const getGeoForIp = (ip) => {
   const geo = cityLookup.get(ip)
@@ -530,19 +531,13 @@ const resolveFunctions = {
           //check SHA of postfinance
           const SHASIGN = pspPayload.SHASIGN
           delete pspPayload.SHASIGN
-          //sort params based on upper case order (urgh!)
-          const pspPayloadKeys = Object.keys(pspPayload).sort(function(a, b){
-            if(a.toUpperCase() < b.toUpperCase()) return -1;
-            if(a.toUpperCase() > b.toUpperCase()) return 1;
-            return 0;
-          })
-          let paramsString = ''
           const secret = process.env.PF_SHA_OUT_SECRET
-          pspPayloadKeys.forEach( function(key) {
-            let value = pspPayload[key]
-            if(value)
-              paramsString += `${key.toUpperCase()}=${value}${secret}`
-          })
+          //sort params based on upper case order (urgh!)
+          const paramsString = Object.keys(pspPayload)
+            .sort( (a, b) => ascending(a.toUpperCase(), b.toUpperCase()))
+            .filter(key => pspPayload[key])
+            .map(key => `${key.toUpperCase()}=${pspPayload[key]}${secret}`)
+            .join('')
           const shasum = crypto.createHash('sha1')
           shasum.update(paramsString)
           if(SHASIGN!==shasum.digest('hex').toUpperCase())
