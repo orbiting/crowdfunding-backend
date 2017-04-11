@@ -692,8 +692,7 @@ const resolveFunctions = {
         await transaction.transactionCommit()
 
         return {
-          pledgeId: pledge.id,
-          userId: user.id
+          pledgeId: pledge.id
         }
       } catch(e) {
         await transaction.transactionRollback()
