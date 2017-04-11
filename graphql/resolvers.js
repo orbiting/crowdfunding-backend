@@ -10,6 +10,7 @@ const maxmind = require('maxmind')
 const cityLookup = maxmind.openSync(geoipDatabase.city)
 const crypto = require('crypto')
 const {ascending} = require('d3-array')
+const logger = require('../lib/logger')
 
 const getGeoForIp = (ip) => {
   const geo = cityLookup.get(ip)
@@ -41,14 +42,15 @@ const sendMail = (mail) => {
   })
 }
 
-const signIn = (email, req) => {
+const signIn = (email, req, t) => {
   if(req.user) {
     //fail gracefully
     return {phrase: ''}
   }
 
   if(!email.match(/^.+@.+\..+$/)) {
-    throw new Error('Email-Adresse nicht gültig.')
+    logger.info('invalid email', { req: req._log(), email })
+    throw new Error(t('api/email/invalid'))
   }
 
   const token = uuid()
@@ -80,6 +82,13 @@ const signIn = (email, req) => {
   return {phrase}
 }
 
+ensureSignedIn = (req, t) => {
+  if(!req.user) {
+    logger.info('unauthorized', { req: req._log() })
+    throw new Error(t('api/unauthorized'))
+  }
+}
+
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -108,15 +117,14 @@ const resolveFunctions = {
     async roles(_, args, {loaders, pgdb}) {
       return pgdb.public.roles.find( args )
     },
-    async crowdfundings(_, args, {loaders, pgdb}) {
+    async crowdfundings(_, args, {loaders, pgdb, req}) {
       return pgdb.public.crowdfundings.find()
     },
     async crowdfunding(_, args, {loaders, pgdb}) {
       return pgdb.public.crowdfundings.findOne( args )
     },
     async pledges(_, args, {loaders, pgdb, user}) {
-      if(!user)
-        return []
+      if(!user) return []
       return pgdb.public.pledges.find( {userId: user.id} )
     },
     async pledge(_, args, {loaders, pgdb, req}) {
@@ -146,8 +154,7 @@ const resolveFunctions = {
       return loaders.roles.load(roleIds)
     },
     async address(user, args, {loaders, pgdb}) {
-      if(!user.addressId)
-        return null
+      if(!user.addressId) return null
       return pgdb.public.addresses.findOne({id: user.addressId})
     },
     async memberships(user, args, {loaders, pgdb}) {
@@ -227,7 +234,7 @@ const resolveFunctions = {
     async package(pledge, args, {loaders, pgdb}) {
       return pgdb.public.packages.findOne({id: pledge.packageId})
     },
-    async user(pledge, args, {loaders, pgdb}) {
+    async user(pledge, args, {loaders, pgdb, t}) {
       return pgdb.public.users.findOne({id: pledge.userId})
     },
     async payments(pledge, args, {loaders, pgdb}) {
@@ -254,14 +261,16 @@ const resolveFunctions = {
     async signOut(_, args, {loaders, pgdb, user, req}) {
       if(!req.session)
         return
-      req.session.destroy(function(err) {
-        if(err) { throw (err) }
+      req.session.destroy(function(error) {
+        if(error) {
+          logger.error('error trying to destroy session', { req: req._log(), error })
+        }
       })
       return true
     },
-    async updateAddress(_, args, {loaders, pgdb, req, user}) {
-      if(!user)
-        throw new Error('unauthorized')
+    async updateAddress(_, args, {loaders, pgdb, req, user, t}) {
+      ensureSignedIn(req, t)
+
       const {address} = args
       if(!user.addressId) { //user has no address yet
         const transaction = await pgdb.transactionBegin()
@@ -273,16 +282,16 @@ const resolveFunctions = {
           return transaction.transactionCommit()
         } catch(e) {
           await transaction.transactionRollback()
-          throw e
+          logger.error('error in transaction', { req: req._log(), args, error: e })
+          throw new Error(t('api/unexpected'))
         }
       } else { //update address of user
         return pgdb.public.addresses.update({id: user.addressId}, address)
       }
     },
-    async submitQuestion(_, args, {loaders, pgdb, user}) {
-      if(!user) {
-        throw new Error('login required')
-      }
+    async submitQuestion(_, args, {loaders, pgdb, user, t}) {
+      ensureSignedIn(req, t)
+
       const { question } = args
       sendMail({
         to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
@@ -293,22 +302,21 @@ const resolveFunctions = {
 
       return {success: true}
     },
-    async claimMembership(_, args, {loaders, pgdb, req}) {
-      if(!req.user)
-        throw new Error('login required')
+    async claimMembership(_, args, {loaders, pgdb, req, t}) {
+      ensureSignedIn(req, t)
 
       //if this restriction gets removed, make sure to check if
       //the membership doesn't already belong to the user, before
       //making the the transfer and removing the voucherCode
       if(await pgdb.public.memberships.count({userId: req.user.id}))
-        throw new Error('Sie können keinen Gutscheincode einlösen, weil Sie schon eine Mitgliedschaft haben.')
+        throw new Error(t('api/membership/claim/alreadyHave'))
 
       const {voucherCode} = args
       const transaction = await pgdb.transactionBegin()
       try {
         const membership = await transaction.public.memberships.findOne({voucherCode})
         if(!membership)
-          throw new Error('Gutscheincode ungültig')
+          throw new Error(t('api/membership/claim/invalidToken'))
 
         //transfer membership and remove voucherCode
         await transaction.public.memberships.updateOne({id: membership.id}, {
@@ -322,10 +330,11 @@ const resolveFunctions = {
         return true
       } catch(e) {
         await transaction.transactionRollback()
+        logger.info('transaction rollback', { req: req._log(), args, error: e })
         throw e
       }
     },
-    async submitPledge(_, args, {loaders, pgdb, req}) {
+    async submitPledge(_, args, {loaders, pgdb, req, t}) {
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledge } = args
@@ -337,8 +346,10 @@ const resolveFunctions = {
         const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
 
         // check if all templateIds are valid
-        if(packageOptions.length<pledgeOptions.length)
-          throw new Error("one or more of the claimed templateIds are/became invalid")
+        if(packageOptions.length<pledgeOptions.length) {
+          logger.error('one or more of the claimed templateIds are/became invalid', { req: req._log(), args, error: e })
+          throw new Error(t('api/unexpected'))
+        }
 
         // check if packageOptions are all from the same package
         // check if minAmount <= amount <= maxAmount
@@ -348,10 +359,14 @@ const resolveFunctions = {
         let packageId = packageOptions[0].packageId
         pledgeOptions.forEach( (plo) => {
           const pko = packageOptions.find( (pko) => pko.id===plo.templateId)
-          if(packageId!==pko.packageId)
-            throw new Error("options must all be part of the same package!")
-          if(!(pko.minAmount <= plo.amount <= pko.maxAmount))
-            throw new Error(`amount in option (templateId: ${plo.templateId}) out of range`)
+          if(packageId!==pko.packageId) {
+            logger.error('options must all be part of the same package!', { req: req._log(), args, plo, pko })
+            throw new Error(t('api/unexpected'))
+          }
+          if(!(pko.minAmount <= plo.amount <= pko.maxAmount)) {
+            logger.error(`amount in option (templateId: ${plo.templateId}) out of range`, { req: req._log(), args, pko, plo })
+            throw new Error(t('api/unexpected'))
+          }
         })
 
         //check total
@@ -365,8 +380,10 @@ const resolveFunctions = {
           , 0
         ), 100)
 
-        if(pledge.total < minTotal)
-          throw new Error(`pledge.total (${pledge.total}) should be >= (${total})`)
+        if(pledge.total < minTotal) {
+          logger.error(`pledge.total (${pledge.total}) must be >= (${total})`, { req: req._log(), args, minTotal })
+          throw new Error(t('api/unexpected'))
+        }
 
         //calculate donation
         const regularTotal = Math.max(pledgeOptions.reduce(
@@ -379,19 +396,22 @@ const resolveFunctions = {
 
         const donation = pledge.total - regularTotal
         // check reason
-        if(donation < 0 && !pledge.reason)
-          throw new Error('you must provide a reason for reduced pledges')
-
+        if(donation < 0 && !pledge.reason) {
+          logger.error('you must provide a reason for reduced pledges', { req: req._log(), args, donation })
+          throw new Error(t('api/unexpected'))
+        }
 
         let user = null
         if(req.user) { //user logged in
           if(pledge.user) {
-            throw new Error('logged in users must no provide pledge.user')
+            logger.error('logged in users must no provide pledge.user', { req: req._log(), args })
+            throw new Error(t('api/unexpected'))
           }
           user = req.user
         } else { //user not logged in
           if(!pledge.user) {
-            throw new Error('pledge must provide a user if not logged in')
+            logger.error('pledge must provide a user if not logged in', { req: req._log(), args })
+            throw new Error(t('api/unexpected'))
           }
           //try to load existing user by email
           user = await transaction.public.users.findOne({email: pledge.user.email})
@@ -419,7 +439,8 @@ const resolveFunctions = {
         //check if user already has a reduced membership
         //see HACKHACK in payPledge
         if(donation < 0 && await transaction.public.memberships.count({userId: user.id, reducedPrice: true})) {
-          throw new Error('Sie können nur eine reduzierte Mitgliedschaft kaufen!')
+          logger.info('user tried to buy a second reduced membership', { req: req._log(), args })
+          throw new Error(t('api/membership/reduced/alreadyHave'))
         }
 
         //insert pledge
@@ -449,10 +470,11 @@ const resolveFunctions = {
         }
       } catch(e) {
         await transaction.transactionRollback()
+        logger.info('transaction rollback', { req: req._log(), args, error: e })
         throw e
       }
     },
-    async payPledge(_, args, {loaders, pgdb, req}) {
+    async payPledge(_, args, {loaders, pgdb, req, t}) {
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledgePayment } = args
@@ -460,18 +482,22 @@ const resolveFunctions = {
         //check pledgeId
         let pledge = await transaction.public.pledges.findOne({id: pledgePayment.pledgeId})
         if(!pledge) {
-          throw new Error(`pledge (${pledgePayment.pledgeId}) not found`)
+          logger.error(`pledge (${pledgePayment.pledgeId}) not found`, { req: req._log(), args, pledge })
+          throw new Error(t('api/unexpected'))
         }
         if(pledge.status === 'SUCCESSFULL') {
-          throw new Error('plede is paid already')
+          logger.error('pledge is already paid', { req: req._log(), args, pledge, pledgePayment })
+          throw new Error(t('api/pledge/alreadyPaid'))
         }
 
         //check/charge payment
         let pledgeStatus
         let payment
         if(pledgePayment.method == 'PAYMENTSLIP') {
-          if(!pledge.address)
-            throw new Error('PAYMENTSLIP payments must include an address')
+          if(!pledge.address) {
+            logger.error('PAYMENTSLIP payments must include an address', { req: req._log(), args, pledge, pledgeStatus, payment })
+            throw new Error(t('api/unexpected'))
+          }
 
           //insert address
           const address = await transaction.public.addresses.insertAndGetOne(pledge.address)
@@ -492,7 +518,8 @@ const resolveFunctions = {
 
         } else if(pledgePayment.method == 'STRIPE') {
           if(!pledgePayment.sourceId) {
-            throw new Error('sourceId required')
+            logger.error('sourceId required', { req: req._log(), args, pledge, pledgeStatus, payment })
+            throw new Error(t('api/unexpected'))
           }
           let charge = null
           try {
@@ -502,12 +529,12 @@ const resolveFunctions = {
               source: pledgePayment.sourceId
             })
           } catch(e) {
-            //TODO log payment try?
+            logger.error('stripe charge failed', { req: req._log(), args, pledge, pledgeStatus, payment, e })
+            //TODO sanitize error for client
             //throw to client
             throw e
           }
-          //save payment (is done outside of transaction,
-          //to never loose it again)
+          //save payment ( outside of transaction to never loose it again)
           payment = await pgdb.public.payments.insertAndGet({
             type: 'PLEDGE',
             method: 'STRIPE',
@@ -527,8 +554,10 @@ const resolveFunctions = {
 
         } else if(pledgePayment.method == 'POSTFINANCECARD') {
           const pspPayload = JSON.parse(pledgePayment.pspPayload)
-          if(!pspPayload)
-            throw new Error('pspPayload required')
+          if(!pspPayload) {
+            logger.error('pspPayload required', { req: req._log(), args, pledge, pspPayload })
+            throw new Error(t('api/unexpected'))
+          }
           //check SHA of postfinance
           const SHASIGN = pspPayload.SHASIGN
           delete pspPayload.SHASIGN
@@ -539,14 +568,16 @@ const resolveFunctions = {
             .filter(key => pspPayload[key])
             .map(key => `${key.toUpperCase()}=${pspPayload[key]}${secret}`)
             .join('')
-          const shasum = crypto.createHash('sha1')
-          shasum.update(paramsString)
-          if(SHASIGN!==shasum.digest('hex').toUpperCase())
-            throw new Error('SHASIGN not correct!')
+          const shasum = crypto.createHash('sha1').update(paramsString).digest('hex').toUpperCase()
+          if(SHASIGN!==shasum) {
+            logger.error('SHASIGN not correct', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
+            throw new Error(t('api/unexpected'))
+          }
 
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
-            throw new Error('this PAYID was used already 😲😒😢')
+            logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
+            throw new Error(t('api/unexpected'))
           }
 
           //save payment no matter what
@@ -564,6 +595,7 @@ const resolveFunctions = {
           //check if amount is correct
           //PF amount is suddendly in franken
           if(pspPayload.amount*100 !== pledge.total) {
+            logger.info('payed amount doesnt match with pledge', { req: req._log(), args, pledge, pspPayload })
             pledgeStatus = 'PAID_INVESTIGATE'
           }
 
@@ -578,12 +610,15 @@ const resolveFunctions = {
 
         } else if(pledgePayment.method == 'PAYPAL') {
           const pspPayload = JSON.parse(pledgePayment.pspPayload)
-          if(!pspPayload || !pspPayload.tx)
-            throw new Error('pspPayload(.tx) required')
+          if(!pspPayload || !pspPayload.tx) {
+            logger.error('pspPayload(.tx) required', { req: req._log(), args, pledge, pspPayload })
+            throw new Error(t('api/unexpected'))
+          }
 
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.tx})) {
-            throw new Error('this transaction was used already 😲😒😢')
+            logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
+            throw new Error(t('api/unexpected'))
           }
 
           const transactionDetails = {
@@ -605,8 +640,11 @@ const resolveFunctions = {
             body: form
           })
           const responseDict = querystring.parse(await response.text())
-          if(responseDict.ACK !== 'Success')
-            throw new Error('paypal transaction invalid')
+          if(responseDict.ACK !== 'Success') {
+            logger.error('paypal transaction invalid', { req: req._log(), args, pledge, pspPayload, responseDict })
+            throw new Error(t('api/unexpected'))
+            //TODO sanitize paypal error for client
+          }
 
           //get paypal amount (is decimal)
           const amount = parseFloat(responseDict.AMT)*100
@@ -624,13 +662,15 @@ const resolveFunctions = {
 
           //check if amount is correct
           if(amount !== pledge.total) {
+            logger.info('payed amount doesnt match with pledge', { req: req._log(), args, pledge, pspPayload, payment })
             pledgeStatus = 'PAID_INVESTIGATE'
           }
         } else {
           throw new Error('unsupported paymentMethod')
         }
         if(!payment || !pledgeStatus) {
-          throw new Error('should not happen')
+          logger.error('payment or pledgeStatus undefined', { req: req._log(), args, pledge, pspPayload, payment, pledgeStatus })
+          throw new Error(t('api/unexpected'))
         }
 
         //insert pledgePayment
@@ -697,35 +737,41 @@ const resolveFunctions = {
         }
       } catch(e) {
         await transaction.transactionRollback()
+        logger.info('transaction rollback', { req: req._log(), error: e })
         throw e
       }
 
     },
-    async reclaimPledge(_, args, {loaders, pgdb, req}) {
+    async reclaimPledge(_, args, {loaders, pgdb, req, t}) {
       const transaction = await pgdb.transactionBegin()
       try {
         const { pledgeClaim } = args
         //check pledgeId
         let pledge = await transaction.public.pledges.findOne({id: pledgeClaim.pledgeId})
         if(!pledge) {
-          throw new Error(`pledge (${pledgeClaim.pledgeId}) not found`)
+          logger.error(`pledge (${pledgeClaim.pledgeId}) not found`, { req: req._log(), args, pledge })
+          throw new Error(t('api/unexpected'))
         }
-        //TODO do we need to check pledge.status here?
 
         //load original user of pledge
         const pledgeUser = await transaction.public.users.findOne({id: pledge.userId})
         if(pledgeUser.email === pledgeClaim.email) {
-          //TODO fail gracefully?
-          throw new Error('pledge already belongs to the claiming email')
+          logger.info('pledge already belongs to the claiming email', { req: req._log(), args, pledgeUser })
+          return {
+            pledgeId: pledge.id,
+            userId: pledge.userId
+          }
         }
         if(pledgeUser.verified) {
-          throw new Error('cannot claim pledges of verified users')
+          logger.error('cannot claim pledges of verified users', { req: req._log(), args, pledge })
+          throw new Error(t('api/unexpected'))
         }
 
         //check logged in user
         if(req.user) {
           if(req.user.email !== pledgeClaim.email) {
-            throw new Error('logged in users can only claim pledges to themselfs')
+            logger.error('logged in users can only claim pledges to themselfs', { req: req._log(), args, pledge })
+            throw new Error(t('api/unexpected'))
           }
           //transfer pledge to signin user
           pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {userId: req.user.email})
@@ -743,6 +789,7 @@ const resolveFunctions = {
         }
       } catch(e) {
         await transaction.transactionRollback()
+        logger.info('transaction rollback', { req: req._log(), error: e })
         throw e
       }
     }

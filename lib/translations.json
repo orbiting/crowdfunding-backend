@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-10T16:34:21.183Z",
+  "updated": "2017-04-11T18:39:50.874Z",
   "title": "live",
   "data": [
     {
@@ -330,6 +330,34 @@
     {
       "key": "pledge/recievePayment/paypal/cancel",
       "value": "Zahlung abgebrochen. Wählen Sie ein anderes Zahlungsmittel um ihre Bestellung abzuschliessen."
+    },
+    {
+      "key": "api/email/invalid",
+      "value": "E-Mail ungültig"
+    },
+    {
+      "key": "api/unauthorized",
+      "value": "Sie müssen sich zuerst einloggen."
+    },
+    {
+      "key": "api/unexpected",
+      "value": "Ups, da ist was schiefgelaufen. Sorry!"
+    },
+    {
+      "key": "api/membership/claim/alreadyHave",
+      "value": "Sie können keinen Gutscheincode einlösen, weil Sie schon eine Mitgliedschaft haben."
+    },
+    {
+      "key": "api/membership/claim/invalidToken",
+      "value": "Gutscheincode ungültig"
+    },
+    {
+      "key": "api/membership/reduced/alreadyHave",
+      "value": "Sie können nur eine reduzierte Mitgliedschaft kaufen."
+    },
+    {
+      "key": "api/pledge/alreadyPaid",
+      "value": "Dieser Pledge wurde bereits bezahlt."
     }
   ]
 }

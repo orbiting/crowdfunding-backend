@@ -3,6 +3,7 @@ const { PgDb } = require('pogi')
 const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
+const logger = require('./lib/logger')
 
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
@@ -29,6 +30,24 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     server.use('*', cors(corsOptions))
   }
 
+  //add a logger to request
+  server.use(function(req, res, next) {
+    req._log = function() {
+      const log = {
+        body: this.body,
+        headers: this.headers,
+        url: this.url,
+        method: this.method,
+        query: this.query,
+        user: this.user
+      }
+      if(log.headers.cookie) {
+        log.headers.cookie = "REMOVED"
+      }
+    }
+    next()
+  })
+
   // postfinance doesn't support basic-auth for webhooks
   postfinance(server, pgdb)
 
@@ -53,6 +72,6 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
 
   // start the server
   server.listen(process.env.PORT, () => {
-    console.log('server is running on http://localhost:'+process.env.PORT)
+    logger.info('server is running on http://localhost:'+process.env.PORT)
   })
 })
