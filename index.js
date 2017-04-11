@@ -51,15 +51,6 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
 
   graphql(server, pgdb)
 
-  //FIXME remove
-  server.get('/test', function(req, res) {
-    if(req.user) {
-      res.end(JSON.stringify(req.user))
-    } else {
-      res.end("you are not logged in")
-    }
-  })
-
   // start the server
   server.listen(process.env.PORT, () => {
     console.log('server is running on http://localhost:'+process.env.PORT)
