@@ -2,6 +2,8 @@ const bodyParser = require('body-parser')
 const {graphqlExpress, graphiqlExpress} = require('graphql-server-express')
 const {makeExecutableSchema} = require('graphql-tools')
 const OpticsAgent = require('optics-agent')
+const {getFormatter} = require('../lib/utils/translate')
+const MESSAGES = require('../lib/translations.json').data
 
 const Schema = require('./schema')
 const Resolvers = require('./resolvers')
@@ -37,7 +39,8 @@ module.exports = (server, pgdb) => {
           loaders: createLoaders(pgdb),
           pgdb,
           user: req.user,
-          req
+          req,
+          t: getFormatter(MESSAGES)
         }
       }
     })
