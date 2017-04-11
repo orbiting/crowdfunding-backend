@@ -90,7 +90,7 @@ create table "membershipTypes" (
   foreign key ("rewardId", "rewardType") references "rewards" ("id", "type") on update cascade on delete cascade
 );
 
-create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'SUCCESSFULL', 'CANCELLED');
+create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'PAID_INVESTIGATE', 'SUCCESSFULL', 'CANCELLED');
 create table "pledges" (
   "id"          uuid primary key not null default uuid_generate_v4(),
   "packageId"   uuid not null references "packages" on update cascade on delete cascade,

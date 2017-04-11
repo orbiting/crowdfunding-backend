@@ -562,9 +562,8 @@ const resolveFunctions = {
 
           //check if amount is correct
           //PF amount is suddendly in franken
-          //TODO really throw here?
           if(pspPayload.amount*100 !== pledge.total) {
-            throw new Error('payed amount !== pledge.total')
+            pledgeStatus = 'PAID_INVESTIGATE'
           }
 
           //save alias to user
@@ -623,9 +622,8 @@ const resolveFunctions = {
           pledgeStatus = 'SUCCESSFULL'
 
           //check if amount is correct
-          //TODO really throw here?
           if(amount !== pledge.total) {
-            throw new Error('payed amount !== pledge.total')
+            pledgeStatus = 'PAID_INVESTIGATE'
           }
         } else {
           throw new Error('unsupported paymentMethod')

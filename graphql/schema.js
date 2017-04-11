@@ -172,6 +172,7 @@ input AddressInput {
 enum PledgeStatus {
   DRAFT
   WAITING_FOR_PAYMENT
+  PAID_INVESTIGATE
   SUCCESSFULL
   CANCELLED
 }
