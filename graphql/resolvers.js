@@ -209,17 +209,18 @@ const resolveFunctions = {
   },
   Pledge: {
     async options(pledge, args, {loaders, pgdb}) {
+      //we augment pledgeOptions with packageOptions
       const pledgeOptions = await pgdb.public.pledgeOptions.find( {pledgeId: pledge.id} )
       const pledgeOptionTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
       const packageOptions = await pgdb.public.packageOptions.find( {id: pledgeOptionTemplateIds} )
-
-      return packageOptions.map( (pko) => {
-        const plo = pledgeOptions.find( (plo) => plo.templateId==pko.id )
-        if(!plo) throw new Error("this should not happen")
+      return pledgeOptions.map( (plo) => {
+        const pko = packageOptions.find( (pko) => plo.templateId==pko.id )
         pko.id = plo.pledgeId+'-'+plo.templateId //combinded primary key
         pko.amount = plo.amount
         pko.templateId = plo.templateId
         pko.price = plo.price
+        pko.createdAt = plo.createdAt
+        pko.updatedAt = plo.updatedAt
         return pko
       })
     },
