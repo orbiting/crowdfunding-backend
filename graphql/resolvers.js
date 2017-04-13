@@ -693,7 +693,8 @@ const resolveFunctions = {
             pledgeStatus = 'PAID_INVESTIGATE'
           }
         } else {
-          throw new Error('unsupported paymentMethod')
+          logger.error('unsupported paymentMethod', { req: req._log(), args, pledge })
+          throw new Error(t('api/unexpected'))
         }
         if(!payment || !pledgeStatus) {
           logger.error('payment or pledgeStatus undefined', { req: req._log(), args, pledge, pspPayload, payment, pledgeStatus })
