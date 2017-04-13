@@ -547,10 +547,19 @@ const resolveFunctions = {
               source: pledgePayment.sourceId
             })
           } catch(e) {
-            logger.error('stripe charge failed', { req: req._log(), args, pledge, pledgeStatus, payment, e })
-            //TODO sanitize error for client
-            //throw to client
-            throw e
+            logger.info('stripe charge failed', { req: req._log(), args, pledge, pledgeStatus, payment, e })
+            if(e.type === 'StripeCardError') {
+              const translatedError = t('api/pay/'+e.code)
+              if(translatedError) {
+                throw new Error(translatedError)
+              } else {
+                logger.warn('translation not found for stripe error', { req: req._log(), args, pledge, pledgeStatus, payment, e })
+                throw new Error(e.message)
+              }
+            } else {
+              logger.error('unknown error on stripe charge', { req: req._log(), args, pledge, pledgeStatus, payment, e })
+              throw new Error(t('api/unexpected'))
+            }
           }
           //save payment ( outside of transaction to never loose it again)
           payment = await pgdb.public.payments.insertAndGet({
