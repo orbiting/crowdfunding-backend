@@ -612,7 +612,7 @@ const resolveFunctions = {
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
             logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pspPayload.tx}))
+            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pledge.id}))
           }
 
           //save payment no matter what
@@ -660,7 +660,7 @@ const resolveFunctions = {
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.tx})) {
             logger.error('this tx was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pspPayload.tx}))
+            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pledge.id}))
           }
 
           const transactionDetails = {
