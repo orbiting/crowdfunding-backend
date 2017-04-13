@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-13T10:19:56.758Z",
+  "updated": "2017-04-13T10:39:37.742Z",
   "title": "live",
   "data": [
     {
@@ -416,8 +416,16 @@
       "value": "Bei der Bezahlung mit Paypal ist etwas schiefgelaufen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
     },
     {
-      "key": "api/pf/checksumError",
+      "key": "api/pay/pf/checksumError",
       "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
+    },
+    {
+      "key": "api/pay/pspPayload/parseFailed",
+      "value": "Die Bezahldaten konnten nicht überprüft werden. Bitte kontaktieren Sie uns. ID: {id}"
+    },
+    {
+      "key": "api/pay/paymentIdUsedAlready",
+      "value": "Es wurde bereits ein pledge mit dieser Zahlung abgerechnet. Bitte kontaktieren Sie uns. ID: {id}"
     },
     {
       "key": "footer/contact/title",
