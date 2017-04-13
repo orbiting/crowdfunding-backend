@@ -478,7 +478,7 @@ const resolveFunctions = {
         }
 
         //load user
-        const user = await transaction.public.users.findOne({userId: pledge.userId})
+        const user = await transaction.public.users.findOne({id: pledge.userId})
 
         //check/charge payment
         let pledgeStatus
