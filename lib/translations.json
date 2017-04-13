@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-13T09:21:39.018Z",
+  "updated": "2017-04-13T10:19:56.758Z",
   "title": "live",
   "data": [
     {
@@ -146,10 +146,6 @@
     {
       "key": "pledge/title",
       "value": "Mitmachen"
-    },
-    {
-      "key": "pledge/rewards/title",
-      "value": null
     },
     {
       "key": "pledge/contact/title",
@@ -416,12 +412,36 @@
       "value": "An error occurred while processing the card."
     },
     {
+      "key": "api/paypal/unknownError",
+      "value": "Bei der Bezahlung mit Paypal ist etwas schiefgelaufen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
+    },
+    {
+      "key": "api/pf/checksumError",
+      "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
+    },
+    {
       "key": "footer/contact/title",
       "value": "Kontakt"
     },
     {
       "key": "footer/contact/address",
       "value": "Republik AG\nc/o Hotel Rothaus\nSihlhallenstrasse 1\n8004 Zürich\nSchweiz"
+    },
+    {
+      "key": "footer/about/title",
+      "value": "Über uns"
+    },
+    {
+      "key": "footer/about/projecR",
+      "value": "Project R"
+    },
+    {
+      "key": "footer/legal/title",
+      "value": "Rechtliches"
+    },
+    {
+      "key": "footer/legal/imprint",
+      "value": "Impressum"
     }
   ]
 }
