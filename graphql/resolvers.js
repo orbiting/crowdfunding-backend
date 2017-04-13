@@ -419,43 +419,28 @@ const resolveFunctions = {
           throw new Error(t('api/unexpected'))
         }
 
+        //check user
         let user = null
         if(req.user) { //user logged in
-          if(pledge.user) {
-            logger.error('logged in users must no provide pledge.user', { req: req._log(), args })
+          if(req.user.email !== pledge.user.email) {
+            logger.error('req.user.email and pledge.user.email dont match, signout first.', { req: req._log(), args })
             throw new Error(t('api/unexpected'))
           }
           user = req.user
-        } else { //user not logged in
-          if(!pledge.user) {
-            logger.error('pledge must provide a user if not logged in', { req: req._log(), args })
-            throw new Error(t('api/unexpected'))
+        } else {
+          user = await transaction.public.users.findOne({email: pledge.user.email}) //try to load existing user by email
+          if(user && (await transaction.public.pledges.count({userId: user.id}))) { //user has pledges
+            return {emailVerify: true}
+          } else if(!user) { //create user
+            user = await transaction.public.users.insertAndGet({pledge.user})
           }
-          //try to load existing user by email
-          user = await transaction.public.users.findOne({email: pledge.user.email})
-          if(user) {
-            if(user.verified) {
-              //a user with the email adress pledge.user.email already exists, login!
-              return {
-                emailVerify: true
-              }
-            } else { //user not verified
-              //update user with new details
-              user = await transaction.public.users.updateAndGetOne({id: user.id}, {
-                name: pledge.user.name
-              })
-            }
-          } else {
-            user = await transaction.public.users.insertAndGet({
-              email: pledge.user.email,
-              name: pledge.user.name,
-              verified: false
-            })
-          }
+        }
+        //update user details
+        if(user.name !== pledge.user.name) {
+          user = await transaction.public.users.updateAndGetOne({id: user.id}, {name: pledge.user.name})
         }
 
         //check if user already has a reduced membership
-        //see HACKHACK in payPledge
         if(donation < 0 && await transaction.public.memberships.count({userId: user.id, reducedPrice: true})) {
           logger.info('user tried to buy a second reduced membership', { req: req._log(), args })
           throw new Error(t('api/membership/reduced/alreadyHave'))

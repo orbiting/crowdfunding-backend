@@ -195,7 +195,7 @@ type Pledge {
 input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
-  user: UserInput
+  user: UserInput!
   reason: String
 }
 
