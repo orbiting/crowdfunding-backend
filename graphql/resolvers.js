@@ -477,6 +477,9 @@ const resolveFunctions = {
           throw new Error(t('api/pledge/alreadyPaid'))
         }
 
+        //load user
+        const user = await transaction.public.users.findOne({userId: pledge.userId})
+
         //check/charge payment
         let pledgeStatus
         let payment
@@ -488,7 +491,7 @@ const resolveFunctions = {
 
           //insert address
           const address = await transaction.public.addresses.insertAndGetOne(pledge.address)
-          user = await transaction.public.users.updateAndGetOne({id: user.id}, {addressId: address.id})
+          await transaction.public.users.updateAndGetOne({id: user.id}, {addressId: address.id})
 
           //only count PAYMENTSLIP payments up to CHF 1000.- immediately
           if(pledge.total > 100000) {
