@@ -3,7 +3,7 @@ const {graphqlExpress, graphiqlExpress} = require('graphql-server-express')
 const {makeExecutableSchema} = require('graphql-tools')
 const OpticsAgent = require('optics-agent')
 const logger = require('../lib/logger')
-const {getFormatter} = require('../lib/utils/translate')
+const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 
 const Schema = require('./schema')
