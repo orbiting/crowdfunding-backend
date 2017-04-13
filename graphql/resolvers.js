@@ -248,9 +248,6 @@ const resolveFunctions = {
   Membership: {
     async type(membership, args, {loaders, pgdb}) {
       return pgdb.public.membershipTypes.findOne({id: membership.membershipTypeId})
-    },
-    async user(membership, args, {loaders, pgdb}) {
-      return pgdb.public.users.findOne({id: membership.userId})
     }
   },
 

@@ -126,7 +126,6 @@ type Membership {
   type: MembershipType!
   startDate: Date
   pledge: Pledge!
-  user: User!
   voucherCode: String
   reducedPrice: Boolean!
   createdAt: Date!
