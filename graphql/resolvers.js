@@ -286,25 +286,26 @@ const resolveFunctions = {
       })
       return true
     },
-    async updateAddress(_, args, {loaders, pgdb, req, user, t}) {
+    async updateMe(_, args, {loaders, pgdb, req, t}) {
       ensureSignedIn(req, t)
-
-      const {address} = args
-      if(!user.addressId) { //user has no address yet
-        const transaction = await pgdb.transactionBegin()
-        try {
-          const userAddress = await transaction.public.addresses.insertAndGet(address)
-          await transaction.public.users.update({id: user.id}, {
-            addressId: userAddress.id
-          })
-          return transaction.transactionCommit()
-        } catch(e) {
-          await transaction.transactionRollback()
-          logger.error('error in transaction', { req: req._log(), args, error: e })
-          throw new Error(t('api/unexpected'))
+      const {user, address} = args
+      const transaction = await pgdb.transactionBegin()
+      try {
+        if(req.user.name !== user.name || req.user.email !== user.email || req.user.birthday !== user.birthday) {
+          await transaction.public.users.update({id: req.user.id}, user)
         }
-      } else { //update address of user
-        return pgdb.public.addresses.update({id: user.addressId}, address)
+        if(req.user.addressId) { //update address of user
+          await transaction.public.addresses.update({id: req.user.addressId}, address)
+        } else { //user has no address yet
+          const userAddress = await transaction.public.addresses.insertAndGet(address)
+          await transaction.public.users.update({id: req.user.id}, {addressId: userAddress.id})
+        }
+        await transaction.transactionCommit()
+        return pgdb.public.users.find({id: req.user.id})
+      } catch(e) {
+        await transaction.transactionRollback()
+        logger.error('error in transaction', { req: req._log(), args, error: e })
+        throw new Error(t('api/unexpected'))
       }
     },
     async submitQuestion(_, args, {loaders, pgdb, user, t}) {

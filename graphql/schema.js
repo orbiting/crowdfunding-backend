@@ -25,12 +25,11 @@ type RootQuery {
 type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
+  updateMe(user: UserInput!, address: AddressInput!): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
   reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
-
-  updateAddress(address: AddressInput!): User!
   claimMembership(voucherCode: String!): Boolean!
 
   submitQuestion(question: String!): MutationResult
@@ -160,6 +159,7 @@ type Address {
 input UserInput {
   email: String!
   name: String!
+  birthday: Date
 }
 input AddressInput {
   name: String!
