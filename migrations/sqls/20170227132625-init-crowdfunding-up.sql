@@ -118,16 +118,17 @@ create type "paymentMethod" as ENUM ('STRIPE', 'POSTFINANCECARD', 'PAYPAL', 'PAY
 create type "paymentStatus" as ENUM ('WAITING', 'PAID', 'REFUNDED', 'CANCELLED');
 create type "paymentType" as ENUM ('PLEDGE');
 create table "payments" (
-  "id"          uuid primary key not null default uuid_generate_v4(),
-  "type"        "paymentType" not null,
-  "method"      "paymentMethod" not null,
-  "total"       integer not null,
-  "status"      "paymentStatus" not null default 'WAITING',
-  "hrid"        text unique not null default make_hrid('payments', 'hrid', 6),
-  "pspId"       text,
-  "pspPayload"  jsonb,
-  "createdAt"   timestamptz default now(),
-  "updatedAt"   timestamptz default now(),
+  "id"            uuid primary key not null default uuid_generate_v4(),
+  "type"          "paymentType" not null,
+  "method"        "paymentMethod" not null,
+  "paperInvoice"  boolean not null default false,
+  "total"         integer not null,
+  "status"        "paymentStatus" not null default 'WAITING',
+  "hrid"          text unique not null default make_hrid('payments', 'hrid', 6),
+  "pspId"         text,
+  "pspPayload"    jsonb,
+  "createdAt"     timestamptz default now(),
+  "updatedAt"     timestamptz default now(),
   unique ("id", "type")
 );
 

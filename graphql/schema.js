@@ -208,6 +208,7 @@ type PledgeResponse {
 input PledgePaymentInput {
   pledgeId: ID!
   method: PaymentMethod!
+  paperInvoice: Boolean
   sourceId: String
   pspPayload: String
   address: AddressInput
@@ -228,6 +229,7 @@ enum PaymentStatus {
 type PledgePayment {
   id: ID!
   method: PaymentMethod!
+  paperInvoice: Boolean!
   total: Int!
   status: PaymentStatus!
   hrid: String

@@ -531,7 +531,8 @@ const resolveFunctions = {
             type: 'PLEDGE',
             method: 'PAYMENTSLIP',
             total: pledge.total,
-            status: 'WAITING'
+            status: 'WAITING',
+            paperInvoice: pledgePayment.paperInvoice
           })
 
         } else if(pledgePayment.method == 'STRIPE') {
