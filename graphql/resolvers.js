@@ -598,7 +598,7 @@ const resolveFunctions = {
           const shasum = crypto.createHash('sha1').update(paramsString).digest('hex').toUpperCase()
           if(SHASIGN!==shasum) {
             logger.error('SHASIGN not correct', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
-            throw new Error(t('api/unexpected'))
+            throw new Error(t('api/pf/checksumError', {id: pledge.id}))
           }
 
           //check for replay attacks
@@ -669,15 +669,7 @@ const resolveFunctions = {
           const responseDict = querystring.parse(await response.text())
           if(responseDict.ACK !== 'Success') {
             logger.error('paypal transaction invalid', { req: req._log(), args, pledge, pspPayload, responseDict })
-            // paypal has so many different error messages. Let's throw the original one
-            // to the client for now.
-            // https://developer.paypal.com/docs/classic/api/NVPAPIOverview/
-            // https://developer.paypal.com/docs/classic/api/errors/direct-payments/
-            if(responseDict.L_LONGMESSAGE0) {
-              throw new Error(responseDict.L_LONGMESSAGE0)
-            } else {
-              throw new Error(t('api/unexpected'))
-            }
+            throw new Error(t('api/paypal/unknownError', {id: pledge.id}))
           }
 
           //get paypal amount (is decimal)
