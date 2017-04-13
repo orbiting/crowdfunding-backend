@@ -20,6 +20,9 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       throw new Error(t('api/pledge/alreadyPaid'))
     }
 
+    //load user
+    const user = await transaction.public.users.findOne({id: pledge.userId})
+
     //check/charge payment
     let pledgeStatus
     let payment
