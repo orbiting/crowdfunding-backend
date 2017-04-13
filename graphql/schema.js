@@ -13,9 +13,11 @@ type RootQuery {
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
-  pledges: [Pledge]
+  pledges: [Pledge!]!
+  pledge(id: ID!): Pledge
+  draftPledge(id: ID!): Pledge!
 
-  checkEmail(email: String!): CheckMailResult!
+  memberships: [Pledge]
 
   faqs(status: FaqStatus): [Faq]
 }
@@ -23,7 +25,14 @@ type RootQuery {
 type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
-  submitPledge(pledge: PledgeInput): Pledge
+
+  submitPledge(pledge: PledgeInput): PledgeResponse!
+  payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
+  reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
+
+  updateAddress(address: AddressInput!): User!
+  claimMembership(voucherCode: String!): Boolean!
+
   submitQuestion(question: String!): MutationResult
 }
 
@@ -35,17 +44,19 @@ type SignInResponse {
   phrase: String!
 }
 
-type CheckMailResult {
-  free: Boolean!
-}
 
 type User {
   id: ID!
   name: String
   email: String!
+  address: Address
+  birthday: String
   roles: [Role]
   createdAt: Date!
   updatedAt: Date!
+
+  pledges: [Pledge!]!
+  memberships: [Membership!]!
 }
 
 type Role {
@@ -94,6 +105,7 @@ type PackageOption {
   maxAmount: Int
   defaultAmount: Int!
   price: Int!
+  minUserPrice: Int!
   userPrice: Boolean!
   createdAt: Date!
   updatedAt: Date!
@@ -122,22 +134,60 @@ type MembershipType {
   updatedAt: Date!
 }
 
+type Membership {
+  id: ID!
+  type: MembershipType!
+  startDate: Date
+  pledge: Pledge!
+  user: User!
+  voucherCode: String
+  reducedPrice: Boolean!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
 union Reward = Goodie | MembershipType
+
+type Address {
+  name: String
+  line1: String!
+  line2: String
+  postalCode: String!
+  city: String!
+  country: String!
+}
+
+input UserInput {
+  email: String!
+  name: String!
+}
+input AddressInput {
+  name: String!
+  line1: String!
+  line2: String
+  postalCode: String!
+  city: String!
+  country: String!
+}
 
 enum PledgeStatus {
   DRAFT
-  PAYED
-  REFUNDED
+  WAITING_FOR_PAYMENT
+  PAID_INVESTIGATE
+  SUCCESSFULL
+  CANCELLED
 }
 type Pledge {
   id: ID!
-  packageId: ID!
-  crowdfunding: Crowdfunding!
-  status: PledgeStatus!
+  package: Package!
   options: [PackageOption!]!
+  status: PledgeStatus!
   total: Int!
-  payments: [PledgePayment]
+  donation: Int!
+  payments: [PledgePayment!]!
   user: User!
+  reason: String
+  memberships: [Membership!]!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -145,32 +195,49 @@ type Pledge {
 input PledgeInput {
   options: [PackageOptionInput!]!
   total: Int!
-  user: PledgeUserInput
-  payment: PledgePaymentInput!
+  user: UserInput
+  reason: String
 }
-input PledgeUserInput {
-  email: String!
-  name: String!
+
+type PledgeResponse {
+  pledgeId: ID
+  userId: ID
+  emailVerify: Boolean
 }
+
 input PledgePaymentInput {
+  pledgeId: ID!
   method: PaymentMethod!
-  stripeSourceId: String
+  sourceId: String
+  pspPayload: String
+  address: AddressInput
 }
 
 enum PaymentMethod {
-  VISA
-  MASTERCARD
-  PFC
-  EZS
+  STRIPE
+  POSTFINANCECARD
+  PAYPAL
+  PAYMENTSLIP
+}
+enum PaymentStatus {
+  WAITING
+  PAID
+  REFUNDED
+  CANCELLED
 }
 type PledgePayment {
   id: ID!
-  pledge: Pledge!
   method: PaymentMethod!
   total: Int!
-  status: String
+  status: PaymentStatus!
+  hrid: String
   createdAt: Date!
   updatedAt: Date!
+}
+
+input PledgeClaimInput {
+  pledgeId: ID!
+  email: String!
 }
 
 enum FaqStatus {

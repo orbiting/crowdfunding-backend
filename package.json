@@ -7,13 +7,14 @@
   "private": true,
   "author": "Patrick Recher <p@tte.io>",
   "dependencies": {
-    "db-migrate": "^0.10.0-beta.20",
-    "db-migrate-pg": "^0.1.11",
     "body-parser": "^1.16.1",
     "connect-pg-simple": "^3.1.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.1",
+    "d3-array": "^1.1.1",
     "dataloader": "^1.3.0",
+    "db-migrate": "^0.10.0-beta.20",
+    "db-migrate-pg": "^0.1.11",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
     "express-basic-auth": "^1.0.1",
@@ -33,19 +34,35 @@
     "pogi": "^2.1.0",
     "querystring": "^0.2.0",
     "random-noun-generator-german": "^0.1.3",
-    "stripe": "^4.16.0"
+    "stripe": "^4.16.0",
+    "winston": "^2.3.1"
   },
   "scripts": {
     "dev": "NODE_ENV=development nodemon -w graphql -w src -w index.js index.js",
     "start": "node index.js",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
-    "migrate:reset": "db-migrate reset",
-    "seed": "knex seed:run"
+    "db:reset": "db-migrate reset && db-migrate up && knex seed:run",
+    "seed": "knex seed:run",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage",
+    "translations": "gsheets --key=1OHoiENwJH-tqf9yXfXHOevAn17daO_CvB21Rym-oiqk --title=live --pretty --out lib/translations.json"
   },
   "devDependencies": {
     "concurrently": "^3.3.0",
+    "gsheets": "^2.0.0",
     "http-proxy": "^1.16.2",
+    "jest": "^19.0.2",
+    "jest-cli": "^19.0.2",
     "nodemon": "^1.11.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coverageReporters": [ "lcov", "html" ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
