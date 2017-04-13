@@ -669,8 +669,15 @@ const resolveFunctions = {
           const responseDict = querystring.parse(await response.text())
           if(responseDict.ACK !== 'Success') {
             logger.error('paypal transaction invalid', { req: req._log(), args, pledge, pspPayload, responseDict })
-            throw new Error(t('api/unexpected'))
-            //TODO sanitize paypal error for client
+            // paypal has so many different error messages. Let's throw the original one
+            // to the client for now.
+            // https://developer.paypal.com/docs/classic/api/NVPAPIOverview/
+            // https://developer.paypal.com/docs/classic/api/errors/direct-payments/
+            if(responseDict.L_LONGMESSAGE0) {
+              throw new Error(responseDict.L_LONGMESSAGE0)
+            } else {
+              throw new Error(t('api/unexpected'))
+            }
           }
 
           //get paypal amount (is decimal)
