@@ -8,8 +8,6 @@ schema {
 
 type RootQuery {
   me: User
-  roles(id: ID): [Role]
-  users(id: ID, email: String): [User]
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
@@ -50,21 +48,11 @@ type User {
   email: String!
   address: Address
   birthday: String
-  roles: [Role]
   createdAt: Date!
   updatedAt: Date!
 
   pledges: [Pledge!]!
   memberships: [Membership!]!
-}
-
-type Role {
-  id: ID!
-  name: String
-  description: String
-  users: [User]
-  createdAt: Date!
-  updatedAt: Date!
 }
 
 

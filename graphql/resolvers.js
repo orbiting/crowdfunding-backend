@@ -111,12 +111,6 @@ const resolveFunctions = {
     async me(_, args, {loaders, pgdb, user}) {
       return user
     },
-    async users(_, args, {loaders, pgdb}) {
-      return pgdb.public.users.find( args )
-    },
-    async roles(_, args, {loaders, pgdb}) {
-      return pgdb.public.roles.find( args )
-    },
     async crowdfundings(_, args, {loaders, pgdb, req}) {
       return pgdb.public.crowdfundings.find()
     },
@@ -166,11 +160,6 @@ const resolveFunctions = {
   },
 
   User: {
-    async roles(user, args, {loaders, pgdb}) {
-      const userRoles = await loaders.usersRolesForUserIds.load(user.id)
-      const roleIds = usersRoles.map( (ur) => { return ur.roleId } )
-      return loaders.roles.load(roleIds)
-    },
     async address(user, args, {loaders, pgdb}) {
       if(!user.addressId) return null
       return pgdb.public.addresses.findOne({id: user.addressId})
@@ -180,13 +169,6 @@ const resolveFunctions = {
     },
     async pledges(user, args, {loaders, pgdb}) {
       return pgdb.public.pledges.find({userId: user.id})
-    }
-  },
-  Role: {
-    async users(role, args, {loaders, pgdb}) {
-      const userRoles = await loaders.usersRolesForRoleIds.load(role.id)
-      const userIds = usersRoles.map( (ur) => { return ur.userId } )
-      return loaders.users.load(userIds)
     }
   },
   Crowdfunding: {
