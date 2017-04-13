@@ -580,11 +580,19 @@ const resolveFunctions = {
           })
 
         } else if(pledgePayment.method == 'POSTFINANCECARD') {
-          const pspPayload = JSON.parse(pledgePayment.pspPayload)
+          let parsedPspPayload = null
+          try {
+            parsedPspPayload = JSON.parse(pledgePayment.pspPayload)
+          } catch(e) {
+            logger.error('failed to parse pspPayload', { req: req._log(), args, pledge })
+            throw new Error(t('api/pay/parseFailed', {id: pledge.id}))
+          }
+          const pspPayload = parsedPspPayload
           if(!pspPayload) {
             logger.error('pspPayload required', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/unexpected'))
+            throw new Error(t('api/pay/parseFailed', {id: pledge.id}))
           }
+
           //check SHA of postfinance
           const SHASIGN = pspPayload.SHASIGN
           delete pspPayload.SHASIGN
@@ -598,13 +606,13 @@ const resolveFunctions = {
           const shasum = crypto.createHash('sha1').update(paramsString).digest('hex').toUpperCase()
           if(SHASIGN!==shasum) {
             logger.error('SHASIGN not correct', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
-            throw new Error(t('api/pf/checksumError', {id: pledge.id}))
+            throw new Error(t('api/pay/pf/checksumError', {id: pledge.id}))
           }
 
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
             logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/unexpected'))
+            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pspPayload.tx}))
           }
 
           //save payment no matter what
@@ -636,16 +644,23 @@ const resolveFunctions = {
           }
 
         } else if(pledgePayment.method == 'PAYPAL') {
-          const pspPayload = JSON.parse(pledgePayment.pspPayload)
+          let parsedPspPayload = null
+          try {
+            parsedPspPayload = JSON.parse(pledgePayment.pspPayload)
+          } catch(e) {
+            logger.error('failed to parse pspPayload', { req: req._log(), args, pledge })
+            throw new Error(t('api/pay/parseFailed', {id: pledge.id}))
+          }
+          const pspPayload = parsedPspPayload
           if(!pspPayload || !pspPayload.tx) {
             logger.error('pspPayload(.tx) required', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/unexpected'))
+            throw new Error(t('api/pay/parseFailed', {id: pledge.id}))
           }
 
           //check for replay attacks
           if(await pgdb.public.payments.count({pspId: pspPayload.tx})) {
-            logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
-            throw new Error(t('api/unexpected'))
+            logger.error('this tx was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
+            throw new Error(t('api/pay/paymentIdUsedAlready', {id: pspPayload.tx}))
           }
 
           const transactionDetails = {
