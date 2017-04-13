@@ -415,7 +415,11 @@ const resolveFunctions = {
           if(user && (await transaction.public.pledges.count({userId: user.id}))) { //user has pledges
             return {emailVerify: true}
           } else if(!user) { //create user
-            user = await transaction.public.users.insertAndGet({pledge.user})
+            user = await transaction.public.users.insertAndGet({
+              email: pledge.user.email,
+              name: pledge.user.name,
+              birthday: pledge.user.birthday
+            })
           }
         }
         //update user details
