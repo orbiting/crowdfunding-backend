@@ -142,6 +142,24 @@ const resolveFunctions = {
       }
       return null
     },
+    async draftPledge(_, args, {loaders, pgdb, req}) {
+      //used after payPledge, when user comes back from PSP to load pledge again on
+      //pledge site, then client sends the psp payment information it received via
+      //query params. Pledge must not be successfull in this state, otherwise user
+      //clicked back and we want to show him a nice error.
+      const pledge = await pgdb.public.pledges.findOne({id: args.id})
+      if(pledge.status === 'SUCCESSFULL') {
+        logger.error('draftPledge for successfull pledge', { req: req._log(), args, pledge })
+        throw new Error(t('api/pledge/alreadyPaid'))
+      }
+      const user = await pgdb.public.users.findOne({id: pledge.userId})
+      if(req.user.id === user.id || !user.verified) {
+        return pledge
+      } else {
+        logger.error('unauthorized draftPledge', { req: req._log(), args, pledge })
+        throw new Error(t('api/unauthorized'))
+      }
+    },
     async faqs(_, args, {pgdb}) {
       return pgdb.public.faqs.find( args )
     }

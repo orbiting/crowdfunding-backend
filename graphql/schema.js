@@ -15,6 +15,7 @@ type RootQuery {
   crowdfunding(name: String!): Crowdfunding!
   pledges: [Pledge!]!
   pledge(id: ID!): Pledge
+  draftPledge(id: ID!): Pledge
 
   memberships: [Pledge]
 
