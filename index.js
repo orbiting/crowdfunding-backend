@@ -44,6 +44,7 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
       if(log.headers.cookie) {
         log.headers.cookie = "REMOVED"
       }
+      return log
     }
     next()
   })
