@@ -4,6 +4,7 @@ const logger = require('../lib/logger')
 const ensureSignedIn = require('../lib/ensureSignedIn')
 const signIn = require('../lib/signIn')
 const sendMail = require('../lib/sendMail')
+const sendMailTemplate = require('../lib/sendMailTemplate')
 const mutations = require('./mutations/index')
 
 const resolveFunctions = {
@@ -192,13 +193,28 @@ const resolveFunctions = {
       ensureSignedIn(req, t)
 
       const { question } = args
-      sendMail({
-        to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
-        fromEmail: user.email,
-        subject: 'new (FA)Question asked!',
-        text: question
-      })
-
+      await Promise.all([
+        sendMail({
+          to: process.env.QUESTIONS_MAIL_ADDRESS,
+          fromEmail: user.email,
+          subject: 'new (FA)Question asked!',
+          text: `${user.name} hat folgende Frage gestellt:\n\n${question}`
+        }),
+        sendMailTemplate({
+          to: user.email,
+          fromEmail: process.env.QUESTIONS_MAIL_ADDRESS,
+          subject: t('api/faq/mail/subject'),
+          templateName: 'cf_faq',
+          globalMergeVars: [
+            { name: 'NAME',
+              content: user.name
+            },
+            { name: 'QUESTION',
+              content: question
+            }
+          ]
+        })
+      ])
       return {success: true}
     }
   })
