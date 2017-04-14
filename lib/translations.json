@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-14T14:16:54.562Z",
+  "updated": "2017-04-14T14:30:51.508Z",
   "title": "live",
   "data": [
     {
@@ -222,6 +222,10 @@
     {
       "key": "merci/updateMe/title",
       "value": "Adresse"
+    },
+    {
+      "key": "merci/updateMe/birthday/error/empty",
+      "value": null
     },
     {
       "key": "merci/signOut",
@@ -580,6 +584,10 @@
       "value": "Danke für Ihre Frage"
     },
     {
+      "key": "api/signin/mail/subject",
+      "value": "Login Versuch"
+    },
+    {
       "key": "footer/contact/title",
       "value": "Kontakt"
     },
@@ -604,51 +612,51 @@
       "value": "Impressum"
     },
     {
-      "key": "pledge/submit/paymentslip/title",
+      "key": "me/addressForm/title",
       "value": "Ihre Adresse"
     },
     {
-      "key": "pledge/submit/paymentslip/name/label",
+      "key": "me/addressForm/name/label",
       "value": "Anschrift"
     },
     {
-      "key": "pledge/submit/paymentslip/name/error/empty",
+      "key": "me/addressForm/name/error/empty",
       "value": "Anschrift fehlt"
     },
     {
-      "key": "pledge/submit/paymentslip/line1/label",
+      "key": "me/addressForm/line1/label",
       "value": "Strasse und Hausnummer"
     },
     {
-      "key": "pledge/submit/paymentslip/line1/error/empty",
+      "key": "me/addressForm/line1/error/empty",
       "value": "Strasse und Hausnummer fehlt"
     },
     {
-      "key": "pledge/submit/paymentslip/line2/label",
+      "key": "me/addressForm/line2/label",
       "value": "Zusatz (Optional: Einheit, Gebäude, usw.)"
     },
     {
-      "key": "pledge/submit/paymentslip/postalCode/label",
+      "key": "me/addressForm/postalCode/label",
       "value": "Postleitzahl"
     },
     {
-      "key": "pledge/submit/paymentslip/postalCode/error/empty",
+      "key": "me/addressForm/postalCode/error/empty",
       "value": "Postleitzahl fehlt"
     },
     {
-      "key": "pledge/submit/paymentslip/city/label",
+      "key": "me/addressForm/city/label",
       "value": "Stadt"
     },
     {
-      "key": "pledge/submit/paymentslip/city/error/empty",
+      "key": "me/addressForm/city/error/empty",
       "value": "Stadt fehlt"
     },
     {
-      "key": "pledge/submit/paymentslip/country/label",
+      "key": "me/addressForm/country/label",
       "value": "Land"
     },
     {
-      "key": "pledge/submit/paymentslip/country/error/empty",
+      "key": "me/addressForm/country/error/empty",
       "value": "Land fehlt"
     },
     {
