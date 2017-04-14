@@ -102,14 +102,7 @@ exports.configure = ({
     if (!user) {
       return next('user not found!')
     }
-    // Note: We don't return all user profile fields to the client, just ones
-    // that are whitelisted here to limit the amount of user data we expose.
-    next(null, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      verified: user.verified
-    })
+    next(null, user)
   })
 
   // Initialise Passport
