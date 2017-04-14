@@ -188,13 +188,13 @@ const resolveFunctions = {
       })
       return true
     },
-    async submitQuestion(_, args, {loaders, pgdb, user, t}) {
+    async submitQuestion(_, args, {loaders, pgdb, user, req, t}) {
       ensureSignedIn(req, t)
 
       const { question } = args
       sendMail({
         to: process.env.QUESTIONS_MAIL_TO_ADDRESS,
-        from: user.email,
+        fromEmail: user.email,
         subject: 'new (FA)Question asked!',
         text: question
       })
