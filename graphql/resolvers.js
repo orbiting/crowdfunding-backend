@@ -160,7 +160,9 @@ const resolveFunctions = {
     },
     async payments(pledge, args, {loaders, pgdb}) {
       const pledgePayments = await pgdb.public.pledgePayments.find({pledgeId: pledge.id})
-      return pgdb.public.payments.find({id: pledgePayments.map( (pp) => { return pp.paymentId })})
+      return pledgePayments.length
+        ? pgdb.public.payments.find({id: pledgePayments.map( (pp) => { return pp.paymentId })})
+        : []
     },
     async memberships(pledge, args, {loaders, pgdb}) {
       return pgdb.public.memberships.find({pledgeId: pledge.id})
