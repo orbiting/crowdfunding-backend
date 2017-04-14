@@ -10,7 +10,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     const { pledgePayment } = args
 
     //check pledgeId
-    let pledge = await transaction.public.pledges.findOne({id: pledgePayment.pledgeId})
+    const pledge = await transaction.public.pledges.findOne({id: pledgePayment.pledgeId})
     if(!pledge) {
       logger.error(`pledge (${pledgePayment.pledgeId}) not found`, { req: req._log(), args, pledge })
       throw new Error(t('api/unexpected'))
@@ -27,14 +27,14 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     let pledgeStatus
     let payment
     if(pledgePayment.method == 'PAYMENTSLIP') {
-      if(!pledge.address) {
+      if(!pledgePayment.address) {
         logger.error('PAYMENTSLIP payments must include an address', { req: req._log(), args, pledge, pledgeStatus, payment })
         throw new Error(t('api/unexpected'))
       }
 
       //insert address
-      const address = await transaction.public.addresses.insertAndGetOne(pledge.address)
-      user = await transaction.public.users.updateAndGetOne({id: user.id}, {addressId: address.id})
+      const address = await transaction.public.addresses.insertAndGet(pledgePayment.address)
+      await transaction.public.users.updateAndGetOne({id: user.id}, {addressId: address.id})
 
       //only count PAYMENTSLIP payments up to CHF 1000.- immediately
       if(pledge.total > 100000) {
@@ -284,7 +284,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         }
       }
       // update pledge status
-      pledge = await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
+      await transaction.public.pledges.updateAndGetOne({id: pledge.id}, {status: pledgeStatus})
     }
 
     //commit transaction
