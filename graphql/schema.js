@@ -47,7 +47,7 @@ type User {
   name: String
   email: String!
   address: Address
-  birthday: String
+  birthday: Date
   createdAt: Date!
   updatedAt: Date!
 
