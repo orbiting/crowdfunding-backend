@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-13T10:39:37.742Z",
+  "updated": "2017-04-14T14:16:54.562Z",
   "title": "live",
   "data": [
     {
@@ -124,24 +124,128 @@
       "value": "Notizbuch"
     },
     {
-      "key": "merci/postpay/title/me",
-      "value": "Merci {name}"
-    },
-    {
       "key": "merci/postpay/waiting",
-      "value": "Bitte bestätigen Sie ihre Email-Adresse:"
+      "value": "Wir haben Ihnen an «{email}» ein Bestätigunsemail mit den Wörtern «{phrase}» geschickt. Bitte klicken Sie auf den darin enthaltenen Link."
     },
     {
-      "key": "merci/postpay/change-email",
-      "value": "ändern"
+      "key": "merci/signedOut/title",
+      "value": "Ihre Gelöbnisse ansehen"
+    },
+    {
+      "key": "merci/signedOut/signIn",
+      "value": "Bitte anmelden:"
+    },
+    {
+      "key": "merci/empty/title",
+      "value": "Hallo {nameOrEmail}"
+    },
+    {
+      "key": "merci/empty/text",
+      "value": "Sie haben uns noch nicht unterstützt."
+    },
+    {
+      "key": "merci/empty/button",
+      "value": "Jetzt mitmachen"
     },
     {
       "key": "merci/title",
-      "value": "Pledges ansehen"
+      "value": "Merci & Willkomen, {name}"
     },
     {
-      "key": "merci/signin",
-      "value": "Bitte anmelden:"
+      "key": "merci/lead",
+      "value": "Vielen Dank für Ihre Unterstützung. Es ist eine Ehre Sie als Mitglied begrüssen zu dürfen. Seien Sie stolz und hissen Sie unsere Flagge im ganze Inter-Land."
+    },
+    {
+      "key": "merci/share/tweetTemplate",
+      "value": "Journalismus ist mehr als nur ein Geschäft für irgendwelche Konzerne, beteilige dich."
+    },
+    {
+      "key": "merci/share/emailSubject",
+      "value": "Ein neues, unabhängiges Magazin"
+    },
+    {
+      "key": "merci/share/emailBody",
+      "value": "Hallo\n\nWerde Mitglied und Abonoment vom der Republik:\n{url}\n\nHerzliche Grüsse,\n{backerName}"
+    },
+    {
+      "key": "merci/pledge/label",
+      "value": "Erstellt {formattedDateTime}"
+    },
+    {
+      "key": "merci/payment/method/STRIPE",
+      "value": "Kreditkarte"
+    },
+    {
+      "key": "merci/payment/method/POSTFINANCECARD",
+      "value": "Postkarte"
+    },
+    {
+      "key": "merci/payment/method/PAYPAL",
+      "value": "PayPal"
+    },
+    {
+      "key": "merci/payment/method/PAYMENTSLIP",
+      "value": "Einzahlungsschein"
+    },
+    {
+      "key": "merci/payment/status/generic/WAITING",
+      "value": "{formattedTotal} ausstehend"
+    },
+    {
+      "key": "merci/payment/status/generic/PAID",
+      "value": "{formattedTotal} bezahlt mit {method}"
+    },
+    {
+      "key": "merci/payment/status/generic/REFUNDED",
+      "value": "{formattedTotal} zurück erstattet"
+    },
+    {
+      "key": "merci/payment/status/generic/CANCELLED",
+      "value": "{formattedTotal} annulliert"
+    },
+    {
+      "key": "merci/payment/status/PAYMENTSLIP/WAITING",
+      "value": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an:\n\n\nKonto: 61-11760-6\nProject R Genossenschaft\n8004 Zürich"
+    },
+    {
+      "key": "merci/payment/status/PAYMENTSLIP/PAID",
+      "value": "{formattedTotal} bezahlt"
+    },
+    {
+      "key": "merci/payment/PAYMENTSLIP/paperInvoice/1",
+      "value": "Sie erhalten eine Rechnung per Post"
+    },
+    {
+      "key": "merci/payment/PAYMENTSLIP/paperInvoice/0",
+      "value": "Sie haben die Rechnung per E-Mail erhalten"
+    },
+    {
+      "key": "merci/updateMe/title",
+      "value": "Adresse"
+    },
+    {
+      "key": "merci/signOut",
+      "value": "Abmelden"
+    },
+    {
+      "key": "signIn/email/label",
+      "value": "Email-Adresse"
+    },
+    {
+      "key": "signIn/success",
+      "value": "Erfolgreich eingeloggt als {nameOrEmail} ({seconds}s)"
+    },
+    {
+      "key": "signIn/loading",
+      "value": "Lädt"
+    },
+    {
+      "key": "signOut/loading",
+      "value": "Lädt"
+    },
+    {
+      "key": "signOut/error",
+      "value": "Unbekannter Fehler"
     },
     {
       "key": "pledge/title",
@@ -152,8 +256,24 @@
       "value": "Ihre Kontaktinformationen"
     },
     {
-      "key": "pledge/contact/signedin-as",
-      "value": "Du bist eingeloggt als:"
+      "key": "pledge/contact/signedinAs",
+      "value": "Sie sind angemeldet als: {nameOrEmail}"
+    },
+    {
+      "key": "pledge/contact/pastPledges/1",
+      "value": "Sie haben bereits einmal mitgemacht."
+    },
+    {
+      "key": "pledge/contact/pastPledges/other",
+      "value": "Sie haben bereits {count} mal mitgemacht."
+    },
+    {
+      "key": "pledge/contact/signOut",
+      "value": "abmelden"
+    },
+    {
+      "key": "pledge/contact/signIn",
+      "value": "Schon mal unterstützt?"
     },
     {
       "key": "pledge/contact/name/label",
@@ -176,7 +296,11 @@
       "value": "E-Mail ungültig"
     },
     {
-      "key": "pledge/submit/pay/title",
+      "key": "pledge/submit/payMethod/title",
+      "value": "Zahlungsart auswählen"
+    },
+    {
+      "key": "pledge/submit/payMethod/error",
       "value": "Zahlungsart auswählen"
     },
     {
@@ -264,6 +388,10 @@
       "value": "bezahlen"
     },
     {
+      "key": "pledge/submit/loading/stripe/3dsecure",
+      "value": "3-D Secure"
+    },
+    {
       "key": "pledge/submit/loading/postfinance",
       "value": "weiterleiten"
     },
@@ -334,6 +462,26 @@
     {
       "key": "pledge/recievePayment/paypal/cancel",
       "value": "Zahlung abgebrochen. Wählen Sie ein anderes Zahlungsmittel um ihre Bestellung abzuschliessen."
+    },
+    {
+      "key": "pledge/recievePayment/3dsecure/failed",
+      "value": "3-D Secure fehlgeschlagen. Versuchen Sie es nochmals oder wählen Sie ein anderes Zahlungsmittel."
+    },
+    {
+      "key": "pledge/3dsecure/payment_method_not_available",
+      "value": "Das Zahlungsmittel ist zurzeit nicht verfügbar, versuchen Sie es mit einem anderen Zahlungsmittel."
+    },
+    {
+      "key": "pledge/3dsecure/processing_error",
+      "value": "Unerwarteter Fehler beim Bezahlen. Versuchen Sie es erneut."
+    },
+    {
+      "key": "pledge/3dsecure/unkown",
+      "value": "Unbekannter Fehler beim Bezahlen."
+    },
+    {
+      "key": "pledge/3dsecure/redirect/failed",
+      "value": "3-D Secure ihrer Bank ist nicht verfügbar. Versuchen Sie es mit einem anderen Zahlungsmittel."
     },
     {
       "key": "api/email/invalid",
@@ -428,6 +576,10 @@
       "value": "Es wurde bereits ein pledge mit dieser Zahlung abgerechnet. Bitte kontaktieren Sie uns. ID: {id}"
     },
     {
+      "key": "api/faq/mail/subject",
+      "value": "Danke für Ihre Frage"
+    },
+    {
       "key": "footer/contact/title",
       "value": "Kontakt"
     },
@@ -450,6 +602,58 @@
     {
       "key": "footer/legal/imprint",
       "value": "Impressum"
+    },
+    {
+      "key": "pledge/submit/paymentslip/title",
+      "value": "Ihre Adresse"
+    },
+    {
+      "key": "pledge/submit/paymentslip/name/label",
+      "value": "Anschrift"
+    },
+    {
+      "key": "pledge/submit/paymentslip/name/error/empty",
+      "value": "Anschrift fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/line1/label",
+      "value": "Strasse und Hausnummer"
+    },
+    {
+      "key": "pledge/submit/paymentslip/line1/error/empty",
+      "value": "Strasse und Hausnummer fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/line2/label",
+      "value": "Zusatz (Optional: Einheit, Gebäude, usw.)"
+    },
+    {
+      "key": "pledge/submit/paymentslip/postalCode/label",
+      "value": "Postleitzahl"
+    },
+    {
+      "key": "pledge/submit/paymentslip/postalCode/error/empty",
+      "value": "Postleitzahl fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/city/label",
+      "value": "Stadt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/city/error/empty",
+      "value": "Stadt fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/country/label",
+      "value": "Land"
+    },
+    {
+      "key": "pledge/submit/paymentslip/country/error/empty",
+      "value": "Land fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/paperInvoice",
+      "value": "Rechnung per Post"
     }
   ]
 }
