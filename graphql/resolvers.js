@@ -176,8 +176,8 @@ const resolveFunctions = {
   },
 
   RootMutation: Object.assign({}, mutations, {
-    async signIn(_, args, {loaders, pgdb, user, req}) {
-      return signIn(args.email, req)
+    async signIn(_, args, {loaders, pgdb, user, req, t}) {
+      return signIn(args.email, req, t)
     },
     async signOut(_, args, {loaders, pgdb, user, req}) {
       if(!req.session)
