@@ -13,7 +13,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
 
     // check if all templateIds are valid
     if(packageOptions.length<pledgeOptions.length) {
-      logger.error('one or more of the claimed templateIds are/became invalid', { req: req._log(), args, error: e })
+      logger.error('one or more of the claimed templateIds are/became invalid', { req: req._log(), args })
       throw new Error(t('api/unexpected'))
     }
 

@@ -47,7 +47,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         method: 'PAYMENTSLIP',
         total: pledge.total,
         status: 'WAITING',
-        paperInvoice: pledgePayment.paperInvoice
+        paperInvoice: pledgePayment.paperInvoice || false
       })
 
     } else if(pledgePayment.method == 'STRIPE') {
@@ -227,7 +227,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       throw new Error(t('api/unexpected'))
     }
     if(!payment || !pledgeStatus) {
-      logger.error('payment or pledgeStatus undefined', { req: req._log(), args, pledge, pspPayload, payment, pledgeStatus })
+      logger.error('payment or pledgeStatus undefined', { req: req._log(), args, pledge, payment, pledgeStatus })
       throw new Error(t('api/unexpected'))
     }
 
