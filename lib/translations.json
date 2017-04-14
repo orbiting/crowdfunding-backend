@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-14T14:30:51.508Z",
+  "updated": "2017-04-14T15:20:15.145Z",
   "title": "live",
   "data": [
     {
@@ -224,8 +224,24 @@
       "value": "Adresse"
     },
     {
+      "key": "merci/updateMe/birthday/label",
+      "value": "Geburtsdatum"
+    },
+    {
+      "key": "merci/updateMe/birthday/hint",
+      "value": "TT.MM.JJJJ, notwendig für Ihre Mitgliedschaft"
+    },
+    {
       "key": "merci/updateMe/birthday/error/empty",
-      "value": null
+      "value": "Geburtsdatum fehlt"
+    },
+    {
+      "key": "merci/updateMe/birthday/error/invalid",
+      "value": "Geburtsdatum ungültig"
+    },
+    {
+      "key": "merci/updateMe/submit",
+      "value": "Speichern"
     },
     {
       "key": "merci/signOut",
@@ -586,6 +602,10 @@
     {
       "key": "api/signin/mail/subject",
       "value": "Login Versuch"
+    },
+    {
+      "key": "api/pledge/mail/subject",
+      "value": "Vielen Dank!"
     },
     {
       "key": "footer/contact/title",
