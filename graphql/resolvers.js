@@ -60,7 +60,7 @@ const resolveFunctions = {
       //query params. Pledge must not be successfull in this state, otherwise user
       //clicked back and we want to show him a nice error.
       const pledge = await pgdb.public.pledges.findOne({id: args.id})
-      if(pledge.status === 'SUCCESSFULL') {
+      if(pledge.status === 'SUCCESSFUL') {
         logger.error('draftPledge for successfull pledge', { req: req._log(), args, pledge })
         throw new Error(t('api/pledge/alreadyPaid'))
       }
@@ -105,7 +105,7 @@ const resolveFunctions = {
         FROM pledges pl
         JOIN packages pa ON pl."packageId"=pa.id
         WHERE pl.status = $1
-        AND pa."crowdfundingId"=$2`, ['SUCCESSFULL', crowdfunding.id]) || 0
+        AND pa."crowdfundingId"=$2`, ['SUCCESSFUL', crowdfunding.id]) || 0
       const people = await pgdb.public.queryOneField(`
         SELECT COUNT(m.id)
         FROM memberships m

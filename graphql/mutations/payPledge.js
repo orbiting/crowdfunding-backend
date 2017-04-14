@@ -15,7 +15,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       logger.error(`pledge (${pledgePayment.pledgeId}) not found`, { req: req._log(), args, pledge })
       throw new Error(t('api/unexpected'))
     }
-    if(pledge.status === 'SUCCESSFULL') {
+    if(pledge.status === 'SUCCESSFUL') {
       logger.error('pledge is already paid', { req: req._log(), args, pledge, pledgePayment })
       throw new Error(t('api/pledge/alreadyPaid'))
     }
@@ -40,7 +40,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       if(pledge.total > 100000) {
         pledgeStatus = 'WAITING_FOR_PAYMENT'
       } else {
-        pledgeStatus = 'SUCCESSFULL'
+        pledgeStatus = 'SUCCESSFUL'
       }
       payment = await transaction.public.payments.insertAndGet({
         type: 'PLEDGE',
@@ -86,7 +86,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         pspId: charge.id,
         pspPayload: charge
       })
-      pledgeStatus = 'SUCCESSFULL'
+      pledgeStatus = 'SUCCESSFUL'
       //save sourceId to user
       await transaction.public.paymentSources.insert({
         method: 'STRIPE',
@@ -141,7 +141,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         pspId: pspPayload.PAYID,
         pspPayload: pspPayload
       })
-      pledgeStatus = 'SUCCESSFULL'
+      pledgeStatus = 'SUCCESSFUL'
 
       //check if amount is correct
       //PF amount is suddendly in franken
@@ -215,7 +215,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         pspId: pspPayload.tx,
         pspPayload: responseDict
       })
-      pledgeStatus = 'SUCCESSFULL'
+      pledgeStatus = 'SUCCESSFUL'
 
       //check if amount is correct
       if(amount !== pledge.total) {
@@ -241,7 +241,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     if(pledge.status !== pledgeStatus) {
       //generate Memberships
       // TODO extract to function
-      if(pledgeStatus === 'SUCCESSFULL') {
+      if(pledgeStatus === 'SUCCESSFUL') {
         // get augmented pledge options
         const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledge.id})
         const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( (plo) => plo.templateId)})
