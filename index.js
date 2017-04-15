@@ -3,6 +3,8 @@ const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
 const logger = require('./lib/logger')
+const {getFormatter} = require('./lib/translate')
+const MESSAGES = require('./lib/translations.json').data
 
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
@@ -16,6 +18,7 @@ const graphql = require('./graphql')
 const postfinance = require('./src/postfinance')
 const newsletter = require('./src/newsletter')
 
+const t = getFormatter(MESSAGES)
 
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   const server = express()
@@ -69,7 +72,7 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     pgdb: pgdb
   })
 
-  graphql(server, pgdb)
+  graphql(server, pgdb, t)
 
   // start the server
   server.listen(process.env.PORT, () => {
