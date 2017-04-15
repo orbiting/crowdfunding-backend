@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const logger = require('../../lib/logger')
 const sendMailTemplate = require('../../lib/sendMailTemplate')
+const fetch = require('isomorphic-unfetch')
 
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()

@@ -1,4 +1,3 @@
-require('isomorphic-fetch')
 const { PgDb } = require('pogi')
 const cors = require('cors')
 const express = require('express')
@@ -15,12 +14,13 @@ process.env.PORT = process.env.PORT || 3001
 const auth = require('./src/auth')
 const graphql = require('./graphql')
 const postfinance = require('./src/postfinance')
+const newsletter = require('./src/newsletter')
 
 
 PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   const server = express()
 
-  //isomorphic-fetch needs explicit CORS headers otherwise, cookies are not sent
+  //fetch needs explicit CORS headers otherwise, cookies are not sent
   if(process.env.CORS_WHITELIST_URL) {
     const corsOptions = {
       origin: process.env.CORS_WHITELIST_URL,
