@@ -30,6 +30,7 @@ type RootMutation {
   reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
   claimMembership(voucherCode: String!): Boolean!
 
+  remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
 }
 

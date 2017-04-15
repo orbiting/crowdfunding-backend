@@ -55,6 +55,8 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
   // postfinance doesn't support basic-auth for webhooks
   postfinance(server, pgdb)
 
+  server.use(newsletter(t))
+
   if (process.env.BASIC_AUTH_PASS) {
     server.use(basicAuth({
       users: { [process.env.BASIC_AUTH_USER]: process.env.BASIC_AUTH_PASS },
