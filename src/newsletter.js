@@ -7,9 +7,9 @@ const subscribeEmail = require('../lib/subscribeEmail')
 module.exports = (t) =>
   server.get('/newsletter/subscribe', bodyParser.json(), async (req, res) => {
     const {list, email, token, successMessage} = req.query
-    const {FRONTEND_BASIC_URL} = process.env
+    const {FRONTEND_BASE_URL} = process.env
 
-    const invalidUrl = `${FRONTEND_BASIC_URL}/newsletter/welcome?message=${encodeURIComponent(t('api/newsletter/invalidRequest'))}`
+    const invalidUrl = `${FRONTEND_BASE_URL}/newsletter/welcome?message=${encodeURIComponent(t('api/newsletter/invalidRequest'))}`
 
     if (!list || !email || !token) {
       return res.redirect(invalidUrl)
@@ -25,7 +25,7 @@ module.exports = (t) =>
 
     const message = response.message || successMessage || ''
     return res.redirect([
-      FRONTEND_BASIC_URL,
+      FRONTEND_BASE_URL,
       '/newsletter/welcome',
       `?message=${encodeURIComponent(message)}`
     ].join(''))
