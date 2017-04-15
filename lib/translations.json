@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-14T15:20:15.145Z",
+  "updated": "2017-04-15T13:00:02.993Z",
   "title": "live",
   "data": [
     {
@@ -221,7 +221,7 @@
     },
     {
       "key": "merci/updateMe/title",
-      "value": "Adresse"
+      "value": "Persönliche Angaben"
     },
     {
       "key": "merci/updateMe/birthday/label",
@@ -229,7 +229,7 @@
     },
     {
       "key": "merci/updateMe/birthday/hint",
-      "value": "TT.MM.JJJJ, notwendig für Ihre Mitgliedschaft"
+      "value": "TT.MM.JJJJ, notwendig für Ihre rechtmässige Mitgliedschaft"
     },
     {
       "key": "merci/updateMe/birthday/error/empty",
@@ -244,8 +244,20 @@
       "value": "Speichern"
     },
     {
+      "key": "merci/updateMe/updating",
+      "value": "speichert"
+    },
+    {
+      "key": "merci/updateMe/edit",
+      "value": "ändern"
+    },
+    {
       "key": "merci/signOut",
       "value": "Abmelden"
+    },
+    {
+      "key": "signIn/button",
+      "value": "anmelden"
     },
     {
       "key": "signIn/email/label",
@@ -292,8 +304,12 @@
       "value": "abmelden"
     },
     {
-      "key": "pledge/contact/signIn",
+      "key": "pledge/contact/signIn/show",
       "value": "Schon mal unterstützt?"
+    },
+    {
+      "key": "pledge/contact/signIn/hide",
+      "value": "Das erste Mal hier?"
     },
     {
       "key": "pledge/contact/name/label",
@@ -608,6 +624,26 @@
       "value": "Vielen Dank!"
     },
     {
+      "key": "api/remindeme/mail/subject",
+      "value": "Erinnerung REPUBLIK crowdfunding"
+    },
+    {
+      "key": "api/remindeme/successMessage",
+      "value": "Wir werden Sie erinnern"
+    },
+    {
+      "key": "api/newsletter/invalidRequest",
+      "value": "Ungültige Anfrage du mongi!"
+    },
+    {
+      "key": "api/newsletter/alreadySubscribed",
+      "value": "Sie sind bereits eingetragen"
+    },
+    {
+      "key": "api/newsletter/subscriptionFailed",
+      "value": "Anmeldung fehlgeschlagen"
+    },
+    {
       "key": "footer/contact/title",
       "value": "Kontakt"
     },
@@ -678,6 +714,10 @@
     {
       "key": "me/addressForm/country/error/empty",
       "value": "Land fehlt"
+    },
+    {
+      "key": "pledge/submit/paymentslip/title",
+      "value": "Rechnungsadresse"
     },
     {
       "key": "pledge/submit/paymentslip/paperInvoice",
