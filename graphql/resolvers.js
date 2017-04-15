@@ -1,10 +1,6 @@
 const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
-const ensureSignedIn = require('../lib/ensureSignedIn')
-const signIn = require('../lib/signIn')
-const sendMail = require('../lib/sendMail')
-const sendMailTemplate = require('../lib/sendMailTemplate')
 const mutations = require('./mutations/index')
 
 const resolveFunctions = {
@@ -175,49 +171,7 @@ const resolveFunctions = {
     }
   },
 
-  RootMutation: Object.assign({}, mutations, {
-    async signIn(_, args, {loaders, pgdb, user, req, t}) {
-      return signIn(args.email, req, t)
-    },
-    async signOut(_, args, {loaders, pgdb, user, req}) {
-      if(!req.session)
-        return
-      req.session.destroy(function(error) {
-        if(error) {
-          logger.error('error trying to destroy session', { req: req._log(), error })
-        }
-      })
-      return true
-    },
-    async submitQuestion(_, args, {loaders, pgdb, user, req, t}) {
-      ensureSignedIn(req, t)
-
-      const { question } = args
-      await Promise.all([
-        sendMail({
-          to: process.env.QUESTIONS_MAIL_ADDRESS,
-          fromEmail: user.email,
-          subject: 'new (FA)Question asked!',
-          text: `${user.name} hat folgende Frage gestellt:\n\n${question}`
-        }),
-        sendMailTemplate({
-          to: user.email,
-          fromEmail: process.env.QUESTIONS_MAIL_ADDRESS,
-          subject: t('api/faq/mail/subject'),
-          templateName: 'cf_faq',
-          globalMergeVars: [
-            { name: 'NAME',
-              content: user.name
-            },
-            { name: 'QUESTION',
-              content: question
-            }
-          ]
-        })
-      ])
-      return {success: true}
-    }
-  })
+  RootMutation: mutations
 }
 
 module.exports = resolveFunctions
