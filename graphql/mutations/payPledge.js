@@ -3,6 +3,7 @@ const querystring = require('querystring')
 const crypto = require('crypto')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const logger = require('../../lib/logger')
+const sendMailTemplate = require('../../lib/sendMailTemplate')
 
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
@@ -290,6 +291,51 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     //commit transaction
     await transaction.transactionCommit()
 
+    const newPledge = await pgdb.public.pledges.findOne({id: pledge.id})
+    const package = await pgdb.public.packages.findOne({id: newPledge.packageId})
+    const memberships = await pgdb.public.memberships.find({pledgeId: newPledge.id})
+    const newUser = await pgdb.public.users.findOne({id: user.id})
+    const address = await pgdb.public.addresses.findOne({id: newUser.addressId})
+    await sendMailTemplate({
+      to: user.email,
+      fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
+      subject: t('api/pledge/mail/subject'),
+      templateName: 'cf_pledge',
+      globalMergeVars: [
+        { name: 'NAME',
+          content: newUser.name
+        },
+        { name: 'WAITING_FOR_PAYMENT',
+          content: newPledge.status==='WAITING_FOR_PAYMENT'
+        },
+        { name: 'PAPER_INVOICE',
+          content: payment.paperInvoice
+        },
+        { name: 'PAYMENTSLIP',
+          content: pledgePayment.method==='PAYMENTSLIP'
+        },
+        { name: 'ASK_PERSONAL_INFO',
+          content: (!newUser.addressId || !newUser.birthday)
+        },
+        { name: 'VOUCHER_CODES',
+          content: package.name==='ABO_GIVE'
+            ? memberships.map( m => m.voucherCode ).join(', ')
+            : null
+        },
+        { name: 'TOTAL',
+          content: newPledge.total/100.0
+        },
+        { name: 'ADDRESS',
+          content: address
+            ? `<span>${address.name}<br/>
+${address.line1}<br/>
+${address.line2 ? address.line2+'<br/>' : ''}
+${address.postalCode} ${address.city}<br/>
+${address.country}</span>`
+            : null
+        },
+      ]
+    })
     return {
       pledgeId: pledge.id
     }
