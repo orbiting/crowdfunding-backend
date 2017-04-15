@@ -92,15 +92,16 @@ create table "membershipTypes" (
 
 create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'PAID_INVESTIGATE', 'SUCCESSFUL', 'CANCELLED');
 create table "pledges" (
-  "id"          uuid primary key not null default uuid_generate_v4(),
-  "packageId"   uuid not null references "packages" on update cascade on delete cascade,
-  "userId"      uuid not null references "users" on update cascade on delete cascade,
-  "status"      "pledgeStatus" not null default 'DRAFT',
-  "reason"      text,
-  "total"       integer not null,
-  "donation"    integer not null,
-  "createdAt"   timestamptz default now(),
-  "updatedAt"   timestamptz default now()
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "packageId"       uuid not null references "packages" on update cascade on delete cascade,
+  "userId"          uuid not null references "users" on update cascade on delete cascade,
+  "status"          "pledgeStatus" not null default 'DRAFT',
+  "reason"          text,
+  "total"           integer not null,
+  "donation"        integer not null,
+  "sendConfirmMail" boolean not null default false,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now()
 );
 
 create table "pledgeOptions" (

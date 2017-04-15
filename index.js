@@ -71,7 +71,8 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     secret: process.env.SESSION_SECRET,
     domain: process.env.COOKIE_DOMAIN || undefined,
     dev: DEV,
-    pgdb: pgdb
+    pgdb: pgdb,
+    t
   })
 
   graphql(server, pgdb, t)

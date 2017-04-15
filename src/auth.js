@@ -1,10 +1,12 @@
 const session = require('express-session')
 const PgSession = require('connect-pg-simple')(session)
 const passport = require('passport')
+const sendPendingPledgeConfirmations = require('../lib/sendPendingPledgeConfirmations')
 
 exports.configure = ({
   server = null, // Express Server
   pgdb = null, // pogi connection
+  t = null, // translater
   // Secret used to encrypt session data on the server
   secret = null,
   // Specifies the value for the Domain Set-Cookie attribute
@@ -30,6 +32,9 @@ exports.configure = ({
   }
   if (pgdb === null) {
     throw new Error('pgdb option must be a connected pogi instance')
+  }
+  if (t === null) {
+    throw new Error('t option must be the translator')
   }
   // Sessions store for express-session (defaults to connect-pg-simple using DATABASE_URL)
   const store = new PgSession({
@@ -87,6 +92,9 @@ exports.configure = ({
     await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{passport}', '${JSON.stringify({user: user.id})}')`)
     await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{token}', 'null')`)
     //set authorizer IP, location
+
+    //singin hooks
+    await sendPendingPledgeConfirmations(user.id, pgdb, t)
 
     return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
   })
