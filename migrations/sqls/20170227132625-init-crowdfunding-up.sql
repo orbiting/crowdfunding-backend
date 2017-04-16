@@ -127,6 +127,7 @@ create table "payments" (
   "hrid"          text unique not null default make_hrid('payments', 'hrid', 6),
   "pspId"         text,
   "pspPayload"    jsonb,
+  "dueDate"       date,
   "createdAt"     timestamptz default now(),
   "updatedAt"     timestamptz default now(),
   unique ("id", "type")

@@ -220,6 +220,7 @@ type PledgePayment {
   total: Int!
   status: PaymentStatus!
   hrid: String
+  dueDate: Date
   createdAt: Date!
   updatedAt: Date!
 }

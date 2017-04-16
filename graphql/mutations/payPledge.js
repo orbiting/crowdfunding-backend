@@ -4,6 +4,8 @@ const crypto = require('crypto')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const logger = require('../../lib/logger')
 
+const PAYMENT_DEADLINE_DAYS = 10
+
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
   try {
@@ -42,12 +44,14 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       } else {
         pledgeStatus = 'SUCCESSFULL'
       }
+      const now = new Date()
       payment = await transaction.public.payments.insertAndGet({
         type: 'PLEDGE',
         method: 'PAYMENTSLIP',
         total: pledge.total,
         status: 'WAITING',
-        paperInvoice: pledgePayment.paperInvoice || false
+        paperInvoice: pledgePayment.paperInvoice || false,
+        dueDate: new Date(now).setDate(now.getDate() + PAYMENT_DEADLINE_DAYS)
       })
 
     } else if(pledgePayment.method == 'STRIPE') {
