@@ -83,10 +83,12 @@ exports.configure = ({
       user = await Users.insertAndGet({email, verified: true})
     }
 
-    //log in the session
-    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{passport}', '${JSON.stringify({user: user.id})}')`)
-    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{token}', 'null')`)
-    //set authorizer IP, location
+    //log in the session and delete token
+    const sess = Object.assign({}, session.sess, {
+      passport: {user: user.id},
+      token: null
+    })
+    await Sessions.updateOne({sid: session.sid}, {sess})
 
     return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
   })
