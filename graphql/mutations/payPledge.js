@@ -7,6 +7,8 @@ const sendMailTemplate = require('../../lib/sendMailTemplate')
 const sendPendingPledgeConfirmations = require('../../lib/sendPendingPledgeConfirmations')
 const fetch = require('isomorphic-unfetch')
 
+const PAYMENT_DEADLINE_DAYS = 10
+
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
   try {
@@ -45,12 +47,14 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       } else {
         pledgeStatus = 'SUCCESSFUL'
       }
+      const now = new Date()
       payment = await transaction.public.payments.insertAndGet({
         type: 'PLEDGE',
         method: 'PAYMENTSLIP',
         total: pledge.total,
         status: 'WAITING',
-        paperInvoice: pledgePayment.paperInvoice || false
+        paperInvoice: pledgePayment.paperInvoice || false,
+        dueDate: new Date(now).setDate(now.getDate() + PAYMENT_DEADLINE_DAYS)
       })
 
     } else if(pledgePayment.method == 'STRIPE') {
