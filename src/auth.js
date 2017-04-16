@@ -88,10 +88,12 @@ exports.configure = ({
       user = await Users.insertAndGet({email, verified: true})
     }
 
-    //log in the session
-    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{passport}', '${JSON.stringify({user: user.id})}')`)
-    await Sessions.query(`UPDATE sessions SET sess = jsonb_set(sess, '{token}', 'null')`)
-    //set authorizer IP, location
+    //log in the session and delete token
+    const sess = Object.assign({}, session.sess, {
+      passport: {user: user.id},
+      token: null
+    })
+    await Sessions.updateOne({sid: session.sid}, {sess})
 
     //singin hooks
     await sendPendingPledgeConfirmations(user.id, pgdb, t)
@@ -110,14 +112,7 @@ exports.configure = ({
     if (!user) {
       return next('user not found!')
     }
-    // Note: We don't return all user profile fields to the client, just ones
-    // that are whitelisted here to limit the amount of user data we expose.
-    next(null, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      verified: user.verified
-    })
+    next(null, user)
   })
 
   // Initialise Passport

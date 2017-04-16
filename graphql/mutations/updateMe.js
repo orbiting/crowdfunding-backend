@@ -16,7 +16,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       await transaction.public.users.update({id: req.user.id}, {addressId: userAddress.id})
     }
     await transaction.transactionCommit()
-    return pgdb.public.users.find({id: req.user.id})
+    return pgdb.public.users.findOne({id: req.user.id})
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
