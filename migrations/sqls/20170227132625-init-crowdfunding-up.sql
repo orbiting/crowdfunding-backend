@@ -182,3 +182,17 @@ CREATE TRIGGER trigger_voucher_code
 BEFORE INSERT ON memberships
 FOR EACH ROW
 EXECUTE PROCEDURE voucher_code_trigger_function();
+
+
+create table "postfinancePayments" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "buchungsdatum"   date not null,
+  "valuta"          date not null,
+  "avisierungstext" text not null,
+  "gutschrift"      integer not null,
+  "mitteilung"      text,
+  "matched"         boolean not null default false,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now(),
+  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift", "mitteilung")
+);
