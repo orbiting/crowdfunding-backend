@@ -23,42 +23,42 @@ getPaymentsInput = (path) => {
   //trash first 4 lines as they contain another table with (Buchungsart, Konto, etc)
   //trash rows without gutschrift (such as lastschrift and footer)
   //keys to lower case
-	//trash uninteresting columns
-	//parse columns
-	//extract mitteilung
+  //trash uninteresting columns
+  //parse columns
+  //extract mitteilung
   const inputFile = rw.readFileSync(path, 'utf8')
-	const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
-	const parseDate = ['Buchungsdatum', 'Valuta']
-	const parseAmount = ['Gutschrift']
+  const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
+  const parseDate = ['Buchungsdatum', 'Valuta']
+  const parseAmount = ['Gutschrift']
   return csvParse( inputFile.split('\n').slice(4).join('\n') )
     .filter( row => row.Gutschrift )
     .map( row => {
-			let newRow = {}
-			Object.keys(row).forEach( key => {
-				const value = row[key]
-				if(includeColumns.indexOf(key) > -1) {
-					const newKey = key.toLowerCase()
-					if(parseDate.indexOf(key) > -1) {
-						newRow[newKey] = new Date(value)
-					}
-					else if(parseAmount.indexOf(key) > -1) {
-						newRow[newKey] = parseInt( parseFloat(value)*100 )
-					}
-					else {
-						if(key==='Avisierungstext') {
-							try {
-								newRow['mitteilung'] = /.*?MITTEILUNGEN:\s(.*?)(\s|$)/g.exec(value)[1]
-							} catch(e) {
-								console.log("Cloud not extract mitteilung from row:")
-								console.log(row)
-							}
-						}
-						newRow[newKey] = value
-					}
-				}
-			})
-			return newRow
-		})
+      let newRow = {}
+      Object.keys(row).forEach( key => {
+        const value = row[key]
+        if(includeColumns.indexOf(key) > -1) {
+          const newKey = key.toLowerCase()
+          if(parseDate.indexOf(key) > -1) {
+            newRow[newKey] = new Date(value)
+          }
+          else if(parseAmount.indexOf(key) > -1) {
+            newRow[newKey] = parseInt( parseFloat(value)*100 )
+          }
+          else {
+            if(key==='Avisierungstext') {
+              try {
+                newRow['mitteilung'] = /.*?MITTEILUNGEN:\s(.*?)(\s|$)/g.exec(value)[1]
+              } catch(e) {
+                console.log("Cloud not extract mitteilung from row:")
+                console.log(row)
+              }
+            }
+            newRow[newKey] = value
+          }
+        }
+      })
+      return newRow
+    })
 }
 
 writeReport = async (pgdb) => {
@@ -130,8 +130,8 @@ Promise.resolve().then( async () => {
   await Promise.all(
     paymentsInput.map( payment => {
       return pgdb.public.postfinancePayments.insert(payment)
-      .then( v => { return {payment, status: "resolved"} })
-      .catch( e => { return {payment, e, status: "rejected"} })
+        .then( v => { return {payment, status: "resolved"} })
+        .catch( e => { return {payment, e, status: "rejected"} })
     })
   ).then( results => {
     if(LOG_FAILED_INSERTS) {
