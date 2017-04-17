@@ -1,7 +1,7 @@
 // developed for postfinance exports
 // usage: cat data/export_Bewegungen_20170410.csv | node script/matchPayments.js
 
-const { PgDb } = require('pogi')
+const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(';').parse
@@ -116,12 +116,10 @@ writeReport = async (pgdb) => {
 }
 
 
-Promise.resolve().then( async () => {
+PgDb.connect().then( async (pgdb) => {
   console.log("importing new payments...")
 
   const paymentsInput = getPaymentsInput('/dev/stdin')
-
-  const pgdb = await PgDb.connect({connectionString: process.env.DATABASE_URL})
 
   //insert into db, it it fails, the row exists
   //this could also be done inside of the following transaction,

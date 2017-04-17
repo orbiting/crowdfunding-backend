@@ -1,4 +1,4 @@
-const { PgDb } = require('pogi')
+const PgDb = require('./lib/pgdb')
 const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
@@ -20,7 +20,7 @@ const requestLog = require('./src/requestLog')
 
 const t = getFormatter(MESSAGES)
 
-PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
+PgDb.connect().then( (pgdb) => {
   const server = express()
 
   //fetch needs explicit CORS headers otherwise, cookies are not sent

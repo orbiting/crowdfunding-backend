@@ -2,11 +2,33 @@ const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
+const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
+
+const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
+const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
-    description: 'Date custom scalar type',
+    description: 'DateTime (format %d.%m.%Y)',
+    parseValue(value) {
+      // parse dates as 12:00 Zulu
+      return dateParse(value+' 12 Z')
+    },
+    serialize(value) {
+      //value is a js date at 12:00 Zulu
+      return dateFormat(value)
+    },
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return dateParse(ast.value+' 12 Z')
+      }
+      return null
+    },
+  }),
+  DateTime: new GraphQLScalarType({
+    name: 'DateTime',
+    description: 'Date (format ISO-8601)',
     parseValue(value) {
       return new Date(value)
     },
