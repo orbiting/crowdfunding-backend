@@ -28,7 +28,7 @@ type RootMutation {
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
-  reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
+  reclaimPledge(pledgeId: ID!): Boolean!
   claimMembership(voucherCode: String!): Boolean!
 
   remindEmail(email: String!): Boolean!
@@ -225,11 +225,6 @@ type PledgePayment {
   dueDate: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
-}
-
-input PledgeClaimInput {
-  pledgeId: ID!
-  email: String!
 }
 
 enum FaqStatus {
