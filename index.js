@@ -5,6 +5,7 @@ const basicAuth = require('express-basic-auth')
 const logger = require('./lib/logger')
 const {getFormatter} = require('./lib/translate')
 const MESSAGES = require('./lib/translations.json').data
+const util = require('util')
 
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
@@ -19,6 +20,14 @@ const newsletter = require('./src/newsletter')
 const requestLog = require('./src/requestLog')
 
 const t = getFormatter(MESSAGES)
+
+
+//crash on unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('unhandled promise rejection', { promise: util.inspect(promise) })
+  throw new Error(t('api/unexpected'))
+})
+
 
 PgDb.connect().then( (pgdb) => {
   const server = express()
