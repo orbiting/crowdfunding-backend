@@ -15,7 +15,6 @@ process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')
-const postfinance = require('./src/postfinance')
 const newsletter = require('./src/newsletter')
 
 const t = getFormatter(MESSAGES)
@@ -51,9 +50,6 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     }
     next()
   })
-
-  // postfinance doesn't support basic-auth for webhooks
-  postfinance(server, pgdb)
 
   server.use(newsletter(t))
 
