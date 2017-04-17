@@ -3,8 +3,6 @@ const {graphqlExpress, graphiqlExpress} = require('graphql-server-express')
 const {makeExecutableSchema} = require('graphql-tools')
 const OpticsAgent = require('optics-agent')
 const logger = require('../lib/logger')
-const {getFormatter} = require('../lib/utils/translate')
-const MESSAGES = require('../lib/translations.json').data
 
 const Schema = require('./schema')
 const Resolvers = require('./resolvers')
@@ -22,7 +20,7 @@ OpticsAgent.configureAgent({
 OpticsAgent.instrumentSchema(executableSchema)
 
 
-module.exports = (server, pgdb) => {
+module.exports = (server, pgdb, t) => {
   server.use(OpticsAgent.middleware())
 
   server.use('/graphql',
@@ -41,7 +39,7 @@ module.exports = (server, pgdb) => {
           pgdb,
           user: req.user,
           req,
-          t: getFormatter(MESSAGES)
+          t,
         }
       }
     })

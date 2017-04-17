@@ -1,5 +1,6 @@
 const typeDefinitions = `
 scalar Date
+scalar DateTime
 
 schema {
   query: RootQuery
@@ -30,6 +31,7 @@ type RootMutation {
   reclaimPledge(pledgeClaim: PledgeClaimInput): PledgeResponse!
   claimMembership(voucherCode: String!): Boolean!
 
+  remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
 }
 
@@ -47,9 +49,9 @@ type User {
   name: String
   email: String!
   address: Address
-  birthday: String
-  createdAt: Date!
-  updatedAt: Date!
+  birthday: Date
+  createdAt: DateTime!
+  updatedAt: DateTime!
 
   pledges: [Pledge!]!
   memberships: [Membership!]!
@@ -59,13 +61,13 @@ type User {
 type Crowdfunding {
   id: ID!
   name: String!
-  beginDate: Date!
-  endDate: Date!
+  beginDate: DateTime!
+  endDate: DateTime!
   goal: CrowdfundingGoal!
   status: CrowdfundingStatus!
   packages: [Package!]!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 type CrowdfundingGoal {
   money: Int!
@@ -80,8 +82,8 @@ type Package {
   id: ID!
   name: String!
   options: [PackageOption!]!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type PackageOption {
@@ -94,8 +96,8 @@ type PackageOption {
   price: Int!
   minUserPrice: Int!
   userPrice: Boolean!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 
   amount: Int
   templateId: ID
@@ -109,27 +111,27 @@ input PackageOptionInput {
 type Goodie {
   id: ID!
   name: String!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type MembershipType {
   id: ID!
   name: String!
   duration: Int!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Membership {
   id: ID!
   type: MembershipType!
-  startDate: Date
+  startDate: DateTime
   pledge: Pledge!
   voucherCode: String
   reducedPrice: Boolean!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 union Reward = Goodie | MembershipType
@@ -161,7 +163,7 @@ enum PledgeStatus {
   DRAFT
   WAITING_FOR_PAYMENT
   PAID_INVESTIGATE
-  SUCCESSFULL
+  SUCCESSFUL
   CANCELLED
 }
 type Pledge {
@@ -175,8 +177,8 @@ type Pledge {
   user: User!
   reason: String
   memberships: [Membership!]!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 input PledgeInput {
@@ -220,8 +222,9 @@ type PledgePayment {
   total: Int!
   status: PaymentStatus!
   hrid: String
-  createdAt: Date!
-  updatedAt: Date!
+  dueDate: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 input PledgeClaimInput {
@@ -239,8 +242,8 @@ type Faq {
   status: FaqStatus!
   question: String!
   answer: String!
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 `
 module.exports = [typeDefinitions]

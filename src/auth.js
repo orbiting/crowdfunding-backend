@@ -1,10 +1,12 @@
 const session = require('express-session')
 const PgSession = require('connect-pg-simple')(session)
 const passport = require('passport')
+const sendPendingPledgeConfirmations = require('../lib/sendPendingPledgeConfirmations')
 
 exports.configure = ({
   server = null, // Express Server
   pgdb = null, // pogi connection
+  t = null, // translater
   // Secret used to encrypt session data on the server
   secret = null,
   // Specifies the value for the Domain Set-Cookie attribute
@@ -30,6 +32,9 @@ exports.configure = ({
   }
   if (pgdb === null) {
     throw new Error('pgdb option must be a connected pogi instance')
+  }
+  if (t === null) {
+    throw new Error('t option must be the translator')
   }
   // Sessions store for express-session (defaults to connect-pg-simple using DATABASE_URL)
   const store = new PgSession({
@@ -90,6 +95,9 @@ exports.configure = ({
     })
     await Sessions.updateOne({sid: session.sid}, {sess})
 
+    //singin hooks
+    await sendPendingPledgeConfirmations(user.id, pgdb, t)
+
     return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
   })
 
@@ -104,14 +112,7 @@ exports.configure = ({
     if (!user) {
       return next('user not found!')
     }
-    // Note: We don't return all user profile fields to the client, just ones
-    // that are whitelisted here to limit the amount of user data we expose.
-    next(null, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      verified: user.verified
-    })
+    next(null, user)
   })
 
   // Initialise Passport

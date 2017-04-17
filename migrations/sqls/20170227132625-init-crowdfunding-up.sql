@@ -90,17 +90,18 @@ create table "membershipTypes" (
   foreign key ("rewardId", "rewardType") references "rewards" ("id", "type") on update cascade on delete cascade
 );
 
-create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'PAID_INVESTIGATE', 'SUCCESSFULL', 'CANCELLED');
+create type "pledgeStatus" as ENUM ('DRAFT', 'WAITING_FOR_PAYMENT', 'PAID_INVESTIGATE', 'SUCCESSFUL', 'CANCELLED');
 create table "pledges" (
-  "id"          uuid primary key not null default uuid_generate_v4(),
-  "packageId"   uuid not null references "packages" on update cascade on delete cascade,
-  "userId"      uuid not null references "users" on update cascade on delete cascade,
-  "status"      "pledgeStatus" not null default 'DRAFT',
-  "reason"      text,
-  "total"       integer not null,
-  "donation"    integer not null,
-  "createdAt"   timestamptz default now(),
-  "updatedAt"   timestamptz default now()
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "packageId"       uuid not null references "packages" on update cascade on delete cascade,
+  "userId"          uuid not null references "users" on update cascade on delete cascade,
+  "status"          "pledgeStatus" not null default 'DRAFT',
+  "reason"          text,
+  "total"           integer not null,
+  "donation"        integer not null,
+  "sendConfirmMail" boolean not null default false,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now()
 );
 
 create table "pledgeOptions" (
@@ -127,6 +128,7 @@ create table "payments" (
   "hrid"          text unique not null default make_hrid('payments', 'hrid', 6),
   "pspId"         text,
   "pspPayload"    jsonb,
+  "dueDate"       date,
   "createdAt"     timestamptz default now(),
   "updatedAt"     timestamptz default now(),
   unique ("id", "type")
@@ -180,3 +182,17 @@ CREATE TRIGGER trigger_voucher_code
 BEFORE INSERT ON memberships
 FOR EACH ROW
 EXECUTE PROCEDURE voucher_code_trigger_function();
+
+
+create table "postfinancePayments" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "buchungsdatum"   date not null,
+  "valuta"          date not null,
+  "avisierungstext" text not null,
+  "gutschrift"      integer not null,
+  "mitteilung"      text,
+  "matched"         boolean not null default false,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now(),
+  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift", "mitteilung")
+);

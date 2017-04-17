@@ -1,9 +1,10 @@
-require('isomorphic-fetch')
-const { PgDb } = require('pogi')
+const PgDb = require('./lib/pgdb')
 const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
 const logger = require('./lib/logger')
+const {getFormatter} = require('./lib/translate')
+const MESSAGES = require('./lib/translations.json').data
 
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
@@ -14,13 +15,15 @@ process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')
-const postfinance = require('./src/postfinance')
+const newsletter = require('./src/newsletter')
+const requestLog = require('./src/requestLog')
 
+const t = getFormatter(MESSAGES)
 
-PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
+PgDb.connect().then( (pgdb) => {
   const server = express()
 
-  //isomorphic-fetch needs explicit CORS headers otherwise, cookies are not sent
+  //fetch needs explicit CORS headers otherwise, cookies are not sent
   if(process.env.CORS_WHITELIST_URL) {
     const corsOptions = {
       origin: process.env.CORS_WHITELIST_URL,
@@ -30,27 +33,9 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     server.use('*', cors(corsOptions))
   }
 
-  //add a logger to request
-  server.use(function(req, res, next) {
-    req._log = function() {
-      const log = {
-        body: this.body,
-        headers: this.headers,
-        url: this.url,
-        method: this.method,
-        query: this.query,
-        user: this.user
-      }
-      if(log.headers.cookie) {
-        log.headers.cookie = "REMOVED"
-      }
-      return log
-    }
-    next()
-  })
-
-  // postfinance doesn't support basic-auth for webhooks
-  postfinance(server, pgdb)
+  //middleware
+  server.use(requestLog)
+  server.use(newsletter(t))
 
   if (process.env.BASIC_AUTH_PASS) {
     server.use(basicAuth({
@@ -66,10 +51,11 @@ PgDb.connect({connectionString: process.env.DATABASE_URL}).then( (pgdb) => {
     secret: process.env.SESSION_SECRET,
     domain: process.env.COOKIE_DOMAIN || undefined,
     dev: DEV,
-    pgdb: pgdb
+    pgdb: pgdb,
+    t
   })
 
-  graphql(server, pgdb)
+  graphql(server, pgdb, t)
 
   // start the server
   server.listen(process.env.PORT, () => {
