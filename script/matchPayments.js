@@ -6,6 +6,12 @@ const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(';').parse
 const csvFormat = dsvFormat(';').format
+const {getFormatter} = require('../lib/translate')
+const MESSAGES = require('../lib/translations.json').data
+const generateMemberships = require('../lib/generateMemberships')
+const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
+
+const t = getFormatter(MESSAGES)
 
 require('dotenv').config()
 
@@ -168,8 +174,8 @@ Promise.resolve().then( async () => {
       return payment
     })
     console.log(`${updatedPayments.length} payment(s) matched`)
-    if(updatedPayments.length > 0) {
 
+    if(updatedPayments.length > 0) {
       await Promise.all(updatedPayments.map( payment => {
         return transaction.public.payments.update({id: payment.id}, payment)
       }))
@@ -178,29 +184,37 @@ Promise.resolve().then( async () => {
       //update pledges
       const pledgePayments = await transaction.public.pledgePayments.find({paymentId: updatedPayments.map(p => p.id)})
       const pledges = await transaction.public.pledges.find({id: pledgePayments.map(p => p.pledgeId)})
-      const updatedPledges = []
-      updatedPayments.forEach( payment => {
+      let numUpdatedPledges = 0
+      let numPaymentsSuccessful = 0
+      await Promise.all(updatedPayments.map( async (payment) => {
         const pledgePayment = pledgePayments.find( p => p.paymentId === payment.id )
         const pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
         if(!pledgePayment || !pledge) { throw new Error('could not find pledge for payment')}
 
-        let newStatus = pledge.status
+        let newStatus
         if(payment.total >= pledge.total)
           newStatus = 'SUCCESSFUL'
         else
           newStatus = 'PAID_INVESTIGATE'
 
         if(pledge.status !== newStatus) {
-          pledge.status = newStatus
-          updatedPledges.push(pledge)
+          if(newStatus === 'SUCCESSFUL') {
+            await generateMemberships(pledge.id, transaction, t)
+          }
+          await transaction.public.pledges.update({id: pledge.id}, {
+            status: newStatus
+          })
+          numUpdatedPledges += 1
         }
-      })
-      await Promise.all(updatedPledges.map( pledge => {
-        return transaction.public.pledges.update({id: pledge.id}, {
-          status: pledge.status
-        })
+
+        if(newStatus === 'SUCCESSFUL') {
+          await sendPaymentSuccessful(pledge.id, transaction, t)
+          numPaymentsSuccessful += 1
+        }
+
       }))
-      console.log(`${updatedPledges.length} pledge(s) updated`)
+      console.log(`${numUpdatedPledges} pledge(s) updated`)
+      console.log(`${numPaymentsSuccessful} payments SUCCESSFUL (confirmations sent)`)
     }
 
     await transaction.transactionCommit()
