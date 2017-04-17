@@ -1,7 +1,11 @@
 {
-  "updated": "2017-04-15T13:00:02.993Z",
+  "updated": "2017-04-17T17:34:02.461Z",
   "title": "live",
   "data": [
+    {
+      "key": "menu/",
+      "value": "Crowdfunding"
+    },
     {
       "key": "menu/updates",
       "value": "Neues",
@@ -488,6 +492,18 @@
       "value": "Nicht jetzt. Später!\n"
     },
     {
+      "key": "sidebar/reminder/success",
+      "value": "Wir werden Sie erinnern"
+    },
+    {
+      "key": "sidebar/reminder/cancel",
+      "value": "abbrechen"
+    },
+    {
+      "key": "sidebar/reminder/send",
+      "value": "erinnern"
+    },
+    {
       "key": "pledge/recievePayment/error",
       "value": "Zahlung fehlgeschlagen"
     },
@@ -518,6 +534,14 @@
     {
       "key": "pledge/3dsecure/redirect/failed",
       "value": "3-D Secure ihrer Bank ist nicht verfügbar. Versuchen Sie es mit einem anderen Zahlungsmittel."
+    },
+    {
+      "key": "api/auth/success",
+      "value": "Signin erfolgreich, Sie können dieses Fenster wieder schliessen."
+    },
+    {
+      "key": "api/auth/error",
+      "value": "Token ungültig. Bitte versuchen Sie das mit der Anmeldung erneut."
     },
     {
       "key": "api/email/invalid",
@@ -633,7 +657,7 @@
     },
     {
       "key": "api/newsletter/invalidRequest",
-      "value": "Ungültige Anfrage du mongi!"
+      "value": "Ungültige Anfrage"
     },
     {
       "key": "api/newsletter/alreadySubscribed",
@@ -660,8 +684,24 @@
       "value": "Project R"
     },
     {
+      "key": "footer/about/manifest",
+      "value": "Manifest"
+    },
+    {
       "key": "footer/legal/title",
       "value": "Rechtliches"
+    },
+    {
+      "key": "footer/legal/tos",
+      "value": "AGB"
+    },
+    {
+      "key": "footer/legal/privacy",
+      "value": "Datenschutz"
+    },
+    {
+      "key": "footer/legal/statute",
+      "value": "Statuten"
     },
     {
       "key": "footer/legal/imprint",
@@ -722,6 +762,14 @@
     {
       "key": "pledge/submit/paymentslip/paperInvoice",
       "value": "Rechnung per Post"
+    },
+    {
+      "key": "newsletter/title",
+      "value": "Newsletter"
+    },
+    {
+      "key": "newsletter/defaultMessage",
+      "value": "Welcome aboard!"
     }
   ]
 }
