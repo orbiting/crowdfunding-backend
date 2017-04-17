@@ -67,13 +67,19 @@ exports.configure = ({
   server.get('/auth/email/signin/:token', async (req, res) => {
     const token = req.params.token
     if (!token) {
-      return res.status(400).end('token must be provided')
+      return res
+        .set({'content-type': 'text/plain; charset=utf-8'})
+        .status(200)
+        .end(t('api/auth/error'))
     }
 
     // Look up session by token
     const session = await Sessions.findOne({'sess @>': {token}})
     if (!session) {
-      return res.status(400).end('token invalid')
+      return res
+        .set({'content-type': 'text/plain; charset=utf-8'})
+        .status(200)
+        .end(t('api/auth/error'))
     }
 
     const {email} = session.sess
@@ -98,7 +104,10 @@ exports.configure = ({
     //singin hooks
     await sendPendingPledgeConfirmations(user.id, pgdb, t)
 
-    return res.status(200).end("Signin erfolgreich, Sie können dieses Fenster wieder schliessen")
+    return res
+      .set({'content-type': 'text/plain; charset=utf-8'})
+      .status(200)
+      .end(t('api/auth/success'))
   })
 
 
