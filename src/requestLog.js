@@ -14,7 +14,7 @@ module.exports = server.use(function(req, res, next) {
       log.headers.cookie = "REMOVED"
     if(log.headers.authorization)
       log.headers.authorization = "REMOVED"
-    return JSON.stringify(log, null, 2)
+    return log
   }
   next()
 })
