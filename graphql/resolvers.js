@@ -17,6 +17,10 @@ const resolveFunctions = {
     },
     serialize(value) {
       //value is a js date at 12:00 Zulu
+      //or an ISO String
+      if((typeof value) === 'string') {
+        value = new Date(value)
+      }
       return dateFormat(value)
     },
     parseLiteral(ast) {
@@ -33,6 +37,9 @@ const resolveFunctions = {
       return new Date(value)
     },
     serialize(value) {
+      if((typeof value) === 'string') {
+        value = new Date(value)
+      }
       return value.toISOString()
     },
     parseLiteral(ast) {
