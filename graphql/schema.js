@@ -24,7 +24,7 @@ type RootQuery {
 type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
-  updateMe(user: UserInput!, address: AddressInput!): User!
+  updateMe(name: String, birthday: Date, address: AddressInput): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!

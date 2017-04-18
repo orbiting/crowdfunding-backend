@@ -10,7 +10,7 @@ const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
-    description: 'DateTime (format %d.%m.%Y)',
+    description: 'Date (format %d.%m.%Y)',
     parseValue(value) {
       // parse dates as 12:00 Zulu
       return dateParse(value+' 12 Z')
@@ -28,7 +28,7 @@ const resolveFunctions = {
   }),
   DateTime: new GraphQLScalarType({
     name: 'DateTime',
-    description: 'Date (format ISO-8601)',
+    description: 'DateTime (format ISO-8601)',
     parseValue(value) {
       return new Date(value)
     },
