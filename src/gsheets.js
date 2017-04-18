@@ -13,17 +13,13 @@ const mapping = {
 }
 
 const normalize = (data) => data.map( d => {
-  if(d.hasOwnProperty('published'))
-    d.published = !!d.published
-  if(d.hasOwnProperty('date'))
-    d.date = dateParse(d.date)
-  if(d.hasOwnProperty('dateTime'))
-    d.dateTime = dateTimeParse(d.dateTime)
-  if(d.hasOwnProperty('publishedDateTime'))
-    d.publishedDateTime = dateTimeParse(d.publishedDateTime)
-  if(d.hasOwnProperty('slug'))
-    d.slug = slugify(d.slug)
-  return d
+  return Object.assign({}, d, {
+    published: d.hasOwnProperty('published') ? !!d.published : undefiend,
+    date: d.hasOwnProperty('date') ? dateParse(d.date) : undefiend,
+    dateTime: d.hasOwnProperty('dateTime') ? dateTimeParse(d.dateTime) : undefiend,
+    publishedDateTime: d.hasOwnProperty('publishedDateTime') ? dateTimeParse(d.publishedDateTime) : undefiend,
+    slug: d.hasOwnProperty('slug') ? slugify(d.slug) : undefiend
+  })
 })
 
 module.exports = (pgdb, logger) =>
