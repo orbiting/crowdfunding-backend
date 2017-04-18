@@ -17,6 +17,10 @@ const resolveFunctions = {
     },
     serialize(value) {
       //value is a js date at 12:00 Zulu
+      //or an ISO String
+      if((typeof value) === 'string') {
+        value = new Date(value)
+      }
       return dateFormat(value)
     },
     parseLiteral(ast) {
@@ -33,6 +37,9 @@ const resolveFunctions = {
       return new Date(value)
     },
     serialize(value) {
+      if((typeof value) === 'string') {
+        value = new Date(value)
+      }
       return value.toISOString()
     },
     parseLiteral(ast) {
@@ -91,7 +98,17 @@ const resolveFunctions = {
       }
     },
     async faqs(_, args, {pgdb}) {
-      return pgdb.public.faqs.find( args )
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'faqs'}, 'data')
+      return data.filter( d => d.published )
+    },
+    async events(_, args, {pgdb}) {
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'events'}, 'data')
+      return data.filter( d => d.published )
+    },
+    async updates(_, args, {pgdb}) {
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'updates'}, 'data')
+      const now = new Date()
+      return data.filter( d => (new Date(d.publishedDateTime) < now) )
     }
   },
 

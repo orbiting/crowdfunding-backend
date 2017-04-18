@@ -26,6 +26,7 @@
     "graphql-server-express": "^0.6.0",
     "graphql-tag": "^1.2.4",
     "graphql-tools": "^0.10.0",
+    "gsheets": "^2.0.0",
     "isomorphic-unfetch": "^1.0.0",
     "knex": "^0.12.7",
     "kraut": "^0.1.1",
@@ -36,6 +37,7 @@
     "pogi": "^2.1.0",
     "querystring": "^0.2.0",
     "random-noun-generator-german": "^0.1.3",
+    "slugify": "^1.1.0",
     "stripe": "^4.16.0",
     "winston": "^2.3.1"
   },
