@@ -14,11 +14,11 @@ const mapping = {
 
 const normalize = (data) => data.map( d => {
   return Object.assign({}, d, {
-    published: d.hasOwnProperty('published') ? !!d.published : undefiend,
-    date: d.hasOwnProperty('date') ? dateParse(d.date) : undefiend,
-    dateTime: d.hasOwnProperty('dateTime') ? dateTimeParse(d.dateTime) : undefiend,
-    publishedDateTime: d.hasOwnProperty('publishedDateTime') ? dateTimeParse(d.publishedDateTime) : undefiend,
-    slug: d.hasOwnProperty('slug') ? slugify(d.slug) : undefiend
+    published: d.hasOwnProperty('published') ? !!d.published : undefined,
+    date: d.hasOwnProperty('date') ? dateParse(d.date) : undefined,
+    dateTime: d.hasOwnProperty('dateTime') ? dateTimeParse(d.dateTime) : undefined,
+    publishedDateTime: d.hasOwnProperty('publishedDateTime') ? dateTimeParse(d.publishedDateTime) : undefined,
+    slug: d.hasOwnProperty('slug') ? slugify(d.slug) : undefined
   })
 })
 
