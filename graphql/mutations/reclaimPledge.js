@@ -30,21 +30,24 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     }
 
     //transfer belongings to signedin user
-    const newUserId = req.user.id
-    await Promise.all([
-      transaction.public.pledges.updateOne({id: pledge.id}, {userId: newUserId}),
-      transaction.public.memberships.update({userId: pledgeUser.id}, {userId: newUserId}),
-      transaction.public.paymentSources.update({userId: pledgeUser.id}, {userId: newUserId})
-    ])
-    if(pledgeUser.addressId && !req.user.addressId) {
-      await Promise.all([
-        transaction.public.users.updateOne({id: newUserId}, {addressId: pledgeUser.addressId}),
-        transaction.public.users.updateOne({id: pledgeUser.id}, {addressId: null})
-      ])
+    const newUser = req.user
+    const promises = [
+      transaction.public.pledges.updateOne({id: pledge.id}, {userId: newUser.id}),
+      transaction.public.memberships.update({userId: pledgeUser.id}, {userId: newUser.id}),
+      transaction.public.paymentSources.update({userId: pledgeUser.id}, {userId: newUser.id}),
+      transaction.public.users.updateOne({id: newUser.id}, {
+        name: newUser.name || pledgeUser.name,
+        birthday: newUser.birthday || pledgeUser.birthday,
+        addressId: newUser.addressId || pledgeUser.addressId
+      })
+    ]
+    if(pledgeUser.addressId) {
+      promises.push( transaction.public.users.updateOne({id: pledgeUser.id}, {addressId: null}) )
     }
+    await Promise.all(promises)
 
     //send confirmation mail
-    await sendPendingPledgeConfirmations(newUserId, transaction, t)
+    await sendPendingPledgeConfirmations(newUser.id, transaction, t)
 
     //commit transaction
     await transaction.transactionCommit()
