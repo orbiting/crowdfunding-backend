@@ -184,7 +184,15 @@ const resolveFunctions = {
         : []
     },
     async memberships(pledge, args, {loaders, pgdb}) {
-      return pgdb.public.memberships.find({pledgeId: pledge.id})
+      const memberships = await pgdb.public.memberships.find({pledgeId: pledge.id})
+      const users = await pgdb.public.users.find({id: memberships.map( m => m.userId )})
+      return memberships.map( m => {
+        if(m.userId != pledge.userId) { //membership was vouchered to somebody else
+          const user = users.find( u => u.id === m.userId )
+          m.claimerName = user.name
+        }
+        return m
+      })
     }
   },
   Membership: {

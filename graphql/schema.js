@@ -130,6 +130,7 @@ type Membership {
   pledge: Pledge!
   voucherCode: String
   reducedPrice: Boolean!
+  claimerName: String
   createdAt: DateTime!
   updatedAt: DateTime!
 }
