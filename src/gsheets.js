@@ -61,7 +61,6 @@ module.exports = (pgdb, logger) =>
           })
         }
       } catch(e) {
-        console.error(e)
         logger.error('gsheets: error while trying to save data', { e, req: req._log() })
         return res.status(400).end('failed while trying to save data')
       }
