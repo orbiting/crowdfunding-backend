@@ -18,7 +18,9 @@ type RootQuery {
 
   memberships: [Pledge]
 
-  faqs(status: FaqStatus): [Faq]
+  faqs: [Faq]
+  events: [Event]
+  updates: [Update]
 }
 
 type RootMutation {
@@ -227,18 +229,26 @@ type PledgePayment {
   updatedAt: DateTime!
 }
 
-enum FaqStatus {
-  DRAFT
-  PUBLISHED
-}
-
 type Faq {
-  id: ID!
-  status: FaqStatus!
-  question: String!
-  answer: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  category: String
+  question: String
+  answer: String
+}
+type Event {
+  slug: String
+  title: String
+  description: String
+  link: String
+  date: Date
+  time: String
+  where: String
+  locationLink: String
+}
+type Update {
+  slug: String
+  title: String
+  text: String
+  publishedDateTime: DateTime
 }
 `
 module.exports = [typeDefinitions]

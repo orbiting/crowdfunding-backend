@@ -98,7 +98,17 @@ const resolveFunctions = {
       }
     },
     async faqs(_, args, {pgdb}) {
-      return pgdb.public.faqs.find( args )
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'faqs'}, 'data')
+      return data.filter( d => d.published )
+    },
+    async events(_, args, {pgdb}) {
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'events'}, 'data')
+      return data.filter( d => d.published )
+    },
+    async updates(_, args, {pgdb}) {
+      const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'updates'}, 'data')
+      const now = new Date()
+      return data.filter( d => (new Date(d.publishedDateTime) < now) )
     }
   },
 
