@@ -48,8 +48,9 @@ type SignInResponse {
 
 type User {
   id: ID!
-  firstName: String!
-  lastName: String!
+  name: String
+  firstName: String
+  lastName: String
   email: String!
   address: Address
   birthday: Date

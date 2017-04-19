@@ -116,6 +116,9 @@ const resolveFunctions = {
   },
 
   User: {
+    name (user) {
+      return [user.firstName, user.lastName].join(' ')
+    },
     async address(user, args, {loaders, pgdb}) {
       if(!user.addressId) return null
       return pgdb.public.addresses.findOne({id: user.addressId})
