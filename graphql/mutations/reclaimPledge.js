@@ -36,7 +36,8 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       transaction.public.memberships.update({userId: pledgeUser.id}, {userId: newUser.id}),
       transaction.public.paymentSources.update({userId: pledgeUser.id}, {userId: newUser.id}),
       transaction.public.users.updateOne({id: newUser.id}, {
-        name: newUser.name || pledgeUser.name,
+        firstName: newUser.firstName || pledgeUser.firstName,
+        lastName: newUser.lastName || pledgeUser.lastName,
         birthday: newUser.birthday || pledgeUser.birthday,
         addressId: newUser.addressId || pledgeUser.addressId
       })

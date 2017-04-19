@@ -11,7 +11,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       to: process.env.QUESTIONS_MAIL_ADDRESS,
       fromEmail: user.email,
       subject: 'new (FA)Question asked!',
-      text: `${user.name} hat folgende Frage gestellt:\n\n${question}`
+      text: `${user.firstName} ${user.lastName} hat folgende Frage gestellt:\n\n${question}`
     }),
     sendMailTemplate({
       to: user.email,
@@ -20,7 +20,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       templateName: 'cf_faq',
       globalMergeVars: [
         { name: 'NAME',
-          content: user.name
+          content: user.firstName+' '+user.lastName
         },
         { name: 'QUESTION',
           content: question

@@ -211,7 +211,7 @@ const resolveFunctions = {
         if(membership.userId != pledge.userId) { //membership was vouchered to somebody else
           const user = users.find( u => u.id === membership.userId )
           return Object.assign({}, membership, {
-            claimerName: user.name
+            claimerName: user.firstName+' '+user.lastName
           })
         }
         return membership
