@@ -21,6 +21,8 @@ type RootQuery {
   faqs: [Faq]
   events: [Event]
   updates: [Update]
+
+  testimonials(start: Int, limit: Int): [Testimonial!]!
 }
 
 type RootMutation {
@@ -35,6 +37,8 @@ type RootMutation {
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
+
+  submitTestimonial(role: String, quote: String, image: String!): Testimonial!
 }
 
 type MutationResult {
@@ -57,6 +61,7 @@ type User {
 
   pledges: [Pledge!]!
   memberships: [Membership!]!
+  testimonial: Testimonial
 }
 
 
@@ -250,6 +255,22 @@ type Update {
   title: String
   text: String
   publishedDateTime: DateTime
+}
+
+
+type Testimonial {
+  name: String!
+  role: String
+  quote: String
+  video: Video
+  # 256x256 JPEG HTTPS URL
+  image: String!
+}
+
+type Video {
+  hls: String!
+  mp4: String!
+  youtube: String
 }
 `
 module.exports = [typeDefinitions]
