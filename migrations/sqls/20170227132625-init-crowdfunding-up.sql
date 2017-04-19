@@ -194,7 +194,7 @@ create table "postfinancePayments" (
   "matched"         boolean not null default false,
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now(),
-  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift", "mitteilung")
+  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift")
 );
 
 create table "cashPayments" (
