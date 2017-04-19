@@ -3,13 +3,15 @@ const ensureSignedIn = require('../../lib/ensureSignedIn')
 
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   ensureSignedIn(req, t)
-  const {name, birthday, address} = args
+  const {firstName, lastName, birthday, address} = args
   const transaction = await pgdb.transactionBegin()
   try {
-    if(name || birthday) {
+    if(firstName || lastName || birthday) {
       const update = {}
-      if(name)
-        update.name = name
+      if(firstName)
+        update.firstName = firstName
+      if(lastName)
+        update.lastName = lastName
       if(birthday)
         update.birthday = birthday
       await transaction.public.users.update({id: req.user.id}, update)

@@ -91,14 +91,18 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       } else if(!user) { //create user
         user = await transaction.public.users.insertAndGet({
           email: pledge.user.email,
-          name: pledge.user.name,
+          firstName: pledge.user.firstName,
+          lastName: pledge.user.lastName,
           birthday: pledge.user.birthday
         })
       }
     }
     //update user details
-    if(user.name !== pledge.user.name) {
-      user = await transaction.public.users.updateAndGetOne({id: user.id}, {name: pledge.user.name})
+    if(user.firstName !== pledge.user.firstName || user.lastName !== pledge.user.lastName) {
+      user = await transaction.public.users.updateAndGetOne({id: user.id}, {
+        firstName: pledge.user.firstName,
+        lastName: pledge.user.lastName
+      })
     }
     //if we didn't load a alias, generate one
     if(!pfAliasId) {

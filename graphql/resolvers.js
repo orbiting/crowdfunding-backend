@@ -116,6 +116,9 @@ const resolveFunctions = {
   },
 
   User: {
+    name (user) {
+      return [user.firstName, user.lastName].join(' ')
+    },
     async address(user, args, {loaders, pgdb}) {
       if(!user.addressId) return null
       return pgdb.public.addresses.findOne({id: user.addressId})
@@ -211,7 +214,7 @@ const resolveFunctions = {
         if(membership.userId != pledge.userId) { //membership was vouchered to somebody else
           const user = users.find( u => u.id === membership.userId )
           return Object.assign({}, membership, {
-            claimerName: user.name
+            claimerName: user.firstName+' '+user.lastName
           })
         }
         return membership
