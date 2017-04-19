@@ -143,7 +143,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       orderId: newPledge.id,
       amount: newPledge.total,
       alias: pfAliasId,
-      userId
+      userId: user.id
     })
 
     return {
