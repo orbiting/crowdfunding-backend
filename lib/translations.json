@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-17T17:34:02.461Z",
+  "updated": "2017-04-19T11:17:03.438Z",
   "title": "live",
   "data": [
     {
@@ -132,6 +132,22 @@
       "value": "Wir haben Ihnen an «{email}» ein Bestätigunsemail mit den Wörtern «{phrase}» geschickt. Bitte klicken Sie auf den darin enthaltenen Link."
     },
     {
+      "key": "merci/postpay/reclaim",
+      "value": "Falsche Email-Adresse?"
+    },
+    {
+      "key": "merci/claim/signIn/before",
+      "value": "Geben Sie ihre richtige Email-Addresse ein:"
+    },
+    {
+      "key": "merci/claim/signIn/button",
+      "value": "ändern"
+    },
+    {
+      "key": "merci/claim/loading",
+      "value": "überprüfen"
+    },
+    {
       "key": "merci/signedOut/title",
       "value": "Ihre Gelöbnisse ansehen"
     },
@@ -170,6 +186,14 @@
     {
       "key": "merci/share/emailBody",
       "value": "Hallo\n\nWerde Mitglied und Abonoment vom der Republik:\n{url}\n\nHerzliche Grüsse,\n{backerName}"
+    },
+    {
+      "key": "merci/pledges/title/1",
+      "value": "Ihre Unterstützung"
+    },
+    {
+      "key": "merci/pledges/title/other",
+      "value": "Ihre Unterstützungen"
     },
     {
       "key": "merci/pledge/label",
@@ -272,6 +296,18 @@
       "value": "Erfolgreich eingeloggt als {nameOrEmail} ({seconds}s)"
     },
     {
+      "key": "signIn/polling",
+      "value": "Wir haben Ihnen an «{email}» ein Bestätigunsemail mit den Wörtern «{phrase}» geschickt. Bitte klicken Sie auf den darin enthaltenen Link."
+    },
+    {
+      "key": "signIn/email/error/empty",
+      "value": "E-Mail fehlt"
+    },
+    {
+      "key": "signIn/email/error/invalid",
+      "value": "E-Mail ungültig"
+    },
+    {
       "key": "signIn/loading",
       "value": "Lädt"
     },
@@ -336,12 +372,24 @@
       "value": "E-Mail ungültig"
     },
     {
+      "key": "pledge/submit/package/error",
+      "value": "Wählen Sie zuoberst ein Abonnement und Mitgliedschaft oder Sepnden aus"
+    },
+    {
       "key": "pledge/submit/payMethod/title",
       "value": "Zahlungsart auswählen"
     },
     {
       "key": "pledge/submit/payMethod/error",
       "value": "Zahlungsart auswählen"
+    },
+    {
+      "key": "pledge/submit/payMethod/label",
+      "value": "Wählen Sie eine Zahlungsart"
+    },
+    {
+      "key": "pledge/submit/secure",
+      "value": "Sichere Verbindung"
     },
     {
       "key": "pledge/submit/stripe/card/label",
@@ -401,7 +449,11 @@
     },
     {
       "key": "pledge/submit/button/pay",
-      "value": "Bezahlen"
+      "value": "{formattedChf} bezahlen"
+    },
+    {
+      "key": "pledge/submit/button/legal",
+      "value": "Mit dem Bezahlen erklären Sie sich mit den <a href=\"/legal/tos\" target=\"_blank\">AGB</a>s, der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Project R Genossenschaftsstatuten</a> einverstanden."
     },
     {
       "key": "pledge/submit/pay/method/STRIPE",
@@ -564,8 +616,8 @@
       "value": "Gutscheincode ungültig"
     },
     {
-      "key": "api/membership/reduced/alreadyHave",
-      "value": "Sie können nur eine reduzierte Mitgliedschaft kaufen."
+      "key": "api/membership/reduced/alreadyHas",
+      "value": "Sie können leider keine reduzierte Mitgliedschaft kaufen, da sie bereits eine Mitgliedschaft gekauft haben."
     },
     {
       "key": "api/pledge/alreadyPaid",
@@ -680,6 +732,10 @@
       "value": "Über uns"
     },
     {
+      "key": "footer/about/crew",
+      "value": "Crew"
+    },
+    {
       "key": "footer/about/projecR",
       "value": "Project R"
     },
@@ -770,6 +826,58 @@
     {
       "key": "newsletter/defaultMessage",
       "value": "Welcome aboard!"
+    },
+    {
+      "key": "memberships/title/1",
+      "value": "Ihre Mitgliedschaft und Abonoment"
+    },
+    {
+      "key": "memberships/title/other",
+      "value": "Ihre Mitgliedschaften und Abonoments"
+    },
+    {
+      "key": "memberships/give/show",
+      "value": "Verschenken?"
+    },
+    {
+      "key": "memberships/give/hide",
+      "value": "behalten"
+    },
+    {
+      "key": "memberships/give/description",
+      "value": "Sie können Abonements mit dem folgenden Gutscheincode verschenken:<br />\n{voucherCode}<br />\n<br />\nAuf <a href=\"https://www.republik.ch/claim\">republik.ch/claim</a> kann der Code eingelöst und in eine Mitgliedschaft und Abonnoment verwandelt werden. Sobald der Code eingelöst ist, ist das Abonnoment weg.\n"
+    },
+    {
+      "key": "memberships/type/ABO",
+      "value": "Mitglieschaft und Abonnement"
+    },
+    {
+      "key": "memberships/type/BENEFACTOR_ABO",
+      "value": "Gönner-Mitglieschaft und -Abonnement"
+    },
+    {
+      "key": "memberships/label",
+      "value": "Erstellt {formattedDateTime}"
+    },
+    {
+      "key": "memberships/claim/lead",
+      "value": "Mitgliedschaft und Abonnement einlösen"
+    },
+    {
+      "key": "memberships/claim/voucherCode/label",
+      "value": "Gutscheincode"
+    },
+    {
+      "key": "memberships/claim/voucherCode/label/error/empty",
+      "value": "Gutscheincode fehlt"
+    },
+    {
+      "key": "memberships/claim/button",
+      "value": "einlösen"
+    },
+    {
+      "key": "memberships/claim/loading",
+      "value": "überprüfen"
     }
   ]
 }
