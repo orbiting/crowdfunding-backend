@@ -129,6 +129,7 @@ create table "payments" (
   "pspId"         text,
   "pspPayload"    jsonb,
   "dueDate"       date,
+  "exported"      boolean not null default false,
   "createdAt"     timestamptz default now(),
   "updatedAt"     timestamptz default now(),
   unique ("id", "type")
