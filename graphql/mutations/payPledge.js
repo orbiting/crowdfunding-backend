@@ -150,13 +150,16 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         pspPayload: pspPayload
       })
       pledgeStatus = 'SUCCESSFUL'
-      //save alias to user
-      await transaction.public.paymentSources.insert({
-        method: 'POSTFINANCECARD',
-        userId: user.id,
-        pspId: pspPayload.ALIAS,
-        pspPayload: pspPayload
-      })
+
+      if(pspPayload.ALIAS && !(await transaction.public.paymentSources.count({userId: user.id, method: 'POSTFINANCECARD'}))) {
+        //save alias to user
+        await transaction.public.paymentSources.insert({
+          method: 'POSTFINANCECARD',
+          userId: user.id,
+          pspId: pspPayload.ALIAS,
+          pspPayload: pspPayload
+        })
+      }
 
       //check if amount is correct
       //PF amount is suddendly in franken
