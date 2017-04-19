@@ -92,10 +92,16 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       user = await transaction.public.users.updateAndGetOne({id: user.id}, {name: pledge.user.name})
     }
 
-    //check if user already has a reduced membership
-    if(donation < 0 && await transaction.public.memberships.count({userId: user.id, reducedPrice: true})) {
-      logger.info('user tried to buy a second reduced membership', { req: req._log(), args })
-      throw new Error(t('api/membership/reduced/alreadyHave'))
+    //buying reduced is only ok if user doesn't have a pledge yet, except donation only
+    if(donation < 0 && await transaction.public.pledges.count({userId: user.id})) {
+      const pledges = await transaction.public.pledges.find({userId: user.id})
+      const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledges.map( p => p.id )})
+      const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( p => p.templateId )})
+      const rewards = await pgdb.public.rewards.find({id: packageOptions.map( p => p.rewardId )})
+      if(rewards.length) {
+        logger.info('user tried to buy a reduced membership and already pledged before', { req: req._log(), args })
+        throw new Error(t('api/membership/reduced/alreadyHas'))
+      }
     }
 
     //insert pledge
