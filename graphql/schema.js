@@ -195,6 +195,8 @@ type PledgeResponse {
   pledgeId: ID
   userId: ID
   emailVerify: Boolean
+  pfAliasId: String
+  pfSHA: String
 }
 
 input PledgePaymentInput {
