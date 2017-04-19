@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-19T11:17:03.438Z",
+  "updated": "2017-04-19T22:26:52.656Z",
   "title": "live",
   "data": [
     {
@@ -30,6 +30,10 @@
       "key": "header/button",
       "value": "Mitmachen",
       "undefined": "An Bord kommen"
+    },
+    {
+      "key": "package/title",
+      "value": "Abo und Mitgliedschaft für ein Jahr"
     },
     {
       "key": "package/customize/changePackage",
@@ -69,7 +73,12 @@
     },
     {
       "key": "package/DONATE/title",
-      "value": "Spenden – sonst nichts"
+      "value": "Spenden, sonst nichts"
+    },
+    {
+      "key": "package/DONATE/title/short",
+      "value": "Spende",
+      "undefined": "used in paymentslip export"
     },
     {
       "key": "package/DONATE/description",
@@ -89,7 +98,8 @@
     },
     {
       "key": "package/ABO/title",
-      "value": "Abonnement für ein Jahr"
+      "value": "Für mich",
+      "undefined": "Abonnement für ein Jahr"
     },
     {
       "key": "package/ABO/description",
@@ -97,7 +107,8 @@
     },
     {
       "key": "package/ABO_GIVE/title",
-      "value": "Abonnements verschenken"
+      "value": "Für andere",
+      "undefined": "Abonnements verschenken"
     },
     {
       "key": "package/ABO_GIVE/description",
@@ -105,7 +116,8 @@
     },
     {
       "key": "package/BENEFACTOR/title",
-      "value": "Gönner Abonnement"
+      "value": "Für Gönner",
+      "undefined": "Gönner Abonnement"
     },
     {
       "key": "package/BENEFACTOR/description",
@@ -125,7 +137,12 @@
     },
     {
       "key": "option/NOTEBOOK/label/1",
-      "value": "Notizbuch"
+      "value": "Notizbuch",
+      "undefined": "used in paymentslip export"
+    },
+    {
+      "key": "package/choose",
+      "value": "Auswählen"
     },
     {
       "key": "merci/postpay/waiting",
@@ -169,11 +186,11 @@
     },
     {
       "key": "merci/title",
-      "value": "Merci & Willkomen, {name}"
+      "value": "Willkommen an Bord, {name}"
     },
     {
       "key": "merci/lead",
-      "value": "Vielen Dank für Ihre Unterstützung. Es ist eine Ehre Sie als Mitglied begrüssen zu dürfen. Seien Sie stolz und hissen Sie unsere Flagge im ganze Inter-Land."
+      "value": "Vielen Dank für Ihre Unterstützung. Es ist uns eine Ehre, Sie als Teil unseres Unternehmens zu begrüssen. <br /> Auf dieser Seite finden Sie alles, was wir von Ihnen wissen: Ihre Einkäufe, Ihre Postadresse (brauchen wir leider) und Ihr Foto (brauchen wir nicht, würde uns aber freuen), letzteres mit einem Slogan (würde uns ebenfalls freuen). <br /> Hier unser Slogan: Lang lebe die Republik! "
     },
     {
       "key": "merci/share/tweetTemplate",
@@ -257,7 +274,7 @@
     },
     {
       "key": "merci/updateMe/birthday/hint",
-      "value": "TT.MM.JJJJ, notwendig für Ihre rechtmässige Mitgliedschaft"
+      "value": "TT.MM.JJJJ, notwendig für Ihre Mitgliedschaft bei Project R"
     },
     {
       "key": "merci/updateMe/birthday/error/empty",
@@ -352,12 +369,20 @@
       "value": "Das erste Mal hier?"
     },
     {
-      "key": "pledge/contact/name/label",
-      "value": "Ihr Name"
+      "key": "pledge/contact/firstName/label",
+      "value": "Ihr Vorname"
     },
     {
-      "key": "pledge/contact/name/error/empty",
-      "value": "Name fehlt"
+      "key": "pledge/contact/firstName/error/empty",
+      "value": "Vorname fehlt"
+    },
+    {
+      "key": "pledge/contact/lastName/label",
+      "value": "Ihr Nachname"
+    },
+    {
+      "key": "pledge/contact/lastName/error/empty",
+      "value": "Nachname fehlt"
     },
     {
       "key": "pledge/contact/email/label",
@@ -538,6 +563,10 @@
     {
       "key": "sidebar/signIn",
       "value": "Sie sind bereits an Bord?"
+    },
+    {
+      "key": "sidebar/investor",
+      "value": "Investor werden"
     },
     {
       "key": "sidebar/reminder/button",
@@ -732,7 +761,7 @@
       "value": "Über uns"
     },
     {
-      "key": "footer/about/crew",
+      "key": "footer/crew",
       "value": "Crew"
     },
     {
@@ -836,6 +865,22 @@
       "value": "Ihre Mitgliedschaften und Abonoments"
     },
     {
+      "key": "memberships/giver/giveable/1",
+      "value": "Abo und Mitgliedschaft verschenken?"
+    },
+    {
+      "key": "memberships/giver/giveable/other",
+      "value": "{count} Abos und Mitgliedschaften verschenken?"
+    },
+    {
+      "key": "memberships/giver/given/1",
+      "value": "Sie haben ein Abo und Mitgliedschaft verschenkt"
+    },
+    {
+      "key": "memberships/giver/given/other",
+      "value": "Sie haben {count} Abos und Mitgliedschaften verschenkt"
+    },
+    {
       "key": "memberships/give/show",
       "value": "Verschenken?"
     },
@@ -844,8 +889,16 @@
       "value": "behalten"
     },
     {
-      "key": "memberships/give/description",
-      "value": "Sie können Abonements mit dem folgenden Gutscheincode verschenken:<br />\n{voucherCode}<br />\n<br />\nAuf <a href=\"https://www.republik.ch/claim\">republik.ch/claim</a> kann der Code eingelöst und in eine Mitgliedschaft und Abonnoment verwandelt werden. Sobald der Code eingelöst ist, ist das Abonnoment weg.\n"
+      "key": "memberships/give/description/before/1",
+      "value": "Sie können ein Abo und Mitgliedschaft mit dem folgendem Gutscheincode verschenken:\n\n"
+    },
+    {
+      "key": "memberships/give/description/before/other",
+      "value": "Sie können Abos und Mitgliedschaften mit folgenden Gutscheincodes verschenken:\n\n"
+    },
+    {
+      "key": "memberships/give/description/after",
+      "value": "Auf <a href=\"/claim\">republik.ch/claim</a> können Gutscheincodes eingelöst und in Mitgliedschaften und Abonnoments verwandelt werden."
     },
     {
       "key": "memberships/type/ABO",
@@ -854,6 +907,10 @@
     {
       "key": "memberships/type/BENEFACTOR_ABO",
       "value": "Gönner-Mitglieschaft und -Abonnement"
+    },
+    {
+      "key": "memberships/type/REDUCED_ABO",
+      "value": "Mitglieschaft und Abonnement (reduziert)"
     },
     {
       "key": "memberships/label",
