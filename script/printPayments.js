@@ -13,8 +13,6 @@ const csvFormat = dsvFormat(';').format
 const {timeFormat} = require('../lib/formats')
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
-const generateMemberships = require('../lib/generateMemberships')
-const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
 
 const t = getFormatter(MESSAGES)
 
