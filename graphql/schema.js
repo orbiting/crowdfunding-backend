@@ -250,6 +250,7 @@ type Event {
   where: String
   locationLink: String
   metaDescription: String
+  socialMediaImage: String
 }
 type Update {
   slug: String
