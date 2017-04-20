@@ -7,6 +7,7 @@
   "private": true,
   "author": "Patrick Recher <p@tte.io>",
   "dependencies": {
+    "aws-sign": "^0.1.2",
     "body-parser": "^1.16.1",
     "connect-pg-simple": "^3.1.2",
     "cookie-parser": "^1.4.3",
