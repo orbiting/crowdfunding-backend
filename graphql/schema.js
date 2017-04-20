@@ -258,6 +258,7 @@ type Update {
   text: String
   publishedDateTime: DateTime
   metaDescription: String
+  socialMediaImage: String
 }
 `
 module.exports = [typeDefinitions]
