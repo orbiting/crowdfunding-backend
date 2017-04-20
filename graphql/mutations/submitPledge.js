@@ -1,4 +1,6 @@
 const logger = require('../../lib/logger')
+const postfinanceSHA = require('../../lib/postfinanceSHA')
+const uuid = require('uuid/v4')
 
 module.exports = async (_, args, {loaders, pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
@@ -69,12 +71,19 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
 
     //check user
     let user = null
+    let pfAliasId = null
     if(req.user) { //user logged in
       if(req.user.email !== pledge.user.email) {
         logger.error('req.user.email and pledge.user.email dont match, signout first.', { req: req._log(), args })
         throw new Error(t('api/unexpected'))
       }
       user = req.user
+      //load possible exising PF alias, only exists if the user is logged in,
+      //otherwise he can't have an alias already
+      pfAliasId = await transaction.public.paymentSources.findOneFieldOnly({
+        userId: user.id,
+        method: 'POSTFINANCECARD'
+      }, 'pspId')
     } else {
       user = await transaction.public.users.findOne({email: pledge.user.email}) //try to load existing user by email
       if(user && (await transaction.public.pledges.count({userId: user.id}))) { //user has pledges
@@ -82,14 +91,22 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       } else if(!user) { //create user
         user = await transaction.public.users.insertAndGet({
           email: pledge.user.email,
-          name: pledge.user.name,
+          firstName: pledge.user.firstName,
+          lastName: pledge.user.lastName,
           birthday: pledge.user.birthday
         })
       }
     }
     //update user details
-    if(user.name !== pledge.user.name) {
-      user = await transaction.public.users.updateAndGetOne({id: user.id}, {name: pledge.user.name})
+    if(user.firstName !== pledge.user.firstName || user.lastName !== pledge.user.lastName) {
+      user = await transaction.public.users.updateAndGetOne({id: user.id}, {
+        firstName: pledge.user.firstName,
+        lastName: pledge.user.lastName
+      })
+    }
+    //if we didn't load a alias, generate one
+    if(!pfAliasId) {
+      pfAliasId = uuid()
     }
 
     //buying reduced is only ok if user doesn't have a pledge yet, except donation only
@@ -125,9 +142,19 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
     //commit transaction
     await transaction.transactionCommit()
 
+    //generate PF SHA
+    const pfSHA = postfinanceSHA({
+      orderId: newPledge.id,
+      amount: newPledge.total,
+      alias: pfAliasId,
+      userId: user.id
+    })
+
     return {
       pledgeId: newPledge.id,
-      userId: user.id
+      userId: user.id,
+      pfSHA,
+      pfAliasId
     }
   } catch(e) {
     await transaction.transactionRollback()

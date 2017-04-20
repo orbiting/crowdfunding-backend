@@ -129,6 +129,7 @@ create table "payments" (
   "pspId"         text,
   "pspPayload"    jsonb,
   "dueDate"       date,
+  "exported"      boolean not null default false,
   "createdAt"     timestamptz default now(),
   "updatedAt"     timestamptz default now(),
   unique ("id", "type")
@@ -194,5 +195,14 @@ create table "postfinancePayments" (
   "matched"         boolean not null default false,
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now(),
-  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift", "mitteilung")
+  unique ("buchungsdatum", "valuta", "avisierungstext", "gutschrift")
+);
+
+create table "cashPayments" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "hrid"            text not null,
+  "matched"         boolean not null default false,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now(),
+  unique ("hrid")
 );

@@ -28,7 +28,7 @@ type RootQuery {
 type RootMutation {
   signIn(email: String!): SignInResponse!
   signOut: Boolean!
-  updateMe(name: String, birthday: Date, address: AddressInput): User!
+  updateMe(firstName: String, lastName: String, birthday: Date, address: AddressInput): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
@@ -53,6 +53,8 @@ type SignInResponse {
 type User {
   id: ID!
   name: String
+  firstName: String
+  lastName: String
   email: String!
   address: Address
   birthday: Date
@@ -155,7 +157,8 @@ type Address {
 
 input UserInput {
   email: String!
-  name: String!
+  firstName: String!
+  lastName: String!
   birthday: Date
 }
 input AddressInput {
@@ -200,6 +203,8 @@ type PledgeResponse {
   pledgeId: ID
   userId: ID
   emailVerify: Boolean
+  pfAliasId: String
+  pfSHA: String
 }
 
 input PledgePaymentInput {

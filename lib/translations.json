@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-19T11:17:03.438Z",
+  "updated": "2017-04-20T10:42:44.043Z",
   "title": "live",
   "data": [
     {
@@ -30,6 +30,10 @@
       "key": "header/button",
       "value": "Mitmachen",
       "undefined": "An Bord kommen"
+    },
+    {
+      "key": "package/title",
+      "value": "Abo und Mitgliedschaft für ein Jahr"
     },
     {
       "key": "package/customize/changePackage",
@@ -69,7 +73,12 @@
     },
     {
       "key": "package/DONATE/title",
-      "value": "Spenden – sonst nichts"
+      "value": "Spenden, sonst nichts"
+    },
+    {
+      "key": "package/DONATE/title/short",
+      "value": "Spende",
+      "undefined": "used in paymentslip export"
     },
     {
       "key": "package/DONATE/description",
@@ -89,7 +98,8 @@
     },
     {
       "key": "package/ABO/title",
-      "value": "Abonnement für ein Jahr"
+      "value": "Für mich",
+      "undefined": "Abonnement für ein Jahr"
     },
     {
       "key": "package/ABO/description",
@@ -97,7 +107,8 @@
     },
     {
       "key": "package/ABO_GIVE/title",
-      "value": "Abonnements verschenken"
+      "value": "Für andere",
+      "undefined": "Abonnements verschenken"
     },
     {
       "key": "package/ABO_GIVE/description",
@@ -105,7 +116,8 @@
     },
     {
       "key": "package/BENEFACTOR/title",
-      "value": "Gönner Abonnement"
+      "value": "Für Gönner",
+      "undefined": "Gönner Abonnement"
     },
     {
       "key": "package/BENEFACTOR/description",
@@ -125,11 +137,16 @@
     },
     {
       "key": "option/NOTEBOOK/label/1",
-      "value": "Notizbuch"
+      "value": "Notizbuch",
+      "undefined": "used in paymentslip export"
+    },
+    {
+      "key": "package/choose",
+      "value": "Auswählen"
     },
     {
       "key": "merci/postpay/waiting",
-      "value": "Wir haben Ihnen an «{email}» ein Bestätigunsemail mit den Wörtern «{phrase}» geschickt. Bitte klicken Sie auf den darin enthaltenen Link."
+      "value": "Danke, Sie sind mit dem Wichtigsten durch. Jetzt müssen Sie noch Ihre Mailadresse bestätigen. Wir haben Ihnen ein kurzes Mail geschickt. Dieses enthält fett gedruckt die drei seltsamen Wörter: <b>«{phrase}»</b> Gehen Sie zu Ihrem Postfach, öffnen Sie das Mail, kontrollieren Sie, ob dort die drei gleichen seltsamen Wörter stehen. Sind es dieselben, klicken Sie den Link darunter. <br /> (Die Sache mit den drei Wörtern ist leider nötig. Es ist eine Sicherheitsmassname, damit niemand mit Ihrer Mailadresse Unfug treiben kann.) "
     },
     {
       "key": "merci/postpay/reclaim",
@@ -169,11 +186,11 @@
     },
     {
       "key": "merci/title",
-      "value": "Merci & Willkomen, {name}"
+      "value": "Willkommen an Bord, {name}"
     },
     {
       "key": "merci/lead",
-      "value": "Vielen Dank für Ihre Unterstützung. Es ist eine Ehre Sie als Mitglied begrüssen zu dürfen. Seien Sie stolz und hissen Sie unsere Flagge im ganze Inter-Land."
+      "value": "Vielen Dank für Ihre Unterstützung. Es ist uns eine Ehre, Sie als Teil unseres Unternehmens zu begrüssen. <br /> Auf dieser Seite finden Sie alles, was wir von Ihnen wissen: Ihre Einkäufe, Ihre Postadresse (brauchen wir leider) und Ihr Foto (brauchen wir nicht, würde uns aber freuen), letzteres mit einem Slogan (würde uns ebenfalls freuen). <br /> Hier unser Slogan: Lang lebe die Republik! "
     },
     {
       "key": "merci/share/tweetTemplate",
@@ -257,7 +274,7 @@
     },
     {
       "key": "merci/updateMe/birthday/hint",
-      "value": "TT.MM.JJJJ, notwendig für Ihre rechtmässige Mitgliedschaft"
+      "value": "TT.MM.JJJJ, notwendig für Ihre Mitgliedschaft bei Project R"
     },
     {
       "key": "merci/updateMe/birthday/error/empty",
@@ -297,7 +314,7 @@
     },
     {
       "key": "signIn/polling",
-      "value": "Wir haben Ihnen an «{email}» ein Bestätigunsemail mit den Wörtern «{phrase}» geschickt. Bitte klicken Sie auf den darin enthaltenen Link."
+      "value": "Jetzt müssen Sie noch Ihre Mailadresse bestätigen. Wir haben Ihnen ein kurzes Mail geschickt. Dieses enthält fett gedruckt die drei seltsamen Wörter: <b>«{phrase}»</b> Gehen Sie zu Ihrem Postfach, öffnen Sie das Mail, kontrollieren Sie, ob dort die drei gleichen seltsamen Wörter stehen. Sind es dieselben, klicken Sie den Link darunter. <br /> (Die Sache mit den drei Wörtern ist leider nötig. Es ist eine Sicherheitsmassname, damit niemand mit Ihrer Mailadresse Unfug treiben kann.) "
     },
     {
       "key": "signIn/email/error/empty",
@@ -352,12 +369,20 @@
       "value": "Das erste Mal hier?"
     },
     {
-      "key": "pledge/contact/name/label",
-      "value": "Ihr Name"
+      "key": "pledge/contact/firstName/label",
+      "value": "Ihr Vorname"
     },
     {
-      "key": "pledge/contact/name/error/empty",
-      "value": "Name fehlt"
+      "key": "pledge/contact/firstName/error/empty",
+      "value": "Vorname fehlt"
+    },
+    {
+      "key": "pledge/contact/lastName/label",
+      "value": "Ihr Nachname"
+    },
+    {
+      "key": "pledge/contact/lastName/error/empty",
+      "value": "Nachname fehlt"
     },
     {
       "key": "pledge/contact/email/label",
@@ -390,6 +415,14 @@
     {
       "key": "pledge/submit/secure",
       "value": "Sichere Verbindung"
+    },
+    {
+      "key": "pledge/submit/stripe/js/loading",
+      "value": "Kreditkartenzahlungen wird vorbereitet"
+    },
+    {
+      "key": "pledge/submit/stripe/js/failed",
+      "value": "Kreditkartenzahlungen sind zur Zeit nicht möglich. Wählen Sie eine andere Zahlungsart."
     },
     {
       "key": "pledge/submit/stripe/card/label",
@@ -540,6 +573,10 @@
       "value": "Sie sind bereits an Bord?"
     },
     {
+      "key": "sidebar/investor",
+      "value": "Investor werden"
+    },
+    {
       "key": "sidebar/reminder/button",
       "value": "Nicht jetzt. Später!\n"
     },
@@ -589,11 +626,11 @@
     },
     {
       "key": "api/auth/success",
-      "value": "Signin erfolgreich, Sie können dieses Fenster wieder schliessen."
+      "value": "Perfekt! Ihre E-Mail Adresse ist somit bestätigt. Sie können dieses Fenster wieder schliessen."
     },
     {
       "key": "api/auth/error",
-      "value": "Token ungültig. Bitte versuchen Sie das mit der Anmeldung erneut."
+      "value": "Leider hat etwas nicht ganz geklappt. Bitte versuchen Sie, den Link zur Anmeldung erneut zu klicken. Klappt das ein zweites Mal nicht, stehen wir Ihnen gerne mit Rat zur Verfügung. Schreiben Sie uns ihr Problem auf kontakt@republik.ch. "
     },
     {
       "key": "api/email/invalid",
@@ -673,19 +710,19 @@
     },
     {
       "key": "api/paypal/unknownError",
-      "value": "Bei der Bezahlung mit Paypal ist etwas schiefgelaufen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
+      "value": "Bei der Bezahlung mit Paypal ist etwas schiefgelaufen. Wir haben Ihre Angaben und den Fehler gespeichert. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
     },
     {
       "key": "api/pay/pf/checksumError",
-      "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihren Pledge und den Fehler gespeichert. Bitte kontaktieren Sie uns. ID: {id}"
+      "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihre Angaben und den Fehler gespeichert. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
     },
     {
       "key": "api/pay/pspPayload/parseFailed",
-      "value": "Die Bezahldaten konnten nicht überprüft werden. Bitte kontaktieren Sie uns. ID: {id}"
+      "value": "Die Bezahldaten konnten nicht überprüft werden. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
     },
     {
       "key": "api/pay/paymentIdUsedAlready",
-      "value": "Es wurde bereits ein pledge mit dieser Zahlung abgerechnet. Bitte kontaktieren Sie uns. ID: {id}"
+      "value": "Es wurde bereits ein pledge mit dieser Zahlung abgerechnet. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
     },
     {
       "key": "api/faq/mail/subject",
@@ -693,7 +730,7 @@
     },
     {
       "key": "api/signin/mail/subject",
-      "value": "Login Versuch"
+      "value": "E-Mail Adresse bestätigen (für die REPUBLIK)"
     },
     {
       "key": "api/pledge/mail/subject",
@@ -732,7 +769,7 @@
       "value": "Über uns"
     },
     {
-      "key": "footer/about/crew",
+      "key": "footer/crew",
       "value": "Crew"
     },
     {
@@ -836,6 +873,26 @@
       "value": "Ihre Mitgliedschaften und Abonoments"
     },
     {
+      "key": "memberships/giver/giveable/show",
+      "value": "Abo und Mitgliedschaft verschenken?"
+    },
+    {
+      "key": "memberships/giver/given/notGive",
+      "value": "Sie haben das Abo und die Mitgliedschaft verschenkt."
+    },
+    {
+      "key": "memberships/giver/given/1",
+      "value": "Sie haben ein Abo und Mitgliedschaft bereits verschenkt."
+    },
+    {
+      "key": "memberships/giver/given/other",
+      "value": "Sie haben {count} Abos und Mitgliedschaften bereits verschenkt."
+    },
+    {
+      "key": "memberships/giver/description",
+      "value": "Empfänger:"
+    },
+    {
       "key": "memberships/give/show",
       "value": "Verschenken?"
     },
@@ -844,8 +901,20 @@
       "value": "behalten"
     },
     {
-      "key": "memberships/give/description",
-      "value": "Sie können Abonements mit dem folgenden Gutscheincode verschenken:<br />\n{voucherCode}<br />\n<br />\nAuf <a href=\"https://www.republik.ch/claim\">republik.ch/claim</a> kann der Code eingelöst und in eine Mitgliedschaft und Abonnoment verwandelt werden. Sobald der Code eingelöst ist, ist das Abonnoment weg.\n"
+      "key": "memberships/give/description/before/notGive",
+      "value": "Wollen Sie das Abo nicht selber nutzen? Und nicht Mitglied von Porject R werden? Sie können Ihr Abo und Mitgliedschaft mit dem folgendem Gutscheincode verschenken:"
+    },
+    {
+      "key": "memberships/give/description/before/1",
+      "value": "Sie können ein Abo und Mitgliedschaft mit dem folgendem Gutscheincode verschenken:"
+    },
+    {
+      "key": "memberships/give/description/before/other",
+      "value": "Sie können Abos und Mitgliedschaften mit folgenden Gutscheincodes verschenken:"
+    },
+    {
+      "key": "memberships/give/description/after",
+      "value": "Auf <a href=\"/claim\">republik.ch/claim</a> können Gutscheincodes eingelöst und in Mitgliedschaften und Abonnoments verwandelt werden."
     },
     {
       "key": "memberships/type/ABO",
@@ -854,6 +923,10 @@
     {
       "key": "memberships/type/BENEFACTOR_ABO",
       "value": "Gönner-Mitglieschaft und -Abonnement"
+    },
+    {
+      "key": "memberships/type/REDUCED_ABO",
+      "value": "Mitglieschaft und Abonnement (reduziert)"
     },
     {
       "key": "memberships/label",
@@ -878,6 +951,10 @@
     {
       "key": "memberships/claim/loading",
       "value": "überprüfen"
+    },
+    {
+      "key": "print/paymentslip/reduction",
+      "value": "selbst bestimmte reduktion"
     }
   ]
 }

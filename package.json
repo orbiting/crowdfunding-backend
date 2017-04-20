@@ -39,6 +39,7 @@
     "random-noun-generator-german": "^0.1.3",
     "slugify": "^1.1.0",
     "stripe": "^4.16.0",
+    "uuid": "^3.0.1",
     "winston": "^2.3.1"
   },
   "scripts": {
