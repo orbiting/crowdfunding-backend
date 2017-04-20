@@ -80,7 +80,6 @@ PgDb.connect().then( async (pgdb) => {
         template: packageOption
       })
     })
-    //console.log(_pledgeOptions)
 
     let spendeCountedAsPledgeOption = false
     const produkte = _pledgeOptions.map( pledgeOption => {
@@ -88,12 +87,9 @@ PgDb.connect().then( async (pgdb) => {
         if(pledgeOption.template.reward.membershipType) {
           //memberships/type/ABO
           //memberships/type/BENEFACTOR_ABO
-          let beschrieb = t('memberships/type/'+pledgeOption.template.reward.name)
-          if(pledge.donation < 0)
-            beschrieb = t('memberships/type/REDUCED_ABO')
           return {
             anzahl: pledgeOption.amount,
-            beschrieb,
+            beschrieb: t('memberships/type/'+pledgeOption.template.reward.name),
             preis: formatPrice(pledgeOption.price)
           }
         } else {// if(pledgeOption.template.reward.goodie) {
@@ -118,6 +114,13 @@ PgDb.connect().then( async (pgdb) => {
         anzahl: '1',
         beschrieb: t('package/DONATE/title/short'),
         preis: formatPrice(pledge.donation)
+      })
+    }
+    if(pledge.donation < 0) {
+      produkte.push({
+        anzahl: '1',
+        beschrieb: t('print/paymentslip/reduction'),
+        preis: formatPrice(-pledge.donation)
       })
     }
     let step;
