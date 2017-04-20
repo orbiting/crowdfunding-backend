@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-19T22:59:56.995Z",
+  "updated": "2017-04-20T10:42:44.043Z",
   "title": "live",
   "data": [
     {
@@ -415,6 +415,14 @@
     {
       "key": "pledge/submit/secure",
       "value": "Sichere Verbindung"
+    },
+    {
+      "key": "pledge/submit/stripe/js/loading",
+      "value": "Kreditkartenzahlungen wird vorbereitet"
+    },
+    {
+      "key": "pledge/submit/stripe/js/failed",
+      "value": "Kreditkartenzahlungen sind zur Zeit nicht möglich. Wählen Sie eine andere Zahlungsart."
     },
     {
       "key": "pledge/submit/stripe/card/label",
@@ -943,6 +951,10 @@
     {
       "key": "memberships/claim/loading",
       "value": "überprüfen"
+    },
+    {
+      "key": "print/paymentslip/reduction",
+      "value": "selbst bestimmte reduktion"
     }
   ]
 }
