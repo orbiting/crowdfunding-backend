@@ -272,7 +272,7 @@ type Testimonial {
   role: String
   quote: String
   video: Video
-  # 256x256 JPEG HTTPS URL
+  # 384x384 JPEG HTTPS URL
   image: String!
 }
 
