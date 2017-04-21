@@ -4,9 +4,9 @@ module.exports = async (_, args, {pgdb}) => {
 
   if(name) {
     const users = await pgdb.public.users.findWhere(`
-      "firstName" % $1 OR "lastName" % $1 OR
-      "firstName" ILIKE $2 OR "lastName" ILIKE $2
-    `, [name, `${name}%`])
+      "firstName" % :name OR "lastName" % :name OR
+      "firstName" ILIKE :nameLike OR "lastName" ILIKE :nameLike
+    `, { name, nameLike: name+'%' })
     if(!users.length)
       return []
 
@@ -15,8 +15,12 @@ module.exports = async (_, args, {pgdb}) => {
       FROM users u
       JOIN testimonials t
       ON t."userId" = u.id
-      WHERE u."firstName" % $1 OR u."lastName" % $1 OR u."firstName" ILIKE $2 OR u."lastName" ILIKE $2
-    `, [name, `${name}%`])
+      WHERE
+        u."firstName" % :name OR u."lastName" % :name OR
+        u."firstName" ILIKE :nameLike OR u."lastName" ILIKE :nameLike
+      OFFSET :offset
+      LIMIT :limit;
+    `, { name, nameLike: name+'%', seed, offset, limit })
     if(!testimonials.length)
       return []
 
@@ -52,11 +56,7 @@ module.exports = async (_, args, {pgdb}) => {
       ORDER BY random()
       OFFSET :offset
       LIMIT :limit;
-    `, {
-      seed,
-      offset,
-      limit
-    })
+    `, { seed, offset, limit })
     if(!testimonials.length)
       return []
 
