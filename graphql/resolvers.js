@@ -144,6 +144,12 @@ const resolveFunctions = {
     },
     async pledges(user, args, {loaders, pgdb}) {
       return pgdb.public.pledges.find({userId: user.id})
+    },
+    async testimonial(user, args, {pgdb}) {
+      const testimonial = await pgdb.public.testimonials.findOne({userId: user.id})
+      return Object.assign({}, testimonial, {
+        name: `${user.firstName} ${user.lastName}`
+      })
     }
   },
   Crowdfunding: {
