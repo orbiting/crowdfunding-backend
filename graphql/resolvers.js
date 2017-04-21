@@ -112,6 +112,22 @@ const resolveFunctions = {
       if(!data) return data
       const now = new Date()
       return data.filter( d => (new Date(d.publishedDateTime) < now) )
+    },
+    async testimonials(_, args, {pgdb}) {
+      const testimonials = await pgdb.public.testimonials.find({}, {
+        offset: args.start,
+        limit: args.limit,
+        orderBy: 'createdAt'
+      })
+      if(!testimonials.length)
+        return testimonials
+      const users = await pgdb.public.users.find({id: testimonials.map( t => t.userId )})
+      return testimonials.map( testimonial => {
+        const user = users.find( user => user.id === testimonial.userId )
+        return Object.assign({}, testimonial, {
+          name: `${user.firstName} ${user.lastName}`
+        })
+      })
     }
   },
 
