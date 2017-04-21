@@ -18,10 +18,9 @@ type RootQuery {
 
   memberships: [Pledge]
 
-  faqs: [Faq]
-  events: [Event]
-  updates: [Update]
-
+  faqs: [Faq!]!
+  events: [Event!]!
+  updates: [Update!]!
   testimonials(start: Int, limit: Int): [Testimonial!]!
 }
 
@@ -254,12 +253,16 @@ type Event {
   time: String
   where: String
   locationLink: String
+  metaDescription: String
+  socialMediaImage: String
 }
 type Update {
   slug: String
   title: String
   text: String
   publishedDateTime: DateTime
+  metaDescription: String
+  socialMediaImage: String
 }
 
 
