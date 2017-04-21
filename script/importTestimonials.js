@@ -30,16 +30,22 @@ PgDb.connect().then( async (pgdb) => {
 
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
   await Promise.all(sheet.data.map( async (person) => {
-    const names = person.Name.split(' ')
+    if(person.Filename && fs.existsSync(__dirname+'/photos/'+person.Filename)) {
+      const names = person.Name.split(' ')
 
-    const filename = person.Filename
-    const firstName = names[0]
-    const lastName = names.slice(1).join(' ')
-    const email = person['E-Mailadresse']
-    const quote = person.Statement
-    const role = person.Bezeichnung
+      const filename = person.Filename
+      const firstName = names[0]
+      const lastName = names.slice(1).join(' ')
+      const email = person['E-Mailadresse']
+      const quote = person.Statement
+      const role = person.Bezeichnung
+      const video = {
+        hls: person.hls,
+        mp4: person.mp4,
+        subtitles: person.subtitles,
+        youtube: person.youtube,
+      }
 
-    if(filename) {
       console.log('running for: '+firstName+' '+lastName)
 
       let user = await pgdb.public.users.findOne({email})
@@ -52,7 +58,6 @@ PgDb.connect().then( async (pgdb) => {
       const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
 
-      console.log(filename)
       const image = fs.readFileSync(__dirname+'/photos/'+filename, 'binary')
       const inputBuffer = new Buffer(image, 'binary')
 
@@ -81,7 +86,7 @@ PgDb.connect().then( async (pgdb) => {
         user = await pgdb.public.users.insertAndGet({
           firstName,
           lastName,
-          email
+          email: email || 'vip@project-r.construction'
         })
       }
       if(!testimonial) {
@@ -90,14 +95,16 @@ PgDb.connect().then( async (pgdb) => {
           userId: user.id,
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall
+          image: ASSETS_BASE_URL+pathSmall,
+          video
         })
       } else {
         keyCDN.purgeUrls([pathOriginal, pathSmall])
         await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall
+          image: ASSETS_BASE_URL+pathSmall,
+          video
         })
       }
       counter += 1

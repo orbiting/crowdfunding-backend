@@ -280,6 +280,7 @@ type Video {
   hls: String!
   mp4: String!
   youtube: String
+  subtitles: String
 }
 `
 module.exports = [typeDefinitions]
