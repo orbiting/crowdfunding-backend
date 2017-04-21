@@ -1,6 +1,7 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const sharp = require("sharp")
 const uploadExoscale = require('../../lib/uploadExoscale')
+const keyCDN = require('../../lib/keyCDN')
 const logger = require('../../lib/logger')
 const uuid = require('uuid/v4')
 //const rw = require('rw')
@@ -39,6 +40,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       const inputBuffer = new Buffer(image, 'base64')
       const id = testimonial ? testimonial.id : uuid()
 
+      const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
 
       await Promise.all([
@@ -50,7 +52,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           .then( (data) => {
             uploadExoscale({
               stream: data,
-              path: `/${FOLDER}/${id}_original.jpeg`,
+              path: pathOriginal,
               mimeType: 'image/jpeg',
               bucket: BUCKET
             })
@@ -71,6 +73,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       ])
 
       if(testimonial) {
+        keyCDN.purgeUrls([pathOriginal, pathSmall])
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
