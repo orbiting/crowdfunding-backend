@@ -1,6 +1,27 @@
 
 module.exports = async (_, args, {pgdb}) => {
-  const {seed, offset, limit, name} = args
+  const {seed, offset, limit, name, firstId} = args
+
+  let firstTestimonial
+  let firstUser
+  if(firstId) {
+    firstTestimonial = await pgdb.public.testimonials.findOne({id: firstId})
+    firstUser = await pgdb.public.users.findOne({id: firstTestimonial.userId})
+  }
+
+  const results = (testimonials, users) => {
+    if(firstTestimonial) {
+      testimonials = testimonials.filter( testimonial => testimonial.id !== firstTestimonial.id )
+      users.unshift(firstUser)
+      testimonials.unshift(firstTestimonial)
+    }
+    return testimonials.map( testimonial => {
+      const user = users.find( user => user.id === testimonial.userId )
+      return Object.assign({}, testimonial, {
+        name: `${user.firstName} ${user.lastName}`
+      })
+    })
+  }
 
   if(name) {
     const users = await pgdb.public.users.findWhere(`
@@ -8,7 +29,7 @@ module.exports = async (_, args, {pgdb}) => {
       "firstName" ILIKE :nameLike OR "lastName" ILIKE :nameLike
     `, { name, nameLike: name+'%' })
     if(!users.length)
-      return []
+      return results([], [])
 
     const testimonials = await pgdb.query(`
       SELECT t.id, t."userId", t.role, t.quote, t.video, t.image, t."createdAt", t."updatedAt"
@@ -22,14 +43,9 @@ module.exports = async (_, args, {pgdb}) => {
       LIMIT :limit;
     `, { name, nameLike: name+'%', seed, offset, limit })
     if(!testimonials.length)
-      return []
+      return results([], [])
 
-    return testimonials.map( testimonial => {
-      const user = users.find( user => user.id === testimonial.userId )
-      return Object.assign({}, testimonial, {
-        name: `${user.firstName} ${user.lastName}`
-      })
-    })
+    return results(testimonials, users)
 
   } else {
     const testimonials = await pgdb.query(`
@@ -58,14 +74,9 @@ module.exports = async (_, args, {pgdb}) => {
       LIMIT :limit;
     `, { seed, offset, limit })
     if(!testimonials.length)
-      return []
+      return results([], [])
 
     const users = await pgdb.public.users.find({id: testimonials.map( t => t.userId )})
-    return testimonials.map( testimonial => {
-      const user = users.find( user => user.id === testimonial.userId )
-      return Object.assign({}, testimonial, {
-        name: `${user.firstName} ${user.lastName}`
-      })
-    })
+    return results(testimonials, users)
   }
 }

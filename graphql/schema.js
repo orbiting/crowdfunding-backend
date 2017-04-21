@@ -21,7 +21,7 @@ type RootQuery {
   faqs: [Faq!]!
   events: [Event!]!
   updates: [Update!]!
-  testimonials(offset: Int, limit: Int, seed: Float!, name: String): [Testimonial!]!
+  testimonials(offset: Int, limit: Int, seed: Float!, name: String, firstId: ID): [Testimonial!]!
 }
 
 type RootMutation {
