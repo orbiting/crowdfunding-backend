@@ -5,13 +5,15 @@ const logger = require('../../lib/logger')
 const uuid = require('uuid/v4')
 //const rw = require('rw')
 
-const BUCKET = 'testimonials'
+const BUCKET = 'republik'
+const FOLDER = 'testimonials'
 const IMAGE_SIZE_SMALL = 256
 
 module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
   const { role, quote, image } = args
+  const { ASSETS_BASE_URL } = process.env
 
   // test with local image
   //const inputFile = rw.readFileSync(__dirname+'/../image.b64', 'utf8')
@@ -37,7 +39,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       const inputBuffer = new Buffer(image, 'base64')
       const id = testimonial ? testimonial.id : uuid()
 
-      const filenameSmall = `${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
+      const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
 
       await Promise.all([
         sharp(inputBuffer)
@@ -48,7 +50,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           .then( (data) => {
             uploadExoscale({
               stream: data,
-              filename: `${id}_original.jpeg`,
+              path: `/${FOLDER}/${id}_original.jpeg`,
               mimeType: 'image/jpeg',
               bucket: BUCKET
             })
@@ -61,7 +63,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           .then( (data) => {
             uploadExoscale({
               stream: data,
-              filename: filenameSmall,
+              path: pathSmall,
               mimeType: 'image/jpeg',
               bucket: BUCKET
             })
@@ -72,7 +74,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
-          image: filenameSmall
+          image: ASSETS_BASE_URL+pathSmall
         })
       } else {
         testimonial = await transaction.public.testimonials.insertAndGet({
@@ -80,7 +82,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           userId: req.user.id,
           role,
           quote,
-          image: filenameSmall
+          image: ASSETS_BASE_URL+pathSmall
         })
       }
     }
