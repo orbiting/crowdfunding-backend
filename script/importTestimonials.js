@@ -59,7 +59,7 @@ PgDb.connect().then( async (pgdb) => {
       await Promise.all([
         convertImage.toJPEG(inputBuffer)
           .then( (data) => {
-            uploadExoscale({
+            return uploadExoscale({
               stream: data,
               path: pathOriginal,
               mimeType: 'image/jpeg',
@@ -68,7 +68,7 @@ PgDb.connect().then( async (pgdb) => {
           }),
         convertImage.toSmallBW(inputBuffer)
           .then( (data) => {
-            uploadExoscale({
+            return uploadExoscale({
               stream: data,
               path: pathSmall,
               mimeType: 'image/jpeg',
