@@ -114,20 +114,50 @@ const resolveFunctions = {
       return data.filter( d => (new Date(d.publishedDateTime) < now) )
     },
     async testimonials(_, args, {pgdb}) {
-      const testimonials = await pgdb.public.testimonials.find({}, {
-        offset: args.start,
-        limit: args.limit,
-        orderBy: 'createdAt'
-      })
-      if(!testimonials.length)
-        return testimonials
-      const users = await pgdb.public.users.find({id: testimonials.map( t => t.userId )})
-      return testimonials.map( testimonial => {
-        const user = users.find( user => user.id === testimonial.userId )
-        return Object.assign({}, testimonial, {
-          name: `${user.firstName} ${user.lastName}`
+      const {start, limit, name} = args
+
+      if(name) {
+        const users = await pgdb.public.users.findWhere(`
+          "firstName" % $1 OR "lastName" % $1 OR
+          "firstName" ILIKE $2 OR "lastName" ILIKE $2
+        `, [name, `${name}%`])
+        if(!users.length)
+          return []
+
+        const testimonials = await pgdb.public.testimonials.find({
+          userId: users.map( u => u.id )
+        }, {
+          offset: start,
+          limit,
+          orderBy: 'createdAt'
         })
-      })
+        if(!testimonials.length)
+          return []
+
+        return testimonials.map( testimonial => {
+          const user = users.find( user => user.id === testimonial.userId )
+          return Object.assign({}, testimonial, {
+            name: `${user.firstName} ${user.lastName}`
+          })
+        })
+
+      } else {
+        const testimonials = await pgdb.public.testimonials.find({}, {
+          offset: start,
+          limit,
+          orderBy: 'createdAt'
+        })
+        if(!testimonials.length)
+          return []
+
+        const users = await pgdb.public.users.find({id: testimonials.map( t => t.userId )})
+        return testimonials.map( testimonial => {
+          const user = users.find( user => user.id === testimonial.userId )
+          return Object.assign({}, testimonial, {
+            name: `${user.firstName} ${user.lastName}`
+          })
+        })
+      }
     }
   },
 
