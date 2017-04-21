@@ -39,11 +39,14 @@ PgDb.connect().then( async (pgdb) => {
       const email = person['E-Mailadresse']
       const quote = person.Statement
       const role = person.Bezeichnung
-      const video = {
-        hls: person.hls,
-        mp4: person.mp4,
-        subtitles: person.subtitles,
-        youtube: person.youtube,
+      let video
+      if(person.hls && person.mp4) {
+        video = {
+          hls: person.hls,
+          mp4: person.mp4,
+          subtitles: person.subtitles,
+          youtube: person.youtube,
+        }
       }
 
       console.log('running for: '+firstName+' '+lastName)
@@ -97,7 +100,7 @@ PgDb.connect().then( async (pgdb) => {
           quote,
           image: ASSETS_BASE_URL+pathSmall,
           video
-        })
+        }, {skipUndefined: true})
       } else {
         keyCDN.purgeUrls([pathOriginal, pathSmall])
         await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
@@ -105,7 +108,7 @@ PgDb.connect().then( async (pgdb) => {
           quote,
           image: ASSETS_BASE_URL+pathSmall,
           video
-        })
+        }, {skipUndefined: true})
       }
       counter += 1
       console.log('finished: '+firstName+' '+lastName)
