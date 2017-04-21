@@ -267,6 +267,7 @@ type Update {
 
 
 type Testimonial {
+  id: ID!
   name: String!
   role: String
   quote: String
