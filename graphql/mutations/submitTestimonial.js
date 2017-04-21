@@ -1,10 +1,10 @@
+const uuid = require('uuid/v4')
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const keyCDN = require('../../lib/keyCDN')
-const logger = require('../../lib/logger')
 const convertImage = require('../../lib/convertImage')
-const uuid = require('uuid/v4')
-//const rw = require('rw')
 const uploadExoscale = require('../../lib/uploadExoscale')
+const logger = require('../../lib/logger')
+//const rw = require('rw')
 
 const FOLDER = 'testimonials'
 const BUCKET = 'republik'
@@ -12,6 +12,13 @@ const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 
 module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
+
+  //check if user has pledged, or was vouchered a memebership
+  const hasPledges = await pgdb.public.pledges.count({userId: req.user.id})
+  if(!hasPledges && !(await pgdb.public.memberships.count({userId: req.user.id}))) {
+    logger.error('not allowed submitTestimonial', { req: req._log(), args, pledge })
+    throw new Error(t('api/testimonial/pledge/required'))
+  }
 
   const { role, quote, image } = args
   const { ASSETS_BASE_URL } = process.env
