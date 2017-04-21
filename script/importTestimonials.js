@@ -29,9 +29,11 @@ PgDb.connect().then( async (pgdb) => {
 
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
   await Promise.all(sheet.data.map( async (person) => {
+    const names = person.Name.split(' ')
+
     const filename = person.Filename
-    const firstName = person.Name.split(' ')[0]
-    const lastName = person.Name.split(' ')[1]
+    const firstName = names[0]
+    const lastName = names.slice(1).join(' ')
     const email = person['E-Mailadresse']
     const quote = person.Statement
     const role = person.Bezeichnung
@@ -91,7 +93,7 @@ PgDb.connect().then( async (pgdb) => {
         })
       } else {
         keyCDN.purgeUrls([pathOriginal, pathSmall])
-        await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
+        await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
           image: ASSETS_BASE_URL+pathSmall
