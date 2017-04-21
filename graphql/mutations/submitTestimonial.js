@@ -89,6 +89,9 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
 
     await transaction.transactionCommit()
 
+    //augement with name
+    testimonial.name = `${req.user.firstName} ${req.user.lastName}`
+
     return testimonial
 
   } catch(e) {
