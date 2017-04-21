@@ -188,6 +188,7 @@ const resolveFunctions = {
     async options(pledge, args, {loaders, pgdb}) {
       //we augment pledgeOptions with packageOptions
       const pledgeOptions = await pgdb.public.pledgeOptions.find( {pledgeId: pledge.id} )
+      if(!pledgeOptions.length) return null
       const pledgeOptionTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
       const packageOptions = await pgdb.public.packageOptions.find( {id: pledgeOptionTemplateIds} )
       return pledgeOptions.map( (plo) => {
@@ -215,6 +216,7 @@ const resolveFunctions = {
     },
     async memberships(pledge, args, {loaders, pgdb}) {
       const memberships = await pgdb.public.memberships.find({pledgeId: pledge.id})
+      if(!memberships.length) return null
       //augment memberships with claimer's names
       const users = await pgdb.public.users.find({id: memberships.map( m => m.userId )})
       return memberships.map( membership => {
