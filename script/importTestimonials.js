@@ -1,5 +1,6 @@
 //
-// This script exports open payments which needs to be send by postal service
+// This script imports testimonials from a gsheet
+// and looks for photos locally at ./photos/
 //
 // usage
 // cf_server  node script/importTestimonials.js
