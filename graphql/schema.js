@@ -38,7 +38,7 @@ type RootMutation {
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
 
-  submitTestimonial(role: String, quote: String, image: String!): Testimonial!
+  submitTestimonial(role: String, quote: String, image: String): Testimonial!
 }
 
 type MutationResult {
