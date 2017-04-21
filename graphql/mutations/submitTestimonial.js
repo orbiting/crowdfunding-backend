@@ -65,7 +65,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       ])
 
       if(testimonial) {
-        keyCDN.purgeUrls([pathOriginal, pathSmall])
+        await keyCDN.purgeUrls([pathOriginal, pathSmall])
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
