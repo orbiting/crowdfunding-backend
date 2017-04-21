@@ -1,14 +1,14 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
-const sharp = require("sharp")
-const uploadExoscale = require('../../lib/uploadExoscale')
 const keyCDN = require('../../lib/keyCDN')
 const logger = require('../../lib/logger')
+const convertImage = require('../../lib/convertImage')
 const uuid = require('uuid/v4')
 //const rw = require('rw')
+const uploadExoscale = require('../../lib/uploadExoscale')
 
-const BUCKET = 'republik'
 const FOLDER = 'testimonials'
-const IMAGE_SIZE_SMALL = 256
+const BUCKET = 'republik'
+const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 
 module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
@@ -44,11 +44,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
 
       await Promise.all([
-        sharp(inputBuffer)
-          .jpeg({
-            quality: 100
-          })
-          .toBuffer()
+        convertImage.toJPEG(inputBuffer)
           .then( (data) => {
             uploadExoscale({
               stream: data,
@@ -57,11 +53,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
               bucket: BUCKET
             })
           }),
-        sharp(inputBuffer)
-          .resize(IMAGE_SIZE_SMALL, IMAGE_SIZE_SMALL)
-          .greyscale()
-          .jpeg()
-          .toBuffer()
+        convertImage.toSmallBW(inputBuffer)
           .then( (data) => {
             uploadExoscale({
               stream: data,
