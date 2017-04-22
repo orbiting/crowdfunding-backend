@@ -36,7 +36,7 @@ PgDb.connect().then( async (pgdb) => {
           mimeType: 'image/png',
           bucket: BUCKET
         }).then( async () => {
-          await keyCDN.purgeUrls([url])
+          await keyCDN.purgeUrls([smImagePath])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
             smImage: url
           })

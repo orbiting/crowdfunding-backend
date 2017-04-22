@@ -131,7 +131,8 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           path: smImagePath,
           mimeType: 'image/png',
           bucket: BUCKET
-        }).then( () => {
+        }).then( async () => {
+          await keyCDN.purgeUrls([smImagePath])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
             smImage: ASSETS_BASE_URL+smImagePath
           })
