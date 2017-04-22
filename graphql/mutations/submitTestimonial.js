@@ -124,7 +124,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   //generate sm picture (PNG!)
   try {
     const smImagePath = `/${FOLDER}/${testimonial.id}_sm.png`
-    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${id}`)
+    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`)
       .then( async (data) => {
         return uploadExoscale({
           stream: data,
@@ -133,7 +133,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           bucket: BUCKET
         }).then( () => {
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
-            smImage: smImagePath
+            smImage: ASSETS_BASE_URL+smImagePath
           })
         })
       })
