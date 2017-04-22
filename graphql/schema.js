@@ -276,6 +276,7 @@ type Testimonial {
   video: Video
   # 384x384 JPEG HTTPS URL
   image: String!
+  smImage: String
   published: Boolean
   adminUnpublished: Boolean
   sequenceNumber: Int
