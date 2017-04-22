@@ -1,7 +1,8 @@
 
 module.exports = async (_, args, {pgdb}) => {
-  const {seed, offset, limit, search, firstId} = args
+  const {offset, limit, search, firstId} = args
   const videosOnly = Object.hasOwnProperty.call(args, 'videosOnly') ? args.videosOnly : false
+  const seed = Object.hasOwnProperty.call(args, 'seed') ? args.seed : Math.random()*2-1
 
   let firstTestimonial
   let firstUser
