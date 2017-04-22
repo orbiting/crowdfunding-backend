@@ -1,9 +1,7 @@
 
 module.exports = async (_, args, {pgdb}) => {
   const {seed, offset, limit, search, firstId} = args
-  const withVideos = args.video || true
-  const withImages = args.image || true
-
+  const videosOnly = Object.hasOwnProperty.call(args, 'videosOnly') ? args.videosOnly : false
 
   let firstTestimonial
   let firstUser
@@ -30,14 +28,23 @@ module.exports = async (_, args, {pgdb}) => {
   if(search) {
     //search via users again to keep search ordering
     const testimonials = await pgdb.query(`
-      SELECT t.id, t."userId", t.role, t.quote, t.video, t.image, t."createdAt", t."updatedAt"
+      SELECT
+        t.id,
+        t."userId",
+        t.role,
+        t.quote,
+        t.video,
+        t.image,
+        t."createdAt",
+        t."updatedAt"
       FROM users u
       JOIN testimonials t
       ON t."userId" = u.id
       WHERE
-        u."firstName" % :search OR u."lastName" % :search OR
+        (u."firstName" % :search OR u."lastName" % :search OR
         u."firstName" ILIKE :searchLike OR u."lastName" ILIKE :searchLike OR
-        t.role % :search OR t.role ILIKE :searchLike
+        t.role % :search OR t.role ILIKE :searchLike)
+        ${videosOnly ? ' AND t.video IS NOT NULL' : ' ' }
       OFFSET :offset
       LIMIT :limit;
     `, { search, searchLike: search+'%', seed, offset, limit })
@@ -74,7 +81,8 @@ module.exports = async (_, args, {pgdb}) => {
           image,
           "createdAt",
           "updatedAt"
-        FROM testimonials
+        FROM testimonials t
+        ${videosOnly ? 'WHERE t.video IS NOT NULL' : '' }
 
         OFFSET 1
       ) s
