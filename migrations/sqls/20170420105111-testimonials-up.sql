@@ -8,6 +8,7 @@ create table "testimonials" (
   "quote"             text,
   "video"             jsonb,
   "image"             text not null,
+  "smImage"           text,
   "published"         boolean not null default true,
   "adminUnpublished"  boolean not null default false,
   "createdAt"         timestamptz default now(),

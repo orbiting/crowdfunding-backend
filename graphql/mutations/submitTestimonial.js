@@ -4,6 +4,7 @@ const keyCDN = require('../../lib/keyCDN')
 const convertImage = require('../../lib/convertImage')
 const uploadExoscale = require('../../lib/uploadExoscale')
 const logger = require('../../lib/logger')
+const renderUrl = require('../../lib/renderUrl')
 //const rw = require('rw')
 
 const FOLDER = 'testimonials'
@@ -22,7 +23,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   }
 
   const { role, quote, image } = args
-  const { ASSETS_BASE_URL } = process.env
+  const { ASSETS_BASE_URL, FRONTEND_BASE_URL } = process.env
 
   //check quote
   if(quote.trim().length > MAX_QUOTE_LENGTH) {
@@ -34,11 +35,13 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   //const inputFile = rw.readFileSync(__dirname+'/../image.b64', 'utf8')
   //const inputBuffer = new Buffer(inputFile, 'base64')
 
+
   const transaction = await pgdb.transactionBegin()
   let sendConfirmEmail = false
+  let testimonial
   try {
 
-    let testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
+    testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
     if(!testimonial || !testimonial.published)
       sendConfirmEmail = true
 
@@ -52,8 +55,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
         role,
         quote
       })
-    } else {
-
+    } else { //new image
       const inputBuffer = new Buffer(image, 'base64')
       const id = testimonial ? testimonial.id : uuid()
 
@@ -103,29 +105,50 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
     }
 
     await transaction.transactionCommit()
-
-    if(sendConfirmEmail) {
-      await sendMailTemplate({
-        to: req.user.email,
-        fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
-        subject: t('api/testimonial/mail/subject'),
-        templateName: 'cf_community',
-        globalMergeVars: [
-          { name: 'NAME',
-            content: req.user.firstName+' '+req.user.lastName
-          },
-        ]
-      })
-    }
-
-    //augement with name
-    testimonial.name = `${req.user.firstName} ${req.user.lastName}`
-
-    return testimonial
-
   } catch(e) {
     await transaction.transactionRollback()
     logger.info('transaction rollback', { req: req._log(), error: e })
     throw e
   }
+
+  //generate sm picture
+  try {
+    const smImagePath = `/${FOLDER}/${testimonial.id}_sm.jpeg`
+    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${id}`)
+      .then( async (data) => {
+        return uploadExoscale({
+          stream: data,
+          path: smImagePath,
+          mimeType: 'image/jpeg',
+          bucket: BUCKET
+        }).then( => {
+          return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
+            smImage: smImagePath
+          })
+        })
+      })
+  } catch(e) {
+    logger.error('sm image render failed', { req: req._log(), args, e })
+    console.error(e)
+  }
+
+  if(sendConfirmEmail) {
+    await sendMailTemplate({
+      to: req.user.email,
+      fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
+      subject: t('api/testimonial/mail/subject'),
+      templateName: 'cf_community',
+      globalMergeVars: [
+        { name: 'NAME',
+          content: req.user.firstName+' '+req.user.lastName
+        },
+      ]
+    })
+  }
+
+  //augement with name
+  testimonial.name = `${req.user.firstName} ${req.user.lastName}`
+
+  return testimonial
+
 }

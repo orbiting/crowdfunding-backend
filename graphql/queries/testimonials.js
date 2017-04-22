@@ -36,6 +36,7 @@ module.exports = async (_, args, {pgdb}) => {
         t.quote,
         t.video,
         t.image,
+        t."smImage",
         t."createdAt",
         t."updatedAt"
       FROM users u
@@ -68,6 +69,7 @@ module.exports = async (_, args, {pgdb}) => {
           NULL AS quote,
           NULL AS video,
           NULL AS image,
+          NULL AS "smImage",
           NULL AS "createdAt",
           NULL AS "updatedAt"
 
@@ -81,6 +83,7 @@ module.exports = async (_, args, {pgdb}) => {
           quote,
           video,
           image,
+          "smImage",
           "createdAt",
           "updatedAt"
         FROM testimonials t
