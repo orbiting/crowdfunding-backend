@@ -27,28 +27,24 @@ module.exports = async (_, args, {pgdb}) => {
     })
   }
 
-  if(name) {
-    const users = await pgdb.public.users.findWhere(`
-      "firstName" % :name OR "lastName" % :name OR
-      "firstName" ILIKE :nameLike OR "lastName" ILIKE :nameLike
-    `, { name, nameLike: name+'%' })
-    if(!users.length)
-      return results([], [])
-
+  if(search) {
+    //search via users again to keep search ordering
     const testimonials = await pgdb.query(`
       SELECT t.id, t."userId", t.role, t.quote, t.video, t.image, t."createdAt", t."updatedAt"
       FROM users u
       JOIN testimonials t
       ON t."userId" = u.id
       WHERE
-        u."firstName" % :name OR u."lastName" % :name OR
-        u."firstName" ILIKE :nameLike OR u."lastName" ILIKE :nameLike
+        u."firstName" % :search OR u."lastName" % :search OR
+        u."firstName" ILIKE :searchLike OR u."lastName" ILIKE :searchLike OR
+        t.role % :search OR t.role ILIKE :searchLike
       OFFSET :offset
       LIMIT :limit;
-    `, { name, nameLike: name+'%', seed, offset, limit })
+    `, { search, searchLike: search+'%', seed, offset, limit })
     if(!testimonials.length)
       return results([], [])
 
+    const users = await pgdb.public.users.find({id: testimonials.map( t => t.userId )})
     return results(testimonials, users)
 
   } else {
@@ -68,7 +64,16 @@ module.exports = async (_, args, {pgdb}) => {
 
         UNION ALL
 
-        SELECT null, id, "userId", role, quote, video, image, "createdAt", "updatedAt"
+        SELECT
+          null,
+          id,
+          "userId",
+          role,
+          quote,
+          video,
+          image,
+          "createdAt",
+          "updatedAt"
         FROM testimonials
 
         OFFSET 1

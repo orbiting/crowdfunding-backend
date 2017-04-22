@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 create table "testimonials" (
   "id"              uuid primary key not null default uuid_generate_v4(),
@@ -11,3 +12,4 @@ create table "testimonials" (
   "updatedAt"       timestamptz default now(),
   unique("userId")
 );
+CREATE INDEX testimonial_role_idx ON "testimonials" USING GIN ("role" gin_trgm_ops);
