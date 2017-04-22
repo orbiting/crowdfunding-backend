@@ -3,7 +3,7 @@
 // and looks for photos locally at ./photos/
 //
 // usage
-// cf_server  node script/importTestimonials.js
+// cf_server  node script/generateSMImages.js
 //
 require('dotenv').config()
 
