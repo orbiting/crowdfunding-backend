@@ -37,6 +37,7 @@ module.exports = async (_, args, {pgdb}) => {
         t.video,
         t.image,
         t."smImage",
+        t."sequenceNumber",
         t."createdAt",
         t."updatedAt"
       FROM users u
@@ -59,7 +60,7 @@ module.exports = async (_, args, {pgdb}) => {
 
   } else {
     const testimonials = await pgdb.query(`
-      SELECT id, "userId", role, quote, video, image, "createdAt", "updatedAt"
+      SELECT id, "userId", role, quote, video, image, "smImage", "sequenceNumber", "createdAt", "updatedAt"
       FROM (
         SELECT
           setseed(:seed),
@@ -70,6 +71,7 @@ module.exports = async (_, args, {pgdb}) => {
           NULL AS video,
           NULL AS image,
           NULL AS "smImage",
+          NULL AS "sequenceNumber",
           NULL AS "createdAt",
           NULL AS "updatedAt"
 
@@ -84,6 +86,7 @@ module.exports = async (_, args, {pgdb}) => {
           video,
           image,
           "smImage",
+          "sequenceNumber",
           "createdAt",
           "updatedAt"
         FROM testimonials t

@@ -140,7 +140,7 @@ type Membership {
   voucherCode: String
   reducedPrice: Boolean!
   claimerName: String
-  sequenceNumber: String
+  sequenceNumber: Int
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -278,6 +278,7 @@ type Testimonial {
   image: String!
   published: Boolean
   adminUnpublished: Boolean
+  sequenceNumber: Int
 }
 
 type Video {
