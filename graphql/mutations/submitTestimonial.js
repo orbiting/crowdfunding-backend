@@ -5,6 +5,7 @@ const convertImage = require('../../lib/convertImage')
 const uploadExoscale = require('../../lib/uploadExoscale')
 const logger = require('../../lib/logger')
 const renderUrl = require('../../lib/renderUrl')
+const sendMailTemplate = require('../../lib/sendMailTemplate')
 //const rw = require('rw')
 
 const FOLDER = 'testimonials'
@@ -15,7 +16,7 @@ const MAX_QUOTE_LENGTH = 140
 module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
-  //check if user has pledged, or was vouchered a memebership
+  //check if user has pledged, or was vouchered a memberships
   const hasPledges = await pgdb.public.pledges.count({userId: req.user.id})
   if(!hasPledges && !(await pgdb.public.memberships.count({userId: req.user.id}))) {
     logger.error('not allowed submitTestimonial', { req: req._log(), args, pledge })
@@ -50,7 +51,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       throw new Error(t('api/testimonial/image/required'))
     }
 
-    const firstMembership = await pgdb.public.memeberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
+    const firstMembership = await pgdb.public.memberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
     let seqNumber
     if(firstMembership)
       seqNumber = firstMembership.sequenceNumber
