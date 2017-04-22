@@ -1,12 +1,16 @@
 
 module.exports = async (_, args, {pgdb}) => {
-  const {seed, offset, limit, name, firstId} = args
+  const {seed, offset, limit, search, firstId} = args
+  const withVideos = args.video || true
+  const withImages = args.image || true
+
 
   let firstTestimonial
   let firstUser
   if(firstId) {
     firstTestimonial = await pgdb.public.testimonials.findOne({id: firstId})
-    firstUser = await pgdb.public.users.findOne({id: firstTestimonial.userId})
+    if(firstTestimonial)
+      firstUser = await pgdb.public.users.findOne({id: firstTestimonial.userId})
   }
 
   const results = (testimonials, users) => {
