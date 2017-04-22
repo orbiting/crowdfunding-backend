@@ -123,8 +123,8 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
 
   //generate sm picture (PNG!)
   try {
-    const smImagePath = `/${FOLDER}/${testimonial.id}_sm.png`
-    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`)
+    const smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
+    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`, 1200, 628)
       .then( async (data) => {
         return uploadExoscale({
           stream: data,

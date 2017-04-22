@@ -25,10 +25,10 @@ PgDb.connect().then( async (pgdb) => {
 
   await Promise.all(testimonials.map( async (testimonial) => {
 
-    const smImagePath = `/${FOLDER}/${testimonial.id}_sm.png`
+    const smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
     const url = ASSETS_BASE_URL+smImagePath
 
-    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`)
+    await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`, 1200, 628)
       .then( async (data) => {
         return uploadExoscale({
           stream: data,
