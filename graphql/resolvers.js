@@ -132,9 +132,12 @@ const resolveFunctions = {
     },
     async testimonial(user, args, {pgdb}) {
       const testimonial = await pgdb.public.testimonials.findOne({userId: user.id})
-      return Object.assign({}, testimonial, {
-        name: `${user.firstName} ${user.lastName}`
-      })
+      if (testimonial) {
+        return Object.assign({}, testimonial, {
+          name: `${user.firstName} ${user.lastName}`
+        })
+      }
+      return null
     }
   },
   Crowdfunding: {
