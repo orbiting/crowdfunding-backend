@@ -9,6 +9,7 @@ const logger = require('../../lib/logger')
 const FOLDER = 'testimonials'
 const BUCKET = 'republik'
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
+const MAX_QUOTE_LENGTH = 140
 
 module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
@@ -22,6 +23,12 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
 
   const { role, quote, image } = args
   const { ASSETS_BASE_URL } = process.env
+
+  //check quote
+  if(quote.trim().length > MAX_QUOTE_LENGTH) {
+    logger.error('quote too long', { req: req._log(), args })
+    throw new Error(t('testimonial/quote/tooLong'))
+  }
 
   // test with local image
   //const inputFile = rw.readFileSync(__dirname+'/../image.b64', 'utf8')
