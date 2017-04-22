@@ -121,7 +121,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           path: smImagePath,
           mimeType: 'image/jpeg',
           bucket: BUCKET
-        }).then( => {
+        }).then( () => {
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
             smImage: smImagePath
           })
