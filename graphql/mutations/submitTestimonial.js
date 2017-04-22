@@ -35,7 +35,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   //const inputBuffer = new Buffer(inputFile, 'base64')
 
   const transaction = await pgdb.transactionBegin()
-  let isFirstTestimonial = false
+  let sendConfirmEmail = false
   try {
 
     let testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
@@ -87,7 +87,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           image: ASSETS_BASE_URL+pathSmall
         })
       } else {
-        isFirstTestimonial = true
+        sendConfirmEmail = true
         testimonial = await transaction.public.testimonials.insertAndGet({
           id,
           userId: req.user.id,
@@ -100,7 +100,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
 
     await transaction.transactionCommit()
 
-    if(isFirstTestimonial) {
+    if(sendConfirmEmail) {
       await sendMailTemplate({
         to: req.user.email,
         fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
