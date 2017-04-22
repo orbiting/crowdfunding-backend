@@ -41,6 +41,7 @@ module.exports = async (_, args, {pgdb}) => {
       JOIN testimonials t
       ON t."userId" = u.id
       WHERE
+        t.published = true AND t."adminUnpublished" = false AND
         (u."firstName" % :search OR u."lastName" % :search OR
         u."firstName" ILIKE :searchLike OR u."lastName" ILIKE :searchLike OR
         t.role % :search OR t.role ILIKE :searchLike)
@@ -82,7 +83,9 @@ module.exports = async (_, args, {pgdb}) => {
           "createdAt",
           "updatedAt"
         FROM testimonials t
-        ${videosOnly ? 'WHERE t.video IS NOT NULL' : '' }
+        WHERE
+          t.published = true AND t."adminUnpublished" = false
+          ${videosOnly ? 'AND t.video IS NOT NULL' : '' }
 
         OFFSET 1
       ) s

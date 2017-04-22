@@ -38,6 +38,7 @@ type RootMutation {
   submitQuestion(question: String!): MutationResult
 
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
+  unpublishTestimonial: Boolean
 }
 
 type MutationResult {
@@ -274,6 +275,8 @@ type Testimonial {
   video: Video
   # 384x384 JPEG HTTPS URL
   image: String!
+  published: Boolean
+  adminUnpublished: Boolean
 }
 
 type Video {

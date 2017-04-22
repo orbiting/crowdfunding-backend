@@ -39,6 +39,8 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
   try {
 
     let testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
+    if(!testimonial || !testimonial.published)
+      sendConfirmEmail = true
 
     if(!testimonial && !image) {
       logger.error('a new testimonials requires an image', { req: req._log(), args })
@@ -84,16 +86,18 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall
+          image: ASSETS_BASE_URL+pathSmall,
+          updatedAt: new Date(),
+          published: true
         })
       } else {
-        sendConfirmEmail = true
         testimonial = await transaction.public.testimonials.insertAndGet({
           id,
           userId: req.user.id,
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall
+          image: ASSETS_BASE_URL+pathSmall,
+          published: true
         })
       }
     }
