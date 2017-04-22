@@ -25,23 +25,24 @@ PgDb.connect().then( async (pgdb) => {
 
   await Promise.all(testimonials.map( async (testimonial) => {
 
-    console.log(`doing magic for magic id: ${testimonial.id}`)
-
-    const smImagePath = `/${FOLDER}/${testimonial.id}_sm.jpeg`
+    const smImagePath = `/${FOLDER}/${testimonial.id}_sm.png`
+    const url = ASSETS_BASE_URL+smImagePath
 
     await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`)
       .then( async (data) => {
         return uploadExoscale({
           stream: data,
           path: smImagePath,
-          mimeType: 'image/jpeg',
+          mimeType: 'image/png',
           bucket: BUCKET
         }).then( () => {
+          keyCDN.purgeUrls([url])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
-            smImage: ASSETS_BASE_URL+smImagePath
+            smImage: url
           })
         })
       })
+    console.log(`magic done for: ${url}`)
 
     counter += 1
 
