@@ -7,6 +7,7 @@
   "private": true,
   "author": "Patrick Recher <p@tte.io>",
   "dependencies": {
+    "aws-sign": "^0.1.2",
     "body-parser": "^1.16.1",
     "connect-pg-simple": "^3.1.2",
     "cookie-parser": "^1.4.3",
@@ -37,6 +38,7 @@
     "pogi": "^2.1.0",
     "querystring": "^0.2.0",
     "random-noun-generator-german": "^0.1.3",
+    "sharp": "^0.17.3",
     "slugify": "^1.1.0",
     "stripe": "^4.16.0",
     "uuid": "^3.0.1",
@@ -52,7 +54,9 @@
     "seed": "knex seed:run",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
-    "translations": "gsheets --key=1OHoiENwJH-tqf9yXfXHOevAn17daO_CvB21Rym-oiqk --title=live --pretty --out lib/translations.json"
+    "translations": "gsheets --key=1OHoiENwJH-tqf9yXfXHOevAn17daO_CvB21Rym-oiqk --title=live --pretty --out lib/translations.json",
+    "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/ script/data/testimonials/",
+    "sync:sm": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/sm/ script/data/testimonials/sm/"
   },
   "devDependencies": {
     "concurrently": "^3.3.0",

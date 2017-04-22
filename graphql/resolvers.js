@@ -2,6 +2,7 @@ const { GraphQLScalarType } = require('graphql')
 const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
+const queries = require('./queries/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
 
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
@@ -50,7 +51,7 @@ const resolveFunctions = {
     },
   }),
 
-  RootQuery: {
+  RootQuery: Object.assign({}, queries, {
     async me(_, args, {loaders, pgdb, user}) {
       return user
     },
@@ -99,21 +100,21 @@ const resolveFunctions = {
     },
     async faqs(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'faqs'}, 'data')
-      if(!data) return data
+      if(!data) return []
       return data.filter( d => d.published )
     },
     async events(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'events'}, 'data')
-      if(!data) return data
+      if(!data) return []
       return data.filter( d => d.published )
     },
     async updates(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'updates'}, 'data')
-      if(!data) return data
+      if(!data) return []
       const now = new Date()
       return data.filter( d => (new Date(d.publishedDateTime) < now) )
     }
-  },
+  }),
 
   User: {
     name (user) {
@@ -128,6 +129,15 @@ const resolveFunctions = {
     },
     async pledges(user, args, {loaders, pgdb}) {
       return pgdb.public.pledges.find({userId: user.id})
+    },
+    async testimonial(user, args, {pgdb}) {
+      const testimonial = await pgdb.public.testimonials.findOne({userId: user.id})
+      if (testimonial) {
+        return Object.assign({}, testimonial, {
+          name: `${user.firstName} ${user.lastName}`
+        })
+      }
+      return null
     }
   },
   Crowdfunding: {
@@ -181,6 +191,7 @@ const resolveFunctions = {
     async options(pledge, args, {loaders, pgdb}) {
       //we augment pledgeOptions with packageOptions
       const pledgeOptions = await pgdb.public.pledgeOptions.find( {pledgeId: pledge.id} )
+      if(!pledgeOptions.length) return []
       const pledgeOptionTemplateIds = pledgeOptions.map( (plo) => plo.templateId )
       const packageOptions = await pgdb.public.packageOptions.find( {id: pledgeOptionTemplateIds} )
       return pledgeOptions.map( (plo) => {
@@ -208,6 +219,7 @@ const resolveFunctions = {
     },
     async memberships(pledge, args, {loaders, pgdb}) {
       const memberships = await pgdb.public.memberships.find({pledgeId: pledge.id})
+      if(!memberships.length) return []
       //augment memberships with claimer's names
       const users = await pgdb.public.users.find({id: memberships.map( m => m.userId )})
       return memberships.map( membership => {

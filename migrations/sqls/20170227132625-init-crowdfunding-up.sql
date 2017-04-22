@@ -157,15 +157,16 @@ create table "paymentSources" (
 
 
 create table "memberships" (
-  "id"              uuid primary key not null default uuid_generate_v4(),
-  "userId"          uuid references "users" on update cascade on delete cascade,
-  "pledgeId"        uuid not null references "pledges"(id) on update cascade on delete cascade,
+  "id"                uuid primary key not null default uuid_generate_v4(),
+  "userId"            uuid references "users" on update cascade on delete cascade,
+  "pledgeId"          uuid not null references "pledges"(id) on update cascade on delete cascade,
   "membershipTypeId"  uuid not null references "membershipTypes"(id) on update cascade on delete cascade,
-  "beginDate"       timestamptz not null,
-  "voucherCode"     text unique,
-  "reducedPrice"    boolean not null default false,
-  "createdAt"       timestamptz default now(),
-  "updatedAt"       timestamptz default now()
+  "beginDate"         timestamptz not null,
+  "voucherCode"       text unique,
+  "reducedPrice"      boolean not null default false,
+  "sequenceNumber"    SERIAL,
+  "createdAt"         timestamptz default now(),
+  "updatedAt"         timestamptz default now()
 );
 
 
