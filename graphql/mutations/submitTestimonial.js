@@ -50,11 +50,17 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       throw new Error(t('api/testimonial/image/required'))
     }
 
+    const firstMembership = await pgdb.public.memeberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
+    let seqNumber
+    if(firstMembership)
+      seqNumber = firstMembership.sequenceNumber
+
     if(!image) {
       testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
         role,
-        quote
-      })
+        quote,
+        sequenceNumber: testimonial.sequenceNumber || seqNumber
+      }, {skipUndefined: true})
     } else { //new image
       const inputBuffer = new Buffer(image, 'base64')
       const id = testimonial ? testimonial.id : uuid()
@@ -83,6 +89,7 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           })
       ])
 
+
       if(testimonial) {
         await keyCDN.purgeUrls([pathOriginal, pathSmall])
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
@@ -90,8 +97,9 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           quote,
           image: ASSETS_BASE_URL+pathSmall,
           updatedAt: new Date(),
-          published: true
-        })
+          published: true,
+          sequenceNumber: testimonial.sequenceNumber || seqNumber
+        }, {skipUndefined: true})
       } else {
         testimonial = await transaction.public.testimonials.insertAndGet({
           id,
@@ -99,8 +107,9 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
           role,
           quote,
           image: ASSETS_BASE_URL+pathSmall,
-          published: true
-        })
+          published: true,
+          sequenceNumber: seqNumber
+        }, {skipUndefined: true})
       }
     }
 

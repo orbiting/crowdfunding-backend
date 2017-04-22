@@ -11,6 +11,7 @@ create table "testimonials" (
   "smImage"           text,
   "published"         boolean not null default true,
   "adminUnpublished"  boolean not null default false,
+  "sequenceNumber"    integer,
   "createdAt"         timestamptz default now(),
   "updatedAt"         timestamptz default now(),
   unique("userId")
