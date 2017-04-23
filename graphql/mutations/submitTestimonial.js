@@ -66,6 +66,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
         role,
         quote,
+        published: true,
         sequenceNumber: testimonial.sequenceNumber || seqNumber
       }, {skipUndefined: true})
     } else { //new image
