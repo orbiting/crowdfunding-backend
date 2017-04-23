@@ -1,12 +1,14 @@
-{ "goals": [
-  { "name": "ONLY_THE_BEGINNING",
-	  "people": 3000,
-    "money": 75000000,
-    "description": ""
-  },
-  { "name": "MORE_AWESOME",
-	  "people": 4000,
-    "money": 80000000,
-    "description": "With this we will do more awesome stuff!"
-  }
-]}
+{
+  "goals": [
+    { "name": "ONLY_THE_BEGINNING",
+      "people": 3000,
+      "money": 75000000,
+      "description": ""
+    },
+    { "name": "MORE_AWESOME",
+      "people": 4000,
+      "money": 80000000,
+      "description": "With this we will do more awesome stuff!"
+    }
+  ]
+}
