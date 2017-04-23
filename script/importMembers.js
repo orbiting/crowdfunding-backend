@@ -32,7 +32,8 @@ PgDb.connect().then( async (pgdb) => {
       user = await pgdb.public.users.insertAndGet({
         firstName,
         lastName,
-        email
+        email,
+        verified: true
       })
     }
 
