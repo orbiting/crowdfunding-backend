@@ -16,4 +16,4 @@ create table "testimonials" (
   "updatedAt"         timestamptz default now(),
   unique("userId")
 );
-CREATE INDEX testimonial_role_idx ON "testimonials" USING GIN ("role" gin_trgm_ops);
+CREATE index "testimonials_role_idx" on "testimonials" using GIN ("role" gin_trgm_ops);

@@ -1,7 +1,7 @@
 const logger = require('../../lib/logger')
 const sendPendingPledgeConfirmations = require('../../lib/sendPendingPledgeConfirmations')
 
-module.exports = async (_, args, {loaders, pgdb, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   //check user
   if(!req.user) {
     logger.error('unauthorized reclaimPledge', { req: req._log(), args, pledge })

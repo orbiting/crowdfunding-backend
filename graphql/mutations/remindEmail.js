@@ -2,7 +2,7 @@ const logger = require('../../lib/logger')
 const subscribeToken = require('../../lib/subscribeToken')
 const sendMailTemplate = require('../../lib/sendMailTemplate')
 
-module.exports = async (_, args, {loaders, pgdb, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   const {email} = args
   const {PUBLIC_URL, REMIND_ME_LIST_ID} = process.env
 

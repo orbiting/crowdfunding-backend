@@ -11,7 +11,6 @@ const executableSchema = makeExecutableSchema({
   typeDefs: Schema,
   resolvers: Resolvers
 })
-const createLoaders = require('./loaders')
 
 //agent for optics.apollodata.com
 OpticsAgent.configureAgent({
@@ -35,7 +34,6 @@ module.exports = (server, pgdb, t) => {
         schema: executableSchema,
         context: {
           opticsContext: OpticsAgent.context(req),
-          loaders: createLoaders(pgdb),
           pgdb,
           user: req.user,
           req,

@@ -1,7 +1,7 @@
 const logger = require('../../lib/logger')
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 
-module.exports = async (_, args, {loaders, pgdb, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
   const {firstName, lastName, birthday, address, phoneNumber} = args
   const transaction = await pgdb.transactionBegin()

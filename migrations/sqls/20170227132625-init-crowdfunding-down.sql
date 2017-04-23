@@ -23,3 +23,11 @@ drop type  if exists "rewardType";
 
 drop function if exists voucher_code_trigger_function();
 drop trigger if exists trigger_voucher_code ON memberships;
+
+drop index if exists "pledges_userId_idx";
+drop index if exists "pledgeOptions_pledgeId_idx";
+drop index if exists "pledgePayments_pledgeId_idx";
+drop index if exists "pledgePayments_createdAt_idx";
+drop index if exists "memberships_userId_idx";
+drop index if exists "memberships_pledgeId";
+drop index if exists "memberships_sequenceNumber_idx";

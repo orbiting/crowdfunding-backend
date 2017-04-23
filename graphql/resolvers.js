@@ -52,20 +52,20 @@ const resolveFunctions = {
   }),
 
   RootQuery: Object.assign({}, queries, {
-    async me(_, args, {loaders, pgdb, user}) {
+    async me(_, args, {pgdb, user}) {
       return user
     },
-    async crowdfundings(_, args, {loaders, pgdb, req}) {
+    async crowdfundings(_, args, {pgdb, req}) {
       return pgdb.public.crowdfundings.find()
     },
-    async crowdfunding(_, args, {loaders, pgdb}) {
+    async crowdfunding(_, args, {pgdb}) {
       return pgdb.public.crowdfundings.findOne( args )
     },
-    async pledges(_, args, {loaders, pgdb, user}) {
+    async pledges(_, args, {pgdb, user}) {
       if(!user) return []
       return pgdb.public.pledges.find( {userId: user.id} )
     },
-    async pledge(_, args, {loaders, pgdb, req}) {
+    async pledge(_, args, {pgdb, req}) {
       if(req.user) {
         return pgdb.public.pledges.findOne({
           id: args.id,
@@ -80,7 +80,7 @@ const resolveFunctions = {
       }
       return null
     },
-    async draftPledge(_, args, {loaders, pgdb, req}) {
+    async draftPledge(_, args, {pgdb, req}) {
       //used after payPledge, when user comes back from PSP to load pledge again on
       //pledge site, then client sends the psp payment information it received via
       //query params. Pledge must not be successfull in this state, otherwise user
@@ -124,14 +124,14 @@ const resolveFunctions = {
     name (user) {
       return [user.firstName, user.lastName].join(' ')
     },
-    async address(user, args, {loaders, pgdb}) {
+    async address(user, args, {pgdb}) {
       if(!user.addressId) return null
       return pgdb.public.addresses.findOne({id: user.addressId})
     },
-    async memberships(user, args, {loaders, pgdb}) {
+    async memberships(user, args, {pgdb}) {
       return pgdb.public.memberships.find({userId: user.id})
     },
-    async pledges(user, args, {loaders, pgdb}) {
+    async pledges(user, args, {pgdb}) {
       return pgdb.public.pledges.find({userId: user.id})
     },
     async testimonial(user, args, {pgdb}) {
@@ -145,7 +145,7 @@ const resolveFunctions = {
     }
   },
   Crowdfunding: {
-    async packages(crowdfunding, args, {loaders, pgdb}) {
+    async packages(crowdfunding, args, {pgdb}) {
       return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
     },
     async goals(crowdfunding, args, {pgdb}) {
@@ -153,7 +153,7 @@ const resolveFunctions = {
         orderBy: ['people asc', 'money asc']
       })
     },
-    async status(crowdfunding, args, {loaders, pgdb}) {
+    async status(crowdfunding, args, {pgdb}) {
       const money = await pgdb.public.queryOneField(`
         SELECT SUM(pl.total)
         FROM pledges pl
@@ -170,12 +170,12 @@ const resolveFunctions = {
     }
   },
   Package: {
-    async options(package_, args, {loaders, pgdb}) {
+    async options(package_, args, {pgdb}) {
       return pgdb.public.packageOptions.find( {packageId: package_.id} )
     }
   },
   PackageOption: {
-    async reward(packageOption, args, {loaders, pgdb}) {
+    async reward(packageOption, args, {pgdb}) {
       return Promise.all( [
         pgdb.public.goodies.find( {rewardId: packageOption.rewardId} ),
         pgdb.public.membershipTypes.find( {rewardId: packageOption.rewardId} )
@@ -191,7 +191,7 @@ const resolveFunctions = {
     }
   },
   Pledge: {
-    async options(pledge, args, {loaders, pgdb}) {
+    async options(pledge, args, {pgdb}) {
       //we augment pledgeOptions with packageOptions
       const pledgeOptions = await pgdb.public.pledgeOptions.find( {pledgeId: pledge.id} )
       if(!pledgeOptions.length) return []
@@ -208,19 +208,19 @@ const resolveFunctions = {
         return pko
       })
     },
-    async package(pledge, args, {loaders, pgdb}) {
+    async package(pledge, args, {pgdb}) {
       return pgdb.public.packages.findOne({id: pledge.packageId})
     },
-    async user(pledge, args, {loaders, pgdb, t}) {
+    async user(pledge, args, {pgdb, t}) {
       return pgdb.public.users.findOne({id: pledge.userId})
     },
-    async payments(pledge, args, {loaders, pgdb}) {
+    async payments(pledge, args, {pgdb}) {
       const pledgePayments = await pgdb.public.pledgePayments.find({pledgeId: pledge.id})
       return pledgePayments.length
         ? pgdb.public.payments.find({id: pledgePayments.map( (pp) => { return pp.paymentId })})
         : []
     },
-    async memberships(pledge, args, {loaders, pgdb}) {
+    async memberships(pledge, args, {pgdb}) {
       const memberships = await pgdb.public.memberships.find({pledgeId: pledge.id})
       if(!memberships.length) return []
       //augment memberships with claimer's names
@@ -237,7 +237,7 @@ const resolveFunctions = {
     }
   },
   Membership: {
-    async type(membership, args, {loaders, pgdb}) {
+    async type(membership, args, {pgdb}) {
       return pgdb.public.membershipTypes.findOne({id: membership.membershipTypeId})
     }
   },

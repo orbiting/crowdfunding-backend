@@ -172,7 +172,7 @@ exports.seed = async function(knex, Promise) {
     minAmount: 0,
     maxAmount: 20,
     defaultAmount: 0,
-    price: 3000,
+    price: 2000,
     userPrice: false,
     createdAt: new Date(),
     updatedAt: new Date()

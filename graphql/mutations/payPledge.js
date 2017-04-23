@@ -10,7 +10,7 @@ const fetch = require('isomorphic-unfetch')
 
 const PAYMENT_DEADLINE_DAYS = 10
 
-module.exports = async (_, args, {loaders, pgdb, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
   try {
     const { pledgePayment } = args
