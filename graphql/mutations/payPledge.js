@@ -118,7 +118,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       }
 
       //check SHA of postfinance
-      const SHASIGN = pspPayload.SHASIGN
+      const {SHASIGN, STATUS, PAYID} = pspPayload
       delete pspPayload.SHASIGN
       const secret = process.env.PF_SHA_OUT_SECRET
       //sort params based on upper case order (urgh!)
@@ -130,11 +130,19 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
       const shasum = crypto.createHash('sha1').update(paramsString).digest('hex').toUpperCase()
       if(SHASIGN!==shasum) {
         logger.error('SHASIGN not correct', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
-        throw new Error(t('api/pay/pf/checksumError', {id: pledge.id}))
+        throw new Error(t('api/pay/pf/error', {id: pledge.id}))
       }
 
+      if(parseInt(STATUS) !== 5 && parseInt(STATUS) !== 9) {
+        logger.error('STATUS not successfull', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
+        throw new Error(t('api/pay/pf/error', {id: pledge.id}))
+      }
+      //check post error status
+      //should be 5
+      //STATUS
+
       //check for replay attacks
-      if(await pgdb.public.payments.count({pspId: pspPayload.PAYID})) {
+      if(await pgdb.public.payments.count({pspId: PAYID})) {
         logger.error('this PAYID was used already 😲😒😢', { req: req._log(), args, pledge, pspPayload })
         throw new Error(t('api/pay/paymentIdUsedAlready', {id: pledge.id}))
       }
@@ -146,7 +154,7 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
         method: 'POSTFINANCECARD',
         total: pspPayload.amount*100,
         status: 'PAID',
-        pspId: pspPayload.PAYID,
+        pspId: PAYID,
         pspPayload: pspPayload
       })
       pledgeStatus = 'SUCCESSFUL'
