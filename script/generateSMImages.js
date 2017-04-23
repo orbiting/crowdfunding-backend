@@ -22,7 +22,7 @@ PgDb.connect().then( async (pgdb) => {
 
   const testimonials = await pgdb.public.testimonials.find({})
 
-  await Promise.all(testimonials.map( async (testimonial) => {
+  for(let testimonial of testimonials) {
 
     const smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
     const url = ASSETS_BASE_URL+smImagePath
@@ -45,7 +45,7 @@ PgDb.connect().then( async (pgdb) => {
 
     counter += 1
 
-  }))
+  }
   console.log(`${counter} images generated`)
 
 }).then( () => {
