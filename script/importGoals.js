@@ -24,24 +24,13 @@ PgDb.connect().then( async (pgdb) => {
   try {
     const crowdfundingId = await transaction.public.crowdfundings.findOneFieldOnly({name: CF_NAME}, 'id')
 
-    await Promise.all(input.goals.map( async (goal) => {
-      const {people, money, description} = goal
+    for(let goal of input.goals) {
+      const {name, people, money, description} = goal
 
-      if(await transaction.public.crowdfundingGoals.count({
-        people,
-        money,
-        'id !=': goal.id
-      }, {skipUndefined: true})) {
-        console.error(goal)
-        throw new Error('a goal already exists with the same number of people and money!')
-      }
+      const existingGoal = await transaction.public.crowdfundingGoals.findOne({name})
 
-      if(goal.id) { //update existing
-        if(!(await transaction.public.crowdfundingGoals.count({id: goal.id}))) {
-          throw new Error('goal referenced by id not found')
-        }
-        await transaction.public.crowdfundingGoals.update({id: goal.id}, {
-          crowdfundingId,
+      if(existingGoal) { //update existing
+        await transaction.public.crowdfundingGoals.update({id: existingGoal.id}, {
           people,
           money,
           description,
@@ -50,12 +39,13 @@ PgDb.connect().then( async (pgdb) => {
       } else {
         await transaction.public.crowdfundingGoals.insert({
           crowdfundingId,
+          name,
           people,
           money,
           description
         }, {skipUndefined: true})
       }
-    }))
+    }
 
     await transaction.transactionCommit()
 

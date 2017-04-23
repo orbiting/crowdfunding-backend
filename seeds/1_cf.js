@@ -19,6 +19,7 @@ exports.seed = async function(knex, Promise) {
 
   let crowdfundingGoal0Id = await knex('crowdfundingGoals').insert({
     crowdfundingId: crowdfundingId,
+    name: 'ONLY_THE_BEGINNING',
     people: 3000,
     money: 75000000,
     createdAt: new Date(),

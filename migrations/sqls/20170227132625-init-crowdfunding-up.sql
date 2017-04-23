@@ -37,6 +37,7 @@ create table "crowdfundings" (
 create table "crowdfundingGoals" (
   "id"              uuid primary key not null default uuid_generate_v4(),
   "crowdfundingId"  uuid not null references "crowdfundings" on update cascade on delete cascade,
+  "name"            text not null unique,
   "people"          integer not null,
   "money"           integer not null,
   "description"     text,
