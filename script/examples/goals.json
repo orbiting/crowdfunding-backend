@@ -3,12 +3,13 @@
     { "name": "ONLY_THE_BEGINNING",
       "people": 3000,
       "money": 75000000,
-      "description": ""
+      "description": "Unser Ziel von 3000 Mitglieder wurde erreicht. Bei <b>4000 Mitglieder</b> richten wir <b>2 Lehrstellenplätze</b> ein!"
     },
     { "name": "MORE_AWESOME",
       "people": 4000,
       "money": 80000000,
-      "description": "With this we will do more awesome stuff!"
+      "description": "Bei <b>4000 Mitglieder</b> richten wir <b>2 Lehrstellenplätze</b> ein!"
+
     }
   ]
 }
