@@ -12,12 +12,19 @@ exports.seed = async function(knex, Promise) {
     name: "REPUBLIK",
     beginDate: new Date("2017-04-26T06:00:00.000Z"),
     endDate: new Date("2017-05-31T23:59:59.999Z"),
-    goalPeople: 3000,
-    goalMoney: 75000000,
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   crowdfundingId = crowdfundingId[0]
+
+  let crowdfundingGoal0Id = await knex('crowdfundingGoals').insert({
+    crowdfundingId: crowdfundingId,
+    people: 3000,
+    money: 75000000,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }).returning('id')
+  crowdfundingGoal0Id = crowdfundingGoal0Id[0]
 
   ///////////////////////////////////////////////////////////
 

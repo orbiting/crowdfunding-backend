@@ -30,10 +30,18 @@ create table "crowdfundings" (
   "name"        varchar not null,
   "beginDate"   timestamptz not null,
   "endDate"     timestamptz not null,
-  "goalPeople"  integer not null,
-  "goalMoney"   integer not null,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
+);
+
+create table "crowdfundingGoals" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "crowdfundingId"  uuid not null references "crowdfundings" on update cascade on delete cascade,
+  "people"          integer not null,
+  "money"           integer not null,
+  "description"     text,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now()
 );
 
 create table "packages" (
