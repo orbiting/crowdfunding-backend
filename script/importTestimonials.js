@@ -1,6 +1,6 @@
 //
 // This script imports testimonials from a gsheet
-// and looks for photos locally at ./photos/
+// and looks for photos locally at ./local/photos/
 //
 // usage
 // cf_server  node script/importTestimonials.js
@@ -41,7 +41,7 @@ PgDb.connect().then( async (pgdb) => {
 
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
   await Promise.all(sheet.data.map( async (person) => {
-    if(person.Filename && fs.existsSync(__dirname+'/photos/'+person.Filename)) {
+    if(person.Filename && fs.existsSync(__dirname+'/local/photos/'+person.Filename)) {
       const names = person.Name.split(' ')
 
       const filename = person.Filename
@@ -72,7 +72,7 @@ PgDb.connect().then( async (pgdb) => {
       const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
 
-      const image = fs.readFileSync(__dirname+'/photos/'+filename, 'binary')
+      const image = fs.readFileSync(__dirname+'/local/photos/'+filename, 'binary')
       const inputBuffer = new Buffer(image, 'binary')
 
       await Promise.all([
