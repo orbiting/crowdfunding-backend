@@ -148,11 +148,10 @@ const resolveFunctions = {
     async packages(crowdfunding, args, {pgdb}) {
       return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
     },
-    async goal(crowdfunding) {
-      return {
-        money: crowdfunding.goalMoney,
-        people: crowdfunding.goalPeople
-      }
+    async goals(crowdfunding, args, {pgdb}) {
+      return pgdb.public.crowdfundingGoals.find({crowdfundingId: crowdfunding.id}, {
+        orderBy: ['people asc', 'money asc']
+      })
     },
     async status(crowdfunding, args, {pgdb}) {
       const money = await pgdb.public.queryOneField(`
