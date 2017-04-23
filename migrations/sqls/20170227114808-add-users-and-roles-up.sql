@@ -20,6 +20,7 @@ create table "users" (
   "firstName"   text,
   "lastName"    text,
   "birthday"    date,
+  "phoneNumber" text,
   "addressId"   uuid references "addresses" on update cascade on delete cascade,
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()

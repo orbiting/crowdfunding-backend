@@ -93,15 +93,21 @@ module.exports = async (_, args, {loaders, pgdb, req, t}) => {
           email: pledge.user.email,
           firstName: pledge.user.firstName,
           lastName: pledge.user.lastName,
-          birthday: pledge.user.birthday
-        })
+          birthday: pledge.user.birthday,
+          phoneNumber: pledge.user.phoneNumber,
+        }, {skipUndefined: true})
       }
     }
     //update user details
-    if(user.firstName !== pledge.user.firstName || user.lastName !== pledge.user.lastName) {
+    if(user.firstName !== pledge.user.firstName
+      || user.lastName !== pledge.user.lastName
+      || user.birthday !== pledge.user.birthday
+      || user.phoneNumber !== pledge.user.phoneNumber) {
       user = await transaction.public.users.updateAndGetOne({id: user.id}, {
         firstName: pledge.user.firstName,
-        lastName: pledge.user.lastName
+        lastName: pledge.user.lastName,
+        birthday: pledge.user.birthday,
+        phoneNumber: pledge.user.phoneNumber,
       })
     }
     //if we didn't load a alias, generate one
