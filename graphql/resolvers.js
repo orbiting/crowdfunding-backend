@@ -106,13 +106,17 @@ const resolveFunctions = {
     async events(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'events'}, 'data')
       if(!data) return []
-      return data.filter( d => d.published )
+      return data
+        .filter( d => d.published )
+        .sort( (a,b) => new Date(a.date) - new Date(b.date) )
     },
     async updates(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'updates'}, 'data')
       if(!data) return []
       const now = new Date()
-      return data.filter( d => (new Date(d.publishedDateTime) < now) )
+      return data
+        .filter( d => (new Date(d.publishedDateTime) < now) )
+        .sort( (a,b) => new Date(b.publishedDateTime) - new Date(a.publishedDateTime) )
     }
   }),
 
