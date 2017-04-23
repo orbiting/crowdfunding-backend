@@ -24,6 +24,16 @@ const BUCKET = 'republik'
 const { ASSETS_BASE_URL } = process.env
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 
+
+function randomString(len) {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for( var i=0; i < 10; i++ )
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+}
+
+
 PgDb.connect().then( async (pgdb) => {
 
   let counter = 0
@@ -89,7 +99,7 @@ PgDb.connect().then( async (pgdb) => {
         user = await pgdb.public.users.insertAndGet({
           firstName,
           lastName,
-          email: email || 'vip@project-r.construction'
+          email: email || `${randomString(10)}@anonymous.project-r.construction`
         })
       }
       if(!testimonial) {

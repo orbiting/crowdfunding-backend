@@ -15,7 +15,7 @@ create table "addresses" (
 
 create table "users" (
   "id"          uuid primary key not null default uuid_generate_v4(),
-  "email"       text not null,
+  "email"       text not null unique,
   "verified"    boolean not null default false,
   "firstName"   text,
   "lastName"    text,
@@ -25,6 +25,5 @@ create table "users" (
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );
-create index "users_email_idx" on "users" ("email");
 create index "users_firstName_idx" on "users" using GIN ("firstName" gin_trgm_ops);
 create index "users_lastName_idx" on "users" using GIN ("lastName" gin_trgm_ops);
