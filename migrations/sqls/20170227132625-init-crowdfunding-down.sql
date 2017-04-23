@@ -1,3 +1,4 @@
+drop table if exists "paymentsLog";
 drop table if exists "postfinancePayments";
 drop table if exists "cashPayments";
 drop table if exists "paymentSources";
