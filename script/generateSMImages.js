@@ -14,8 +14,7 @@ const keyCDN = require('../lib/keyCDN')
 const renderUrl = require('../lib/renderUrl')
 
 const FOLDER = 'testimonials'
-const BUCKET = 'republik'
-const { ASSETS_BASE_URL, FRONTEND_BASE_URL } = process.env
+const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
 PgDb.connect().then( async (pgdb) => {
 
@@ -34,7 +33,7 @@ PgDb.connect().then( async (pgdb) => {
           stream: data,
           path: smImagePath,
           mimeType: 'image/png',
-          bucket: BUCKET
+          bucket: S3BUCKET
         }).then( async () => {
           await keyCDN.purgeUrls([smImagePath])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {

@@ -20,7 +20,6 @@ const convertImage = require('../lib/convertImage')
 const GKEY = '1IoNowWMs6dK3OAK_uyWaZMQKrWU0H6LCTYedLcbHPXk'
 
 const FOLDER = 'testimonials'
-const BUCKET = 'republik'
 const { ASSETS_BASE_URL } = process.env
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 
@@ -35,6 +34,8 @@ function randomString(len) {
 
 
 PgDb.connect().then( async (pgdb) => {
+
+  const {S3BUCKET} = process.env
 
   let counter = 0
 
@@ -81,7 +82,7 @@ PgDb.connect().then( async (pgdb) => {
               stream: data,
               path: pathOriginal,
               mimeType: 'image/jpeg',
-              bucket: BUCKET
+              bucket: S3BUCKET
             })
           }),
         convertImage.toSmallBW(inputBuffer)
@@ -90,7 +91,7 @@ PgDb.connect().then( async (pgdb) => {
               stream: data,
               path: pathSmall,
               mimeType: 'image/jpeg',
-              bucket: BUCKET
+              bucket: S3BUCKET
             })
           })
       ])
