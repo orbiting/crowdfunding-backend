@@ -59,7 +59,7 @@ PgDb.connect().then( async (pgdb) => {
         }
       }
 
-      console.log('running for: '+firstName+' '+lastName)
+      console.log(firstName+' '+lastName)
 
       let user = await pgdb.public.users.findOne({email})
       let testimonial
@@ -99,9 +99,18 @@ PgDb.connect().then( async (pgdb) => {
         user = await pgdb.public.users.insertAndGet({
           firstName,
           lastName,
-          email: email || `${randomString(10)}@anonymous.project-r.construction`
+          email: email || `${randomString(10)}@anonymous.project-r.construction`,
+          verified: true
         })
       }
+      //load existing memberships
+      const firstMembership = await pgdb.public.memberships.findFirst({
+        userId: user.id
+      }, {orderBy: ['sequenceNumber asc']})
+      let sequenceNumber
+      if(firstMembership)
+        sequenceNumber = firstMembership.sequenceNumber
+
       if(!testimonial) {
         await pgdb.public.testimonials.insert({
           id,
@@ -109,7 +118,8 @@ PgDb.connect().then( async (pgdb) => {
           role,
           quote,
           image: ASSETS_BASE_URL+pathSmall,
-          video
+          video,
+          sequenceNumber
         }, {skipUndefined: true})
       } else {
         keyCDN.purgeUrls([pathOriginal, pathSmall])
@@ -117,7 +127,8 @@ PgDb.connect().then( async (pgdb) => {
           role,
           quote,
           image: ASSETS_BASE_URL+pathSmall,
-          video
+          video,
+          sequenceNumber
         }, {skipUndefined: true})
       }
       counter += 1
