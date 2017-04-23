@@ -13,7 +13,7 @@ const BUCKET = 'republik'
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 const MAX_QUOTE_LENGTH = 140
 
-module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
+module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
   //check if user has pledged, or was vouchered a memberships

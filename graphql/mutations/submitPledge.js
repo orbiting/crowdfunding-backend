@@ -2,7 +2,7 @@ const logger = require('../../lib/logger')
 const postfinanceSHA = require('../../lib/postfinanceSHA')
 const uuid = require('uuid/v4')
 
-module.exports = async (_, args, {loaders, pgdb, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
   try {
     const { pledge } = args
