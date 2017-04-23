@@ -4,10 +4,11 @@ const uploadExoscale = require('../lib/uploadExoscale')
 const convertImage = require('../lib/convertImage')
 const slugify = require('../lib/slugify')
 
-const BUCKET = 'republik'
 const FOLDER = 'images'
 const IMAGES_DIR = __dirname+'/data/images/'
 const IMAGES_WIDTH = 1200
+
+const {S3BUCKET} = process.env
 
 Promise.resolve().then( async () => {
   const files = await fs.readdir(IMAGES_DIR)
@@ -28,7 +29,7 @@ Promise.resolve().then( async () => {
               stream: data,
               path: path,
               mimeType: 'image/jpeg',
-              bucket: BUCKET
+              bucket: S3BUCKET
             })
           }),
       ])
@@ -36,25 +37,3 @@ Promise.resolve().then( async () => {
     }
   }))
 })
-/*
-      await Promise.all([
-        convertImage.toJPEG(inputBuffer)
-          .then( (data) => {
-            return uploadExoscale({
-              stream: data,
-              path: pathOriginal,
-              mimeType: 'image/jpeg',
-              bucket: BUCKET
-            })
-          }),
-        convertImage.toSmallBW(inputBuffer)
-          .then( (data) => {
-            return uploadExoscale({
-              stream: data,
-              path: pathSmall,
-              mimeType: 'image/jpeg',
-              bucket: BUCKET
-            })
-          })
-      ])
-*/

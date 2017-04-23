@@ -9,7 +9,6 @@ const sendMailTemplate = require('../../lib/sendMailTemplate')
 //const rw = require('rw')
 
 const FOLDER = 'testimonials'
-const BUCKET = 'republik'
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 const MAX_QUOTE_LENGTH = 140
 
@@ -24,7 +23,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   }
 
   const { role, quote, image } = args
-  const { ASSETS_BASE_URL, FRONTEND_BASE_URL } = process.env
+  const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
   //check quote
   if(quote.trim().length > MAX_QUOTE_LENGTH) {
@@ -83,7 +82,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
               stream: data,
               path: pathOriginal,
               mimeType: 'image/jpeg',
-              bucket: BUCKET
+              bucket: S3BUCKET
             })
           }),
         convertImage.toSmallBW(inputBuffer)
@@ -92,7 +91,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
               stream: data,
               path: pathSmall,
               mimeType: 'image/jpeg',
-              bucket: BUCKET
+              bucket: S3BUCKET
             })
           })
       ])
@@ -137,7 +136,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
           stream: data,
           path: smImagePath,
           mimeType: 'image/png',
-          bucket: BUCKET
+          bucket: S3BUCKET
         }).then( async () => {
           await keyCDN.purgeUrls([smImagePath])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {

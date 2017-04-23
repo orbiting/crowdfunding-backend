@@ -14,18 +14,23 @@ const keyCDN = require('../lib/keyCDN')
 const renderUrl = require('../lib/renderUrl')
 
 const FOLDER = 'testimonials'
-const BUCKET = 'republik'
-const { ASSETS_BASE_URL, FRONTEND_BASE_URL } = process.env
+const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
+const WITH_USER_NAME = false
 
 PgDb.connect().then( async (pgdb) => {
 
   let counter = 0
-
   const testimonials = await pgdb.public.testimonials.find({})
 
-  await Promise.all(testimonials.map( async (testimonial) => {
+  for(let testimonial of testimonials) {
 
-    const smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
+    let smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
+
+    if(WITH_USER_NAME) {
+      const user = await pgdb.public.users.findOne({id: testimonial.userId})
+      smImagePath = `/${FOLDER}/sm/${user.firstName}_${user.lastName}.png`
+    }
+
     const url = ASSETS_BASE_URL+smImagePath
 
     await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`, 1200, 628)
@@ -34,7 +39,7 @@ PgDb.connect().then( async (pgdb) => {
           stream: data,
           path: smImagePath,
           mimeType: 'image/png',
-          bucket: BUCKET
+          bucket: S3BUCKET
         }).then( async () => {
           await keyCDN.purgeUrls([smImagePath])
           return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
@@ -46,7 +51,7 @@ PgDb.connect().then( async (pgdb) => {
 
     counter += 1
 
-  }))
+  }
   console.log(`${counter} images generated`)
 
 }).then( () => {
