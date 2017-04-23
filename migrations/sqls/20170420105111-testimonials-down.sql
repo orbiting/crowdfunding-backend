@@ -1,2 +1,2 @@
 drop table if exists "testimonials";
-drop index if exists testimonial_role_idx;
+drop index if exists "testimonials_role_idx";

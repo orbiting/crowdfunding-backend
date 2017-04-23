@@ -103,6 +103,7 @@ create table "pledges" (
   "createdAt"       timestamptz default now(),
   "updatedAt"       timestamptz default now()
 );
+create index "pledges_userId_idx" on "pledges" ("userId");
 
 create table "pledgeOptions" (
   "templateId"  uuid not null references "packageOptions"(id) on update cascade on delete cascade,
@@ -113,6 +114,7 @@ create table "pledgeOptions" (
   "updatedAt"   timestamptz default now(),
   PRIMARY KEY ("templateId", "pledgeId")
 );
+create index "pledgeOptions_pledgeId_idx" on "pledgeOptions" ("pledgeId");
 
 
 create type "paymentMethod" as ENUM ('STRIPE', 'POSTFINANCECARD', 'PAYPAL', 'PAYMENTSLIP');
@@ -144,6 +146,9 @@ create table "pledgePayments" (
   "updatedAt"    timestamptz default now(),
   foreign key ("paymentId", "paymentType") references "payments" ("id", "type") on update cascade on delete cascade
 );
+create index "pledgePayments_pledgeId_idx" on "pledgePayments" ("pledgeId");
+create index "pledgePayments_createdAt_idx" on "pledgePayments" ("createdAt");
+-- pledgePayments_paymentId_idx is implicit
 
 create table "paymentSources" (
   "id"          uuid primary key not null default uuid_generate_v4(),
@@ -168,6 +173,9 @@ create table "memberships" (
   "createdAt"         timestamptz default now(),
   "updatedAt"         timestamptz default now()
 );
+create index "memberships_userId_idx" on "memberships" ("userId");
+create index "memberships_pledgeId" on "memberships" ("pledgeId");
+create index "memberships_sequenceNumber_idx" on "memberships" ("sequenceNumber");
 
 
 CREATE FUNCTION voucher_code_trigger_function()

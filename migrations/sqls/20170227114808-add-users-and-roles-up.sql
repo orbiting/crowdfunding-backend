@@ -25,6 +25,6 @@ create table "users" (
   "createdAt"   timestamptz default now(),
   "updatedAt"   timestamptz default now()
 );
-CREATE INDEX user_firstname_idx ON "users" USING GIN ("firstName" gin_trgm_ops);
-CREATE INDEX user_lastname_idx ON "users" USING GIN ("lastName" gin_trgm_ops);
-
+create index "users_email_idx" on "users" ("email");
+create index "users_firstName_idx" on "users" using GIN ("firstName" gin_trgm_ops);
+create index "users_lastName_idx" on "users" using GIN ("lastName" gin_trgm_ops);
