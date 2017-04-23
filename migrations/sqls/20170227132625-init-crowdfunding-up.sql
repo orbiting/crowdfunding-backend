@@ -207,3 +207,12 @@ create table "cashPayments" (
   "updatedAt"       timestamptz default now(),
   unique ("hrid")
 );
+
+
+create table "paymentsLog" (
+  "id"              uuid primary key not null default uuid_generate_v4(),
+  "method"          "paymentMethod" not null,
+  "pspPayload"      jsonb,
+  "createdAt"       timestamptz default now(),
+  "updatedAt"       timestamptz default now()
+);
