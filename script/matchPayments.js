@@ -2,7 +2,7 @@
 // This script imports postfinance exports and our cash record exports
 // check the examples folder to see the supported formats.
 // Reports about unmatched payments, pledges in need for investigation
-// and overdue payments are written to scripts/data/
+// and overdue payments are written to scripts/exports/
 //
 // usage Postfinance
 // cf_server  cat script/examples/export_pf.csv | node script/matchPayments.js pf
@@ -80,14 +80,14 @@ const writeReport = async (pgdb) => {
   const unmatchedPF = await pgdb.public.postfinancePayments.find({
     matched: false
   })
-  rw.writeFileSync(__dirname+'/data/unmatched_PF.csv', csvFormat(unmatchedPF), 'utf8')
-  rw.writeFileSync(__dirname+'/data/unmatched_PF.json', JSON.stringify(unmatchedPF, null, 2), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/unmatched_PF.csv', csvFormat(unmatchedPF), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/unmatched_PF.json', JSON.stringify(unmatchedPF, null, 2), 'utf8')
 
   const unmatchedCash = await pgdb.public.cashPayments.find({
     matched: false
   })
-  rw.writeFileSync(__dirname+'/data/unmatched_CASH.csv', csvFormat(unmatchedCash), 'utf8')
-  rw.writeFileSync(__dirname+'/data/unmatched_CASH.json', JSON.stringify(unmatchedCash, null, 2), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/unmatched_CASH.csv', csvFormat(unmatchedCash), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/unmatched_CASH.json', JSON.stringify(unmatchedCash, null, 2), 'utf8')
 
   let investigatePledges = await pgdb.public.pledges.find({
     status: 'PAID_INVESTIGATE'
@@ -132,8 +132,8 @@ const writeReport = async (pgdb) => {
       payment.pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
     })
   }
-  rw.writeFileSync(__dirname+'/data/investigate_pledges.json', JSON.stringify(investigatePledges, null, 2), 'utf8')
-  rw.writeFileSync(__dirname+'/data/overdue_payments.json', JSON.stringify(overduePayments, null, 2), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/investigate_pledges.json', JSON.stringify(investigatePledges, null, 2), 'utf8')
+  rw.writeFileSync(__dirname+'/exports/overdue_payments.json', JSON.stringify(overduePayments, null, 2), 'utf8')
 }
 
 const insertPayments = async (paymentsInput, tableName, pgdb) => {

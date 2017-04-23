@@ -2,7 +2,7 @@
 // This script exports open payments which needs to be send by postal service
 //
 // usage
-// cf_server  node script/printPayments.js > script/data/printPayments.csv
+// cf_server  node script/printPayments.js > script/exports/printPayments.csv
 //
 
 
