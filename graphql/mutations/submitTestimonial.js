@@ -51,6 +51,12 @@ module.exports = async (_, args, {loaders, pgdb, user, req, t}) => {
       throw new Error(t('api/testimonial/image/required'))
     }
 
+    //block if testimonial has a video
+    if(testimonial && testimonial.video) {
+      logger.error('testimonial has a video, change not allowed', { req: req._log(), args })
+      throw new Error(t('api/unexpected'))
+    }
+
     const firstMembership = await pgdb.public.memberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
     let seqNumber
     if(firstMembership)
