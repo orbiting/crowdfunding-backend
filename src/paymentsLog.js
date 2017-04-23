@@ -11,7 +11,7 @@ module.exports = (pgdb) => {
         method: 'STRIPE',
         pspPayload: req.body
       })
-      return res.send(200)
+      return res.sendStatus(200)
   })
 
   // https://developer.paypal.com/docs/integration/direct/webhooks/rest-webhooks/
@@ -22,7 +22,7 @@ module.exports = (pgdb) => {
         method: 'PAYPAL',
         pspPayload: req.body
       })
-      return res.send(200)
+      return res.sendStatus(200)
   })
 
   //https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback
@@ -30,11 +30,12 @@ module.exports = (pgdb) => {
     console.log('--------------------------------')
     console.log('/payments/pf')
     console.log(req.body)
+    console.log(req.query)
     await pgdb.public.paymentsLog.insert({
       method: 'POSTFINANCECARD',
       pspPayload: req.query
     })
-    return res.send(200)
+    return res.sendStatus(200)
   })
 
   return server
