@@ -55,8 +55,9 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
     "translations": "gsheets --key=1OHoiENwJH-tqf9yXfXHOevAn17daO_CvB21Rym-oiqk --title=live --pretty --out lib/translations.json",
-    "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/ script/data/testimonials/",
-    "sync:sm": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/sm/ script/data/testimonials/sm/"
+    "import": "cat script/local/members.csv | node script/importMembers.js && node script/importTestimonials.js && node script/generateSMImages.js",
+    "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik-staging/testimonials/ script/data/testimonials/",
+    "sync:sm": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik-staging/testimonials/sm/ script/data/testimonials/sm/"
   },
   "devDependencies": {
     "concurrently": "^3.4.0",
