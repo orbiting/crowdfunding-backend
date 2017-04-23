@@ -1,6 +1,14 @@
-{ "goals": [
-  { "people": 4000,
-    "money": 800000,
-    "description": "Yes, another goal unlocked!"
-  }
-]}
+{
+  "goals": [
+    {
+      "people": 3000,
+      "money": 75000000,
+      "description": "Unser Ziel von 3000 Mitglieder wurde erreicht. Bei <b>4000 Mitglieder</b> richten wir <b>2 Lehrstellenplätze</b> ein!"
+    },
+    {
+      "people": 4000,
+      "money": 75000000,
+      "description": "Bei <b>4000 Mitglieder</b> richten wir <b>2 Lehrstellenplätze</b> ein!"
+    }
+  ]
+}
