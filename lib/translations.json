@@ -1,10 +1,14 @@
 {
-  "updated": "2017-04-22T17:45:29.868Z",
+  "updated": "2017-04-23T22:18:19.075Z",
   "title": "live",
   "data": [
     {
       "key": "menu/",
       "value": "Crowdfunding"
+    },
+    {
+      "key": "menu/crew",
+      "value": "Wir"
     },
     {
       "key": "menu/updates",
@@ -21,6 +25,10 @@
     {
       "key": "menu/faq",
       "value": "Fragen"
+    },
+    {
+      "key": "menu/pledge",
+      "value": "Mitmachen"
     },
     {
       "key": "header/button",
@@ -90,7 +98,7 @@
     },
     {
       "key": "package/ABO/description",
-      "value": "Willkommen an Bord! Sie erhalten für ein Jahr unser Magazin. Und werden automatisch Mitglied der Project R Genossenschaft. Und damit zu einem kleinen Teil Verleger oder Verlegerin der «Republik»."
+      "value": "Willkommen an Bord! Sie erhalten für ein Jahr unser Magazin. Und werden automatisch Mitglied der Project R Genossenschaft. Und damit zu einem kleinen Teil Verleger oder Verlegerin der Republik."
     },
     {
       "key": "package/ABO_GIVE/title",
@@ -108,7 +116,7 @@
     },
     {
       "key": "package/BENEFACTOR/description",
-      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der «Republik». Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen Anstecker in Gold und ein signiertes Manual für Journalismus im 21. Jahrhundert."
+      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen Anstecker in Gold und ein signiertes Manual für Journalismus im 21. Jahrhundert."
     },
     {
       "key": "option/ABO/label/other",
@@ -177,7 +185,7 @@
     },
     {
       "key": "merci/lead",
-      "value": "Vielen Dank für Ihre Unterstützung. Es ist uns eine Ehre, Sie als Teil unseres Unternehmens zu begrüssen. <br /> Auf dieser Seite finden Sie alles, was wir von Ihnen wissen: Ihre Einkäufe, Ihre Postadresse (brauchen wir leider) und Ihr Foto (brauchen wir nicht, würde uns aber freuen), Letzteres mit einem Slogan (würde uns ebenfalls freuen). <br /> Hier unser Slogan: Lang lebe die «Republik»!"
+      "value": "Vielen Dank für Ihre Unterstützung. Es ist uns eine Ehre, Sie als Teil unseres Unternehmens zu begrüssen. <br /> Auf dieser Seite finden Sie alles, was wir von Ihnen wissen: Ihre Einkäufe, Ihre Postadresse (brauchen wir leider) und Ihr Foto (brauchen wir nicht, würde uns aber freuen), Letzteres mit einem Slogan (würde uns ebenfalls freuen). <br /> Hier unser Slogan: Lang lebe die Republik!"
     },
     {
       "key": "merci/share/tweetTemplate",
@@ -189,7 +197,7 @@
     },
     {
       "key": "merci/share/emailBody",
-      "value": "Hallo Werde Mitglied und Abonnent der «Republik»: {url} Herzliche Grüsse, {backerName}"
+      "value": "Hallo Werde Mitglied und Abonnent der Republik: {url} Herzliche Grüsse, {backerName}"
     },
     {
       "key": "merci/pledges/title/1",
@@ -262,6 +270,10 @@
     {
       "key": "merci/updateMe/birthday/label",
       "value": "Geburtsdatum"
+    },
+    {
+      "key": "merci/updateMe/phone/label",
+      "value": "Telefonnummer (Optional)"
     },
     {
       "key": "merci/updateMe/birthday/hint",
@@ -480,8 +492,12 @@
       "value": "{formattedChf} bezahlen"
     },
     {
-      "key": "pledge/submit/button/legal",
-      "value": "Mit dem Bezahlen erklären Sie sich mit der <a href=\"/legal/tos\" target=\"_blank\">AGB</a>s, der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Statuten der Project R Genossenschaft</a> einverstanden."
+      "key": "pledge/submit/legal/label",
+      "value": "Ich erkläre mich mit den <a href=\"/legal/tos\" target=\"_blank\">AGB</a>s, der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Statuten der Project R Genossenschaft</a> einverstanden."
+    },
+    {
+      "key": "pledge/submit/legal/error",
+      "value": "Sie müssen sich mit den AGBs, der Datenschutzerklärung und den Statuten der Project R Genossenschaft einverstanden erklären."
     },
     {
       "key": "pledge/submit/pay/method/STRIPE",
@@ -525,7 +541,7 @@
     },
     {
       "key": "status/goal/people",
-      "value": "von {count} Mitglieder"
+      "value": "von {count} Mitgliedern"
     },
     {
       "key": "status/goal/money",
@@ -564,12 +580,13 @@
       "value": "{count} Minuten"
     },
     {
-      "key": "sidebar/signIn",
-      "value": "Sie sind bereits an Bord?"
+      "key": "sidebar/investor",
+      "value": "Sie wollen Investor/Investorin werden?",
+      "undefined": "Sie wollen Investor bzw. Investorin der Republik AG werden?"
     },
     {
-      "key": "sidebar/investor",
-      "value": "Sie wollen Investor bzw. Investorin der Republik AG werden?"
+      "key": "sidebar/investor/subject",
+      "value": "Investitionsmöglichkeiten bei der Republik AG"
     },
     {
       "key": "sidebar/reminder/button",
@@ -585,7 +602,7 @@
     },
     {
       "key": "sidebar/reminder/send",
-      "value": "Fehler"
+      "value": "erinnern"
     },
     {
       "key": "pledge/recievePayment/error",
@@ -708,8 +725,9 @@
       "value": "Bei der Bezahlung mit PayPal ist etwas schiefgelaufen. Wir haben Ihre Angaben und den Fehler gespeichert. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
     },
     {
-      "key": "api/pay/pf/checksumError",
-      "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihre Angaben und den Fehler gespeichert. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}"
+      "key": "api/pay/pf/error",
+      "value": "Die Überprüfung der Bezahlung mit Postfinance ist fehlgeschlagen. Wir haben Ihre Angaben und den Fehler gespeichert. Bitte kontaktieren Sie uns unter kontakt@repulik.ch und geben Sie folgende Nummer an: ID: {id}",
+      "undefined": "key angepasst, bitte beachten beim einpflegen der Korrekturen"
     },
     {
       "key": "api/pay/pspPayload/parseFailed",
@@ -725,7 +743,7 @@
     },
     {
       "key": "api/signin/mail/subject",
-      "value": "E-Mail-Adresse bestätigen (für die REPUBLIK)"
+      "value": "E-Mail-Adresse bestätigen (für die Republik)"
     },
     {
       "key": "api/pledge/mail/subject",
@@ -733,7 +751,7 @@
     },
     {
       "key": "api/remindeme/mail/subject",
-      "value": "Erinnerung REPUBLIK Crowdfunding"
+      "value": "Erinnerung Republik Crowdfunding"
     },
     {
       "key": "api/remindeme/successMessage",
@@ -757,7 +775,7 @@
     },
     {
       "key": "footer/contact/address",
-      "value": "Republik Project R Genossenschaft Sihlhallenstrasse 1 8004 Zürich Schweiz"
+      "value": "Republik \nProject R Genossenschaft \nSihlhallenstrasse 1 \n8004 Zürich \nSchweiz"
     },
     {
       "key": "footer/about/title",
@@ -948,6 +966,18 @@
       "value": "überprüfen"
     },
     {
+      "key": "memberships/claim/legal/label",
+      "value": "Ich erkläre mich mit der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Statuten der Project R Genossenschaft</a> einverstanden."
+    },
+    {
+      "key": "memberships/claim/legal/error",
+      "value": "Sie müssen sich mit der Datenschutzerklärung und den Statuten der Project R Genossenschaft einverstanden erklären."
+    },
+    {
+      "key": "memberships/claim/error/title",
+      "value": "Fehler"
+    },
+    {
       "key": "print/paymentslip/reduction",
       "value": "selbst bestimmte Reduktion"
     },
@@ -1103,11 +1133,11 @@
     },
     {
       "key": "testimonial/detail/share/emailSubject",
-      "value": "{name} unterstützt die «Republik»"
+      "value": "{name} unterstützt die Republik"
     },
     {
       "key": "testimonial/pickImage/update",
-      "value": "Portraitfoto ändern"
+      "value": "Porträtfoto ändern"
     },
     {
       "key": "testimonial/quote/tooLong",
@@ -1120,6 +1150,54 @@
     {
       "key": "testimonial/unpublished",
       "value": "Wir können leider ihr Statement nicht publizieren. Schreiben Sie an kontakt@republik.ch für weitere Informationen."
+    },
+    {
+      "key": "testimonial/unpublish/user",
+      "value": "Statement zurücknehmen"
+    },
+    {
+      "key": "testimonial/unpublished/user",
+      "value": "Sie haben ihr Statement zurückgezogen, es erscheint nicht mehr auf der Community Seite."
+    },
+    {
+      "key": "testimonial/meta/title",
+      "value": "Community"
+    },
+    {
+      "key": "testimonial/meta/description",
+      "value": "Noch kein Mitglied? Jetzt mitmachen und Mitglied werden!"
+    },
+    {
+      "key": "testimonial/meta/single/title",
+      "value": "{name} unterstützt die Republik"
+    },
+    {
+      "key": "testimonial/meta/single/pageTitle",
+      "value": "{name} — Community — Republik"
+    },
+    {
+      "key": "testimonial/meta/single/description",
+      "value": "Jetzt beim Crowdfunding mitmachen und an Board kommen."
+    },
+    {
+      "key": "footer/me/title",
+      "value": "Ihr Profil"
+    },
+    {
+      "key": "footer/me/merci/signIn",
+      "value": "Bereits an Bord?"
+    },
+    {
+      "key": "footer/me/merci/signedIn",
+      "value": "Ihre Entscheidungen"
+    },
+    {
+      "key": "footer/me/signOut",
+      "value": "Abmelden"
+    },
+    {
+      "key": "footer/me/claim",
+      "value": "Gutscheincode einlösen"
     }
   ]
 }
