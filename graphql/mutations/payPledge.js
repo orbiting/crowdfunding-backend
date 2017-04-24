@@ -159,14 +159,21 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       })
       pledgeStatus = 'SUCCESSFUL'
 
-      if(pspPayload.ALIAS && !(await transaction.public.paymentSources.count({userId: user.id, method: 'POSTFINANCECARD'}))) {
-        //save alias to user
-        await transaction.public.paymentSources.insert({
-          method: 'POSTFINANCECARD',
+      if(pspPayload.ALIAS) {
+        const paymentSourceExists = await transaction.public.paymentSources.count({
           userId: user.id,
           pspId: pspPayload.ALIAS,
-          pspPayload: pspPayload
+          method: 'POSTFINANCECARD'
         })
+        if(!paymentSourceExists) {
+          //save alias to user
+          await transaction.public.paymentSources.insert({
+            method: 'POSTFINANCECARD',
+            userId: user.id,
+            pspId: pspPayload.ALIAS,
+            pspPayload: pspPayload
+          })
+        }
       }
 
       //check if amount is correct

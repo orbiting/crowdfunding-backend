@@ -78,16 +78,21 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         throw new Error(t('api/unexpected'))
       }
       user = req.user
+
       //load possible exising PF alias, only exists if the user is logged in,
       //otherwise he can't have an alias already
-      pfAliasId = await transaction.public.paymentSources.findOneFieldOnly({
+      const paymentSource = await transaction.public.paymentSources.findFirst({
         userId: user.id,
         method: 'POSTFINANCECARD'
-      }, 'pspId')
+      }, {orderBy: ['createdAt desc']})
+
+      if(paymentSource)
+        pfAliasId = paymentSource.pspId
+
     } else {
       user = await transaction.public.users.findOne({email: pledge.user.email}) //try to load existing user by email
       if(user && (await transaction.public.pledges.count({userId: user.id}))) { //user has pledges
-        return {emailVerify: true}
+        return {emailVerify: true} //user must login before he can submitPledge
       } else if(!user) { //create user
         user = await transaction.public.users.insertAndGet({
           email: pledge.user.email,
