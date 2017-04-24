@@ -73,7 +73,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       } catch(e) {
         logger.info('stripe charge failed', { req: req._log(), args, pledge, pledgeStatus, payment, e })
         if(e.type === 'StripeCardError') {
-          const translatedError = t('api/pay/'+e.code)
+          const translatedError = t('api/pay/stripe/'+e.code)
           if(translatedError) {
             throw new Error(translatedError)
           } else {
