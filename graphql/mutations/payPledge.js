@@ -133,13 +133,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         throw new Error(t('api/pay/pf/error', {id: pledge.id}))
       }
 
-      if(parseInt(STATUS) !== 5 && parseInt(STATUS) !== 9) {
+      //https://e-payment-postfinance.v-psp.com/de/guides/user%20guides/statuses-and-errors
+      if(parseInt(STATUS) !== 9 && parseInt(STATUS) !== 91) {
         logger.error('STATUS not successfull', { req: req._log(), args, pledge, shasum, SHASIGN, pspPayload })
         throw new Error(t('api/pay/pf/error', {id: pledge.id}))
       }
-      //check post error status
-      //should be 5
-      //STATUS
 
       //check for replay attacks
       if(await pgdb.public.payments.count({pspId: PAYID})) {
