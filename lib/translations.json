@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-23T22:18:19.075Z",
+  "updated": "2017-04-24T23:11:47.510Z",
   "title": "live",
   "data": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "key": "menu/crew",
-      "value": "Wir"
+      "value": "Crew"
     },
     {
       "key": "menu/updates",
@@ -116,7 +116,7 @@
     },
     {
       "key": "package/BENEFACTOR/description",
-      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen Anstecker in Gold und ein signiertes Manual für Journalismus im 21. Jahrhundert."
+      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen besonderen Anstecker und ein signiertes Manual für Journalismus im 21. Jahrhundert."
     },
     {
       "key": "option/ABO/label/other",
@@ -424,6 +424,10 @@
       "value": "Sichere Verbindung"
     },
     {
+      "key": "pledge/submit/stripe/prefered",
+      "value": "Bitte zahlen Sie mit Kreditkarte, es ist für uns am günstigsten."
+    },
+    {
       "key": "pledge/submit/stripe/js/loading",
       "value": "Kreditkartenzahlung wird vorbereitet"
     },
@@ -605,6 +609,14 @@
       "value": "erinnern"
     },
     {
+      "key": "pledge/recievePayment/pf/92",
+      "value": "Während des Zahlungsverfahrens ist ein technisches Problem bei PostFinance aufgetreten, das zu einem nicht vorhersehbaren Resultat geführt hat.\n\nBitte nehmen Sie kontakt mit uns auf unter <a href=\"{mailto}\">zahlungen@republik.ch</a>. Sie sollten es nicht erneut versuchen da die Buchung möglicherweise bereits akzeptiert wurde."
+    },
+    {
+      "key": "pledge/recievePayment/pf/denied",
+      "value": "Die Zahlung wurde verweigert. Nutzen Sie eine andere Karte oder wählen Sie eine andere Zahlungsmethode."
+    },
+    {
       "key": "pledge/recievePayment/error",
       "value": "Zahlung fehlgeschlagen"
     },
@@ -774,8 +786,16 @@
       "value": "Kontakt"
     },
     {
+      "key": "footer/contact/name",
+      "value": "Republik \nProject R Genossenschaft "
+    },
+    {
       "key": "footer/contact/address",
-      "value": "Republik \nProject R Genossenschaft \nSihlhallenstrasse 1 \n8004 Zürich \nSchweiz"
+      "value": "Sihlhallenstrasse 1 \n8004 Zürich \nSchweiz"
+    },
+    {
+      "key": "footer/contact/mail",
+      "value": "kontakt@republik.ch"
     },
     {
       "key": "footer/about/title",
@@ -783,7 +803,7 @@
     },
     {
       "key": "footer/crew",
-      "value": "Crew"
+      "value": "Wir"
     },
     {
       "key": "footer/about/projecR",
@@ -967,7 +987,7 @@
     },
     {
       "key": "memberships/claim/legal/label",
-      "value": "Ich erkläre mich mit der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Statuten der Project R Genossenschaft</a> einverstanden."
+      "value": "Ich erkläre mich mit den <a href=\"/legal/tos\" target=\"_blank\">AGB</a>s, der <a href=\"/legal/privacy\" target=\"_blank\">Datenschutzerklärung</a> und den <a href=\"/legal/statute\" target=\"_blank\">Statuten der Project R Genossenschaft</a> einverstanden."
     },
     {
       "key": "memberships/claim/legal/error",
@@ -976,6 +996,14 @@
     {
       "key": "memberships/claim/error/title",
       "value": "Fehler"
+    },
+    {
+      "key": "memberships/sequenceNumber/label",
+      "value": "Abo #{sequenceNumber}"
+    },
+    {
+      "key": "memberships/sequenceNumber/suffix",
+      "value": "#{sequenceNumber}"
     },
     {
       "key": "print/paymentslip/reduction",
@@ -1054,6 +1082,18 @@
     {
       "key": "faq/metaDescription",
       "value": "Antworten zu den brennenden Fragen."
+    },
+    {
+      "key": "faq/before/title",
+      "value": "FAQ — Ihre häufigsten Fragen"
+    },
+    {
+      "key": "faq/before/support/title",
+      "value": "Support"
+    },
+    {
+      "key": "faq/before/support/text",
+      "value": "Bei allen technischen Problemen beim Crowdfunding helfen wir Ihnen gerne so schnell wie möglich per Mail: <a href=\"mailto:kontakt@republik.ch\">kontakt@republik.ch</a>"
     },
     {
       "key": "faq/form/title",
@@ -1189,7 +1229,7 @@
     },
     {
       "key": "footer/me/merci/signedIn",
-      "value": "Ihre Entscheidungen"
+      "value": "Ihre persönliche Übersicht"
     },
     {
       "key": "footer/me/signOut",
@@ -1198,6 +1238,22 @@
     {
       "key": "footer/me/claim",
       "value": "Gutscheincode einlösen"
+    },
+    {
+      "key": "crew/pageTitle",
+      "value": "Crew — Republik"
+    },
+    {
+      "key": "crew/title",
+      "value": "Project-R-Crew"
+    },
+    {
+      "key": "crew/description",
+      "value": "Die Project-R-Crew arbeitet derzeit – gemeinsam mit zahlreichen Komplizinnen im Hintergrund – an der Gesellschaftsform, dem Aufbau der Crowdfunding-Plattform, der IT-Entwicklung und dem Redaktionskonzept."
+    },
+    {
+      "key": "crew/lead",
+      "value": "Zur Aufbau-Crew gehören:"
     }
   ]
 }
