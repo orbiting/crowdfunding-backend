@@ -28,7 +28,7 @@ PgDb.connect().then( async (pgdb) => {
 
     if(WITH_USER_NAME) {
       const user = await pgdb.public.users.findOne({id: testimonial.userId})
-      smImagePath = `/${FOLDER}/sm/${user.firstName}_${user.lastName}.png`
+      smImagePath = `/${FOLDER}/export/${user.firstName}_${user.lastName}.png`
     }
 
     const url = ASSETS_BASE_URL+smImagePath
