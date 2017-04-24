@@ -35,14 +35,14 @@ PgDb.connect().then( async (pgdb) => {
 
     await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`, 1200, 628)
       .then( async (data) => {
-        return uploadExoscale({
+        await uploadExoscale({
           stream: data,
           path: smImagePath,
           mimeType: 'image/png',
           bucket: S3BUCKET
         }).then( async () => {
           await keyCDN.purgeUrls([smImagePath])
-          return pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
+          await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
             smImage: url
           })
         })
