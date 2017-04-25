@@ -40,7 +40,8 @@ PgDb.connect().then( async (pgdb) => {
   let counter = 0
 
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
-  await Promise.all(sheet.data.map( async (person) => {
+
+  for(let person of sheet.data) {
     if(person.Filename && fs.existsSync(__dirname+'/local/photos/'+person.Filename)) {
       const names = person.Name.split(' ')
 
@@ -138,7 +139,7 @@ PgDb.connect().then( async (pgdb) => {
     } else {
       console.log("photo not found: "+person.Filename)
     }
-  }))
+  }
   console.log(`${counter} people imported`)
 
 }).then( () => {
