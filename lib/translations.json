@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-25T01:55:01.336Z",
+  "updated": "2017-04-25T11:22:25.211Z",
   "title": "live",
   "data": [
     {
@@ -743,7 +743,8 @@
     },
     {
       "key": "api/pay/stripe/invalid_cvc",
-      "value": "The card’s security code is invalid."
+      "value": "The card’s security code is invalid.",
+      "undefined": "please translate, it happens"
     },
     {
       "key": "api/pay/stripe/invalid_swipe_data",
@@ -751,15 +752,18 @@
     },
     {
       "key": "api/pay/stripe/incorrect_number",
-      "value": "The card number is incorrect."
+      "value": "The card number is incorrect.",
+      "undefined": "please translate, it happens"
     },
     {
       "key": "api/pay/stripe/expired_card",
-      "value": "The card has expired."
+      "value": "The card has expired.",
+      "undefined": "please translate, it happens"
     },
     {
       "key": "api/pay/stripe/incorrect_cvc",
-      "value": "The card’s security code is incorrect."
+      "value": "The card’s security code is incorrect.",
+      "undefined": "please translate, it happens"
     },
     {
       "key": "api/pay/stripe/incorrect_zip",
@@ -775,7 +779,8 @@
     },
     {
       "key": "api/pay/stripe/processing_error",
-      "value": "An error occurred while processing the card."
+      "value": "An error occurred while processing the card.",
+      "undefined": "please translate, it happens"
     },
     {
       "key": "api/paypal/deny",
@@ -848,7 +853,7 @@
     },
     {
       "key": "footer/crew",
-      "value": "Wir"
+      "value": "Crew"
     },
     {
       "key": "footer/about/projecR",
@@ -1229,6 +1234,10 @@
       "value": "Statement, maximal 140 Zeichen"
     },
     {
+      "key": "testimonial/role/tooLong",
+      "value": "Funktion, maximal 60 Zeichen"
+    },
+    {
       "key": "testimonial/update",
       "value": "aktualisieren"
     },
@@ -1242,7 +1251,7 @@
     },
     {
       "key": "testimonial/unpublished/user",
-      "value": "Sie haben ihr Statement zurückgezogen, es erscheint nicht mehr auf der Community Seite."
+      "value": "Sie haben ihr Statement zurückgezogen, es erscheint nicht mehr auf der Community-Seite."
     },
     {
       "key": "testimonial/meta/title",
