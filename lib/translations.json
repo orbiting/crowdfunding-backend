@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-25T11:22:25.211Z",
+  "updated": "2017-04-25T11:29:02.119Z",
   "title": "live",
   "data": [
     {
@@ -254,7 +254,8 @@
     },
     {
       "key": "merci/payment/status/PAYMENTSLIP/WAITING",
-      "value": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an: Konto: 61-11760-6 Project R Genossenschaft 8004 Zürich"
+      "value": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an: Konto: 61-11760-6 Project R Genossenschaft 8004 Zürich",
+      "undefined": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an:<br />\nPC 61-11760-6<br />\nIBAN: CH50 0900 0000 6101 1760 6<br />\nlautend auf:<br />\nProject R Genossenschaft<br />\nSihlhallenstrasse 1<br />\n8004 Zürich\n"
     },
     {
       "key": "merci/payment/status/PAYMENTSLIP/PAID",
