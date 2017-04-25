@@ -11,6 +11,7 @@ const sendMailTemplate = require('../../lib/sendMailTemplate')
 const FOLDER = 'testimonials'
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 const MAX_QUOTE_LENGTH = 140
+const MAX_QUOTE_LENGTH = 60
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
@@ -25,10 +26,14 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   const { role, quote, image } = args
   const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
-  //check quote
+  //check max lengths
   if(quote.trim().length > MAX_QUOTE_LENGTH) {
     logger.error('quote too long', { req: req._log(), args })
     throw new Error(t('testimonial/quote/tooLong'))
+  }
+  if(role.trim().length > MAX_ROLE_LENGTH) {
+    logger.error('role too long', { req: req._log(), args })
+    throw new Error(t('testimonial/role/tooLong'))
   }
 
   // test with local image
