@@ -26,7 +26,7 @@ module.exports = (pgdb) => {
   })
 
   //https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback
-  server.post('/payments/pf', async (req, res) => {
+  server.get('/payments/pf', async (req, res) => {
     bodyParser.urlencoded({extended: true}),
     await pgdb.public.paymentsLog.insert({
       method: 'POSTFINANCECARD',
