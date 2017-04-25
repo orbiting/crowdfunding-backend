@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-25T11:29:02.119Z",
+  "updated": "2017-04-25T17:46:19.223Z",
   "title": "live",
   "data": [
     {
@@ -254,8 +254,7 @@
     },
     {
       "key": "merci/payment/status/PAYMENTSLIP/WAITING",
-      "value": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an: Konto: 61-11760-6 Project R Genossenschaft 8004 Zürich",
-      "undefined": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an:<br />\nPC 61-11760-6<br />\nIBAN: CH50 0900 0000 6101 1760 6<br />\nlautend auf:<br />\nProject R Genossenschaft<br />\nSihlhallenstrasse 1<br />\n8004 Zürich\n"
+      "value": "Bitte überweisen Sie {formattedTotal} mit der Mitteilung «{hrid}» an:<br />\nPC 61-11760-6<br />\nIBAN: CH50 0900 0000 6101 1760 6<br />\nlautend auf:<br />\nProject R Genossenschaft<br />\nSihlhallenstrasse 1<br />\n8004 Zürich\n"
     },
     {
       "key": "merci/payment/status/PAYMENTSLIP/PAID",
@@ -813,11 +812,15 @@
       "value": "Vielen Dank!"
     },
     {
-      "key": "api/remindeme/mail/subject",
+      "key": "api/remindme/mail/subject",
       "value": "Erinnerung Republik Crowdfunding"
     },
     {
-      "key": "api/remindeme/successMessage",
+      "key": "api/payment/received/mail/subject",
+      "value": "Vielen Dank! Wir haben Ihre Zahlung erhalten."
+    },
+    {
+      "key": "api/remindme/successMessage",
       "value": "Wir werden Sie erinnern"
     },
     {
