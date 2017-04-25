@@ -11,7 +11,7 @@ const sendMailTemplate = require('../../lib/sendMailTemplate')
 const FOLDER = 'testimonials'
 const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
 const MAX_QUOTE_LENGTH = 140
-const MAX_QUOTE_LENGTH = 60
+const MAX_ROLE_LENGTH = 60
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
