@@ -210,6 +210,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         throw new Error(t('api/pay/paymentIdUsedAlready', {id: pledge.id}))
       }
 
+      //https://developer.paypal.com/docs/classic/api/merchant/GetTransactionDetails_API_Operation_NVP/
       const transactionDetails = {
         'METHOD': 'GetTransactionDetails',
         'TRANSACTIONID': pspPayload.tx,
@@ -229,9 +230,24 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         body: form
       })
       const responseDict = querystring.parse(await response.text())
-      if(responseDict.ACK !== 'Success') {
+      if(responseDict.PAYMENTSTATUS !== 'Completed') {
         logger.error('paypal transaction invalid', { req: req._log(), args, pledge, pspPayload, responseDict })
-        throw new Error(t('api/paypal/unknownError', {id: pledge.id}))
+        switch(responseDict.PAYMENTSTATUS) {
+          case 'Canceled_Reversal':
+          case 'Refunded':
+          case 'Reversed':
+          case 'Processed':
+          case 'Pending':
+            throw new Error(t('api/paypal/contactUs', {id: pledge.id}))
+            break
+          case 'Denied':
+          case 'Expired':
+          case 'Failed':
+          case 'Voided':
+            throw new Error(t('api/paypal/deny', {id: pledge.id}))
+            break
+        }
+        throw new Error(t('api/paypal/deny', {id: pledge.id}))
       }
 
       //get paypal amount (is decimal)
