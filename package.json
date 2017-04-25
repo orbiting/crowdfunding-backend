@@ -58,7 +58,8 @@
     "import": "cat script/local/members.csv | node script/importMembers.js && node script/importTestimonials.js && node script/generateSMImages.js",
     "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/ script/local/testimonials/",
     "sync:sm": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/sm/ script/local/testimonials/sm/",
-    "sync:smexport": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/export/ script/local/testimonials/export/"
+    "sync:smexport": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/export/ script/local/testimonials/export/",
+    "upload:images": "node script/uploadImages.js"
   },
   "devDependencies": {
     "concurrently": "^3.4.0",
