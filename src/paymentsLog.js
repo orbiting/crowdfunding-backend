@@ -1,6 +1,5 @@
 const server = require('express').Router()
 const bodyParser = require('body-parser')
-const querystring = require('querystring')
 
 module.exports = (pgdb) => {
 
@@ -30,7 +29,7 @@ module.exports = (pgdb) => {
   server.get('/payments/pf', async (req, res) => {
     await pgdb.public.paymentsLog.insert({
       method: 'POSTFINANCECARD',
-      pspPayload: querystring.parse(req.query)
+      pspPayload: req.query
     })
     return res.sendStatus(200)
   })
