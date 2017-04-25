@@ -1,5 +1,6 @@
 const server = require('express').Router()
 const bodyParser = require('body-parser')
+const querystring = require('querystring')
 
 module.exports = (pgdb) => {
 
@@ -27,10 +28,9 @@ module.exports = (pgdb) => {
 
   //https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback
   server.get('/payments/pf', async (req, res) => {
-    bodyParser.urlencoded({extended: true}),
     await pgdb.public.paymentsLog.insert({
       method: 'POSTFINANCECARD',
-      pspPayload: req.body
+      pspPayload: querystring.parse(req.query)
     })
     return res.sendStatus(200)
   })
