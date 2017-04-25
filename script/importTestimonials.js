@@ -135,6 +135,8 @@ PgDb.connect().then( async (pgdb) => {
       counter += 1
       console.log('finished: '+firstName+' '+lastName)
 
+    } else {
+      console.log("photo not found: "+person.Filename)
     }
   }))
   console.log(`${counter} people imported`)
