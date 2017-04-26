@@ -21,7 +21,7 @@ const GKEY = '1IoNowWMs6dK3OAK_uyWaZMQKrWU0H6LCTYedLcbHPXk'
 
 const FOLDER = 'testimonials'
 const { ASSETS_BASE_URL } = process.env
-const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
+const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 
 
 function randomString(len) {
@@ -72,6 +72,7 @@ PgDb.connect().then( async (pgdb) => {
       const id = testimonial ? testimonial.id : uuid()
       const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
+      const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
 
       const image = fs.readFileSync(__dirname+'/local/photos/'+filename, 'binary')
       const inputBuffer = new Buffer(image, 'binary')
@@ -91,6 +92,15 @@ PgDb.connect().then( async (pgdb) => {
             return uploadExoscale({
               stream: data,
               path: pathSmall,
+              mimeType: 'image/jpeg',
+              bucket: S3BUCKET
+            })
+          }),
+        convertImage.toShare(inputBuffer)
+          .then( (data) => {
+            return uploadExoscale({
+              stream: data,
+              path: pathShare,
               mimeType: 'image/jpeg',
               bucket: S3BUCKET
             })
