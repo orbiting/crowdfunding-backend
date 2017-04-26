@@ -41,107 +41,98 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   //const inputBuffer = new Buffer(inputFile, 'base64')
 
 
-  const transaction = pgdb
-  //const transaction = await pgdb.transactionBegin()
-  //let sendConfirmEmail = false
-  //let testimonial
-  //try {
+  let sendConfirmEmail = false
+  let testimonial
 
-    testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
-    if(!testimonial || !testimonial.published)
-      sendConfirmEmail = true
+  testimonial = await pgdb.public.testimonials.findOne({userId: req.user.id})
+  if(!testimonial || !testimonial.published)
+    sendConfirmEmail = true
 
-    if(!testimonial && !image) {
-      logger.error('a new testimonials requires an image', { req: req._log(), args })
-      throw new Error(t('api/testimonial/image/required'))
-    }
+  if(!testimonial && !image) {
+    logger.error('a new testimonials requires an image', { req: req._log(), args })
+    throw new Error(t('api/testimonial/image/required'))
+  }
 
-    //block if testimonial has a video
-    if(testimonial && testimonial.video) {
-      logger.error('testimonial has a video, change not allowed', { req: req._log(), args })
-      throw new Error(t('api/unexpected'))
-    }
+  //block if testimonial has a video
+  if(testimonial && testimonial.video) {
+    logger.error('testimonial has a video, change not allowed', { req: req._log(), args })
+    throw new Error(t('api/unexpected'))
+  }
 
-    const firstMembership = await pgdb.public.memberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
-    let seqNumber
-    if(firstMembership)
-      seqNumber = firstMembership.sequenceNumber
+  const firstMembership = await pgdb.public.memberships.findFirst({userId: req.user.id}, {orderBy: ['sequenceNumber asc']})
+  let seqNumber
+  if(firstMembership)
+    seqNumber = firstMembership.sequenceNumber
 
-    if(!image) {
-      testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
+  if(!image) {
+    testimonial = await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
+      role,
+      quote,
+      published: true,
+      sequenceNumber: testimonial.sequenceNumber || seqNumber
+    }, {skipUndefined: true})
+  } else { //new image
+    const inputBuffer = new Buffer(image, 'base64')
+    const id = testimonial ? testimonial.id : uuid()
+
+    const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
+    const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
+    const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
+
+    await Promise.all([
+      convertImage.toJPEG(inputBuffer)
+        .then( (data) => {
+          return uploadExoscale({
+            stream: data,
+            path: pathOriginal,
+            mimeType: 'image/jpeg',
+            bucket: S3BUCKET
+          })
+        }),
+      convertImage.toSmallBW(inputBuffer)
+        .then( (data) => {
+          return uploadExoscale({
+            stream: data,
+            path: pathSmall,
+            mimeType: 'image/jpeg',
+            bucket: S3BUCKET
+          })
+        }),
+      convertImage.toShare(inputBuffer)
+        .then( (data) => {
+          return uploadExoscale({
+            stream: data,
+            path: pathShare,
+            mimeType: 'image/jpeg',
+            bucket: S3BUCKET
+          })
+        })
+    ])
+
+
+    if(testimonial) {
+      await keyCDN.purgeUrls([pathOriginal, pathSmall, pathShare])
+      testimonial = await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
         role,
         quote,
+        image: ASSETS_BASE_URL+pathSmall,
+        updatedAt: new Date(),
         published: true,
         sequenceNumber: testimonial.sequenceNumber || seqNumber
       }, {skipUndefined: true})
-    } else { //new image
-      const inputBuffer = new Buffer(image, 'base64')
-      const id = testimonial ? testimonial.id : uuid()
-
-      const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
-      const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
-      const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
-
-      await Promise.all([
-        convertImage.toJPEG(inputBuffer)
-          .then( (data) => {
-            return uploadExoscale({
-              stream: data,
-              path: pathOriginal,
-              mimeType: 'image/jpeg',
-              bucket: S3BUCKET
-            })
-          }),
-        convertImage.toSmallBW(inputBuffer)
-          .then( (data) => {
-            return uploadExoscale({
-              stream: data,
-              path: pathSmall,
-              mimeType: 'image/jpeg',
-              bucket: S3BUCKET
-            })
-          }),
-        convertImage.toShare(inputBuffer)
-          .then( (data) => {
-            return uploadExoscale({
-              stream: data,
-              path: pathShare,
-              mimeType: 'image/jpeg',
-              bucket: S3BUCKET
-            })
-          })
-      ])
-
-
-      if(testimonial) {
-        await keyCDN.purgeUrls([pathOriginal, pathSmall, pathShare])
-        testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
-          role,
-          quote,
-          image: ASSETS_BASE_URL+pathSmall,
-          updatedAt: new Date(),
-          published: true,
-          sequenceNumber: testimonial.sequenceNumber || seqNumber
-        }, {skipUndefined: true})
-      } else {
-        testimonial = await transaction.public.testimonials.insertAndGet({
-          id,
-          userId: req.user.id,
-          role,
-          quote,
-          image: ASSETS_BASE_URL+pathSmall,
-          published: true,
-          sequenceNumber: seqNumber
-        }, {skipUndefined: true})
-      }
+    } else {
+      testimonial = await pgdb.public.testimonials.insertAndGet({
+        id,
+        userId: req.user.id,
+        role,
+        quote,
+        image: ASSETS_BASE_URL+pathSmall,
+        published: true,
+        sequenceNumber: seqNumber
+      }, {skipUndefined: true})
     }
+  }
 
-//    await transaction.transactionCommit()
-//  } catch(e) {
-//    await transaction.transactionRollback()
-//    logger.info('transaction rollback', { req: req._log(), error: e })
-//    throw e
-//  }
 
   //generate sm picture (PNG!)
   try {
