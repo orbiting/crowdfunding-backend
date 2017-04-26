@@ -7,6 +7,7 @@ exports.configure = ({
   server = null, // Express Server
   pgdb = null, // pogi connection
   t = null, // translater
+  logger = null,
   // Secret used to encrypt session data on the server
   secret = null,
   // Specifies the value for the Domain Set-Cookie attribute
@@ -35,6 +36,9 @@ exports.configure = ({
   }
   if (t === null) {
     throw new Error('t option must be the translator')
+  }
+  if (logger === null) {
+    throw new Error('logger required')
   }
   // Sessions store for express-session (defaults to connect-pg-simple using DATABASE_URL)
   const store = new PgSession({
@@ -66,16 +70,11 @@ exports.configure = ({
   // authenticate a token sent by email
   server.get('/auth/email/signin/:token', async (req, res) => {
     const token = req.params.token
-    if (!token) {
-      return res
-        .set({'content-type': 'text/plain; charset=utf-8'})
-        .status(200)
-        .end(t('api/auth/error'))
-    }
 
     // Look up session by token
     const session = await Sessions.findOne({'sess @>': {token}})
     if (!session) {
+      logger.error('auth: no session', { req: req._log(), token })
       return res
         .set({'content-type': 'text/plain; charset=utf-8'})
         .status(200)

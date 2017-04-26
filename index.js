@@ -65,7 +65,8 @@ PgDb.connect().then( (pgdb) => {
     domain: process.env.COOKIE_DOMAIN || undefined,
     dev: DEV,
     pgdb: pgdb,
-    t
+    t,
+    logger
   })
 
   graphql(server, pgdb, t)
