@@ -92,7 +92,10 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     } else {
       user = await transaction.public.users.findOne({email: pledge.user.email}) //try to load existing user by email
       if(user && !!(await transaction.public.pledges.findFirst({userId: user.id}))) { //user has pledges
+
+        await transaction.transactionCommit()
         return {emailVerify: true} //user must login before he can submitPledge
+
       } else if(!user) { //create user
         user = await transaction.public.users.insertAndGet({
           email: pledge.user.email,
