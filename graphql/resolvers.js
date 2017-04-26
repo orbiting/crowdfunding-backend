@@ -163,18 +163,8 @@ const resolveFunctions = {
       })
     },
     async status(crowdfunding, args, {pgdb}) {
-      const money = await pgdb.public.queryOneField(`
-        SELECT SUM(pl.total)
-        FROM pledges pl
-        JOIN packages pa ON pl."packageId"=pa.id
-        WHERE pl.status = $1
-        AND pa."crowdfundingId"=$2`, ['SUCCESSFUL', crowdfunding.id]) || 0
-      const people = await pgdb.public.queryOneField(`
-        SELECT COUNT(m.id)
-        FROM memberships m
-        JOIN pledges pl ON m."pledgeId"=pl.id
-        JOIN packages pa ON pl."packageId"=pa.id
-        WHERE pa."crowdfundingId"=$1`, [crowdfunding.id]) || 0
+      const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`)
+      const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`)
       return {money, people}
     }
   },
