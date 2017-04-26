@@ -17,8 +17,8 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
   //check if user has pledged, or was vouchered a memberships
-  const hasPledges = await pgdb.public.pledges.count({userId: req.user.id})
-  if(!hasPledges && !(await pgdb.public.memberships.count({userId: req.user.id}))) {
+  const hasPledges = !!(await pgdb.public.pledges.findFirst({userId: req.user.id}))
+  if(!hasPledges && !(await pgdb.public.memberships.findFirst({userId: req.user.id}))) {
     logger.error('not allowed submitTestimonial', { req: req._log(), args, pledge })
     throw new Error(t('api/testimonial/pledge/required'))
   }
