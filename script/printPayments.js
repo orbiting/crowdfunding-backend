@@ -27,6 +27,7 @@ PgDb.connect().then( async (pgdb) => {
 
   //console.log('reading data...')
   const payments = await pgdb.public.payments.find({
+    paperInvoice: 'true',
     method: 'PAYMENTSLIP',
     status: 'WAITING'
   })
