@@ -270,6 +270,9 @@ type Update {
   socialMediaImage: String
 }
 
+enum ImageSize {
+  SHARE
+}
 
 type Testimonial {
   id: ID!
@@ -278,7 +281,7 @@ type Testimonial {
   quote: String
   video: Video
   # 384x384 JPEG HTTPS URL
-  image: String!
+  image(size: ImageSize): String!
   smImage: String
   published: Boolean
   adminUnpublished: Boolean
