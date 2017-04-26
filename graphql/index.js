@@ -23,7 +23,7 @@ module.exports = (server, pgdb, t) => {
   server.use(OpticsAgent.middleware())
 
   server.use('/graphql',
-    bodyParser.json({limit: '4mb'}),
+    bodyParser.json({limit: '8mb'}),
     graphqlExpress( (req) => {
       return {
         debug: true,
