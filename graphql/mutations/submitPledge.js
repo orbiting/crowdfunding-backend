@@ -91,8 +91,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
     } else {
       user = await transaction.public.users.findOne({email: pledge.user.email}) //try to load existing user by email
-      if(user && (await transaction.public.pledges.count({userId: user.id}))) { //user has pledges
+      if(user && !!(await transaction.public.pledges.findFirst({userId: user.id}))) { //user has pledges
+
+        await transaction.transactionCommit()
         return {emailVerify: true} //user must login before he can submitPledge
+
       } else if(!user) { //create user
         user = await transaction.public.users.insertAndGet({
           email: pledge.user.email,
@@ -121,7 +124,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     }
 
     //buying reduced is only ok if user doesn't have a pledge yet, except donation only
-    if(donation < 0 && await transaction.public.pledges.count({userId: user.id})) {
+    if(donation < 0 && !!(await transaction.public.pledges.findFirst({userId: user.id}))) {
       const pledges = await transaction.public.pledges.find({userId: user.id})
       const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledges.map( p => p.id )})
       const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( p => p.templateId )})
