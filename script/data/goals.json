@@ -1,0 +1,14 @@
+{
+  "goals": [
+    { "name": "ONLY_THE_BEGINNING",
+      "people": 3000,
+      "money": 75000000,
+      "description": "Dank Ihnen haben wir unser Ziel von 3000 Mitgliedern erreicht! Wir gehen 2018 definitiv an den Start!"
+    },
+    { "name": "SG1",
+      "people": 5000,
+      "money": 75000000,
+      "description": "Wir sind überwältigt. Gemeinsam schaffen wir 5000! Was das bedeutet, kommunizieren wir so bald wie möglich."
+    }
+  ]
+}
