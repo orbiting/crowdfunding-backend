@@ -104,7 +104,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
           .then( (data) => {
             return uploadExoscale({
               stream: data,
-              path: pathSmall,
+              path: pathShare,
               mimeType: 'image/jpeg',
               bucket: S3BUCKET
             })
