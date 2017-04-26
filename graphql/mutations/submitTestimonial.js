@@ -41,10 +41,11 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   //const inputBuffer = new Buffer(inputFile, 'base64')
 
 
-  const transaction = await pgdb.transactionBegin()
-  let sendConfirmEmail = false
-  let testimonial
-  try {
+  const transaction = pgdb
+  //const transaction = await pgdb.transactionBegin()
+  //let sendConfirmEmail = false
+  //let testimonial
+  //try {
 
     testimonial = await transaction.public.testimonials.findOne({userId: req.user.id})
     if(!testimonial || !testimonial.published)
@@ -135,12 +136,12 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       }
     }
 
-    await transaction.transactionCommit()
-  } catch(e) {
-    await transaction.transactionRollback()
-    logger.info('transaction rollback', { req: req._log(), error: e })
-    throw e
-  }
+//    await transaction.transactionCommit()
+//  } catch(e) {
+//    await transaction.transactionRollback()
+//    logger.info('transaction rollback', { req: req._log(), error: e })
+//    throw e
+//  }
 
   //generate sm picture (PNG!)
   try {
