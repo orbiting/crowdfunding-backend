@@ -9,7 +9,7 @@ const sendMailTemplate = require('../../lib/sendMailTemplate')
 //const rw = require('rw')
 
 const FOLDER = 'testimonials'
-const IMAGE_SIZE_SMALL = convertImage.IMAGE_SIZE_SMALL
+const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 const MAX_QUOTE_LENGTH = 140
 const MAX_ROLE_LENGTH = 60
 
@@ -79,11 +79,12 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
       const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
+      const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
 
       await Promise.all([
         convertImage.toJPEG(inputBuffer)
           .then( (data) => {
-            uploadExoscale({
+            return uploadExoscale({
               stream: data,
               path: pathOriginal,
               mimeType: 'image/jpeg',
@@ -92,7 +93,16 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
           }),
         convertImage.toSmallBW(inputBuffer)
           .then( (data) => {
-            uploadExoscale({
+            return uploadExoscale({
+              stream: data,
+              path: pathSmall,
+              mimeType: 'image/jpeg',
+              bucket: S3BUCKET
+            })
+          }),
+        convertImage.toShare(inputBuffer)
+          .then( (data) => {
+            return uploadExoscale({
               stream: data,
               path: pathSmall,
               mimeType: 'image/jpeg',
@@ -103,7 +113,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
 
       if(testimonial) {
-        await keyCDN.purgeUrls([pathOriginal, pathSmall])
+        await keyCDN.purgeUrls([pathOriginal, pathSmall, pathShare])
         testimonial = await transaction.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,

@@ -134,7 +134,7 @@ PgDb.connect().then( async (pgdb) => {
           sequenceNumber
         }, {skipUndefined: true})
       } else {
-        keyCDN.purgeUrls([pathOriginal, pathSmall])
+        keyCDN.purgeUrls([pathOriginal, pathSmall, pathShare])
         await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
