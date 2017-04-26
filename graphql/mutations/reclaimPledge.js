@@ -22,6 +22,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     const pledgeUser = await transaction.public.users.findOne({id: pledge.userId})
     if(pledgeUser.email === req.user.email) {
       logger.info('pledge already belongs to the claiming email', { req: req._log(), args, pledgeUser })
+      await transaction.transactionCommit()
       return true
     }
     if(pledgeUser.verified) {
