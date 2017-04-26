@@ -8,7 +8,12 @@
     { "name": "SG1",
       "people": 5000,
       "money": 75000000,
-      "description": "Erreichen wir die 5000 Unterstützerinnen und Unterstützer, schaffen wir zwei weitere Ausbildungsplätze für junge Journalistinnen und Journalisten."
+      "description": "Dank Ihnen haben wir unser nächstes Ziel von 5000 Unterstützerinnen erreicht. Und schaffen zwei zusätzliche Ausbildungsplätze für junge Journalistinnen und Journalisten."
+    },
+    { "name": "SG2",
+      "people": 7000,
+      "money": 75000000,
+      "description": "Erreichen wir 7000 Unterstützerinnen und Unterstützer, erhöhen wir die Zahl der Köpfe in der Redaktion von 10 auf 11."
     }
   ]
 }
