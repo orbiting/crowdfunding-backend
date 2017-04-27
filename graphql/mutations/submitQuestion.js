@@ -6,12 +6,13 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
   const { question } = args
+  let name = user.firstName ? [user.firstName, user.lastName].join(' ') : ''
   await Promise.all([
     sendMail({
       to: process.env.QUESTIONS_MAIL_ADDRESS,
       fromEmail: process.env.QUESTIONS_MAIL_ADDRESS,
       subject: 'new (FA)Question asked!',
-      text: `${user.firstName} ${user.lastName} hat folgende Frage gestellt:\n\n${question}`
+      text: `${user.mail} - ${name} hat folgende Frage gestellt:\n\n${question}`
     }),
     sendMailTemplate({
       to: user.email,
