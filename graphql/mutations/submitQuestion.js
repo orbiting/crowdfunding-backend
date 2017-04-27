@@ -12,7 +12,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       to: process.env.QUESTIONS_MAIL_ADDRESS,
       fromEmail: process.env.QUESTIONS_MAIL_ADDRESS,
       subject: 'new (FA)Question asked!',
-      text: `${user.mail} - ${name} hat folgende Frage gestellt:\n\n${question}`
+      text: `${user.email} - ${name} hat folgende Frage gestellt:\n\n${question}`
     }),
     sendMailTemplate({
       to: user.email,
