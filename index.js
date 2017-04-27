@@ -34,6 +34,17 @@ process.on('unhandledRejection', (reason, promise) => {
 PgDb.connect().then( (pgdb) => {
   const server = express()
 
+  //redirect to https
+  if (!DEV) {
+    server.enable('trust proxy')
+    server.use((req, res, next) => {
+      if (`${req.protocol}://${req.get('Host')}` !== process.env.PUBLIC_BASE_URL) {
+        return res.redirect(process.env.PUBLIC_BASE_URL + req.url)
+      }
+      return next()
+    })
+  }
+
   //fetch needs explicit CORS headers otherwise, cookies are not sent
   if(process.env.CORS_WHITELIST_URL) {
     const corsOptions = {
