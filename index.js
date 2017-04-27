@@ -38,8 +38,8 @@ PgDb.connect().then( (pgdb) => {
   if (!DEV) {
     server.enable('trust proxy')
     server.use((req, res, next) => {
-      if (`${req.protocol}://${req.get('Host')}` !== process.env.PUBLIC_BASE_URL) {
-        return res.redirect(process.env.PUBLIC_BASE_URL + req.url)
+      if(!req.secure) {
+        res.redirect('https://' + req.hostname + req.url)
       }
       return next()
     })
