@@ -9,7 +9,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   await Promise.all([
     sendMail({
       to: process.env.QUESTIONS_MAIL_ADDRESS,
-      fromEmail: user.email,
+      fromEmail: process.env.QUESTIONS_MAIL_ADDRESS,
       subject: 'new (FA)Question asked!',
       text: `${user.firstName} ${user.lastName} hat folgende Frage gestellt:\n\n${question}`
     }),
