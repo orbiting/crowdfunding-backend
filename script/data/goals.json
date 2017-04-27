@@ -13,7 +13,12 @@
     { "name": "SG2",
       "people": 7000,
       "money": 75000000,
-      "description": "Erreichen wir 7000 Unterstützerinnen und Unterstützer, erhöhen wir die Zahl der Köpfe in der Redaktion von 10 auf 11."
+      "description": "Wir haben 7000 Unterstützerinnen und Unterstützer erreicht und erhöhen die Zahl der Köpfe in der geplanten Redaktion von 10 auf 11. Danke!"
+    },
+    { "name": "SG3",
+      "people": 9000,
+      "money": 75000000,
+      "description": "Erreichen wir 9000 Unterstützerinnen und Unterstützer, realisieren wir pro Jahr zusätzlich vier grosse Geschichten mit einem Gesamtbudget von 250’000 Franken."
     }
   ]
 }
