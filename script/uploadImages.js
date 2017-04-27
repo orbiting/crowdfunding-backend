@@ -39,4 +39,9 @@ Promise.resolve().then( async () => {
   }
   console.log('\nHurrah! These are your new image urls:')
   console.log(urls.join('\n'))
+}).then( () => {
+  process.exit()
+}).catch( e => {
+  console.error(e)
+  process.exit(1)
 })
