@@ -58,7 +58,8 @@
     "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/ script/local/testimonials/",
     "sync:sm": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/sm/ script/local/testimonials/sm/",
     "sync:smexport": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/export/ script/local/testimonials/export/",
-    "upload:images": "node script/uploadImages.js"
+    "upload:images": "node script/uploadImages.js",
+    "download:1k": "s3cmd sync --verbose --exclude '*' --include '*_1000x1000.jpeg' -c ./.s3cfg s3://republik/testimonials/ script/local/1kx1k/"
   },
   "devDependencies": {
     "concurrently": "^3.4.0",
