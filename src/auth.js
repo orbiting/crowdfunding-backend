@@ -78,7 +78,7 @@ exports.configure = ({
 
     if(!token) {
       logger.error('auth: no token', { req: req._log() })
-      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
         + querystring.stringify({email, context}))
     }
 
@@ -87,14 +87,14 @@ exports.configure = ({
       const session = await Sessions.findOne({'sess @>': {token}})
       if (!session) {
         logger.error('auth: no session', { req: req._log(), token })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
           + querystring.stringify({email, context}))
       }
 
       const sessionEmail = session.sess.email
       if(sessionEmail !== email) { //tampered request
         logger.error('auth: session.email and query email dont match', { req: req._log(), sessionEmail })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
           + querystring.stringify({email, context}))
       }
 
