@@ -20,6 +20,7 @@ const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 const generateMemberships = require('../lib/generateMemberships')
 const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
+const sendMail = require('../lib/sendMail')
 
 const t = getFormatter(MESSAGES)
 
@@ -80,14 +81,34 @@ const writeReport = async (pgdb) => {
   const unmatchedPF = await pgdb.public.postfinancePayments.find({
     matched: false
   })
-  rw.writeFileSync(__dirname+'/exports/unmatched_PF.csv', csvFormat(unmatchedPF), 'utf8')
-  rw.writeFileSync(__dirname+'/exports/unmatched_PF.json', JSON.stringify(unmatchedPF, null, 2), 'utf8')
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'unmatched_PF.csv',
+    text: csvFormat(unmatchedPF)
+  })
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'unmatched_PF.json',
+    text: JSON.stringify(unmatchedPF)
+  })
 
   const unmatchedCash = await pgdb.public.cashPayments.find({
     matched: false
   })
-  rw.writeFileSync(__dirname+'/exports/unmatched_CASH.csv', csvFormat(unmatchedCash), 'utf8')
-  rw.writeFileSync(__dirname+'/exports/unmatched_CASH.json', JSON.stringify(unmatchedCash, null, 2), 'utf8')
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'unmatched_CASH.csv',
+    text: csvFormat(unmatchedCash)
+  })
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'unmatched_CASH.json',
+    text: JSON.stringify(unmatchedCash)
+  })
 
   let investigatePledges = await pgdb.public.pledges.find({
     status: 'PAID_INVESTIGATE'
@@ -132,8 +153,18 @@ const writeReport = async (pgdb) => {
       payment.pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
     })
   }
-  rw.writeFileSync(__dirname+'/exports/investigate_pledges.json', JSON.stringify(investigatePledges, null, 2), 'utf8')
-  rw.writeFileSync(__dirname+'/exports/overdue_payments.json', JSON.stringify(overduePayments, null, 2), 'utf8')
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'investigate_pledges.json',
+    text: JSON.stringify(investigatePledges)
+  })
+  sendMail({
+    to: 'admin@project-r.construction',
+    from: 'admin@project-r.construction',
+    subject: 'overdue_payments.json',
+    text: JSON.stringify(overduePayments)
+  })
 }
 
 const insertPayments = async (paymentsInput, tableName, pgdb) => {
