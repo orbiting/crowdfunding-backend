@@ -1,6 +1,7 @@
 const session = require('express-session')
 const PgSession = require('connect-pg-simple')(session)
 const passport = require('passport')
+const querystring = require('querystring')
 const sendPendingPledgeConfirmations = require('../lib/sendPendingPledgeConfirmations')
 
 exports.configure = ({
@@ -68,45 +69,63 @@ exports.configure = ({
   }
 
   // authenticate a token sent by email
-  server.get('/auth/email/signin/:token', async (req, res) => {
-    const token = req.params.token
+  server.get('/auth/email/signin/:token?', async (req, res) => {
+    const {FRONTEND_BASE_URL} = process.env
+    console.log(req.query)
+    const {email, context} = req.query
+    //old links may still contain the token as param
+    const token = req.query.token || req.params.token
 
-    // Look up session by token
-    const session = await Sessions.findOne({'sess @>': {token}})
-    if (!session) {
-      logger.error('auth: no session', { req: req._log(), token })
-      return res
-        .set({'content-type': 'text/plain; charset=utf-8'})
-        .status(200)
-        .end(t('api/auth/error'))
+    if(!token) {
+      logger.error('auth: no token', { req: req._log() })
+      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+        + querystring.stringify({email, context}))
     }
 
-    const {email} = session.sess
-
-    // verify and/or create the user
-    let user = await Users.findOne({email})
-    if (user) {
-      if(!user.verified) {
-        await Users.updateOne({id: user.id}, {verified: true})
+    try {
+      // Look up session by token
+      const session = await Sessions.findOne({'sess @>': {token}})
+      if (!session) {
+        logger.error('auth: no session', { req: req._log(), token })
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+          + querystring.stringify({email, context}))
       }
-    } else {
-      user = await Users.insertAndGet({email, verified: true})
+
+      const sessionEmail = session.sess.email
+      if(sessionEmail !== email) { //tampered request
+        logger.error('auth: session.email and query email dont match', { req: req._log(), sessionEmail })
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+          + querystring.stringify({email, context}))
+      }
+
+      // verify and/or create the user
+      let user = await Users.findOne({email})
+      if (user) {
+        if(!user.verified) {
+          await Users.updateOne({id: user.id}, {verified: true})
+        }
+      } else {
+        user = await Users.insertAndGet({email, verified: true})
+      }
+
+      //log in the session and delete token
+      const sess = Object.assign({}, session.sess, {
+        passport: {user: user.id},
+        token: null
+      })
+      await Sessions.updateOne({sid: session.sid}, {sess})
+
+      //singin hooks
+      await sendPendingPledgeConfirmations(user.id, pgdb, t)
+
+      return res.redirect(FRONTEND_BASE_URL+'/notifications/email-confirmed?'
+        + querystring.stringify({email, context}))
+
+    } catch(e) {
+      logger.error('auth: exception', { req: req._log(), e })
+      return res.redirect(FRONTEND_BASE_URL+'/notifications/unavailable?'
+        + querystring.stringify({email, context}))
     }
-
-    //log in the session and delete token
-    const sess = Object.assign({}, session.sess, {
-      passport: {user: user.id},
-      token: null
-    })
-    await Sessions.updateOne({sid: session.sid}, {sess})
-
-    //singin hooks
-    await sendPendingPledgeConfirmations(user.id, pgdb, t)
-
-    return res
-      .set({'content-type': 'text/plain; charset=utf-8'})
-      .status(200)
-      .end(t('api/auth/success'))
   })
 
 

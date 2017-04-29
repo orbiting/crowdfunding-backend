@@ -25,7 +25,7 @@ type RootQuery {
 }
 
 type RootMutation {
-  signIn(email: String!): SignInResponse!
+  signIn(email: String!, context: String): SignInResponse!
   signOut: Boolean!
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
 
