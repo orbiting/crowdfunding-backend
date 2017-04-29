@@ -18,7 +18,12 @@
     { "name": "SG3",
       "people": 9000,
       "money": 75000000,
-      "description": "Erreichen wir 9000 Unterstützerinnen und Unterstützer, realisieren wir pro Jahr zusätzlich vier grosse Geschichten mit einem Gesamtbudget von 250\u2009000 Franken."
+      "description": "Wow! Gemeinsam haben wir auch das Ziel von 9000 Unterstützerinnen und Unterstützern geschafft. Wir werden dank eurer Unterstützung 2018 vier grosse Recherchen mit einem Gesamtbudget von 250\u2009000 Franken anstossen und realisieren."
+    },
+    { "name": "SG4",
+      "people": 10000,
+      "money": 75000000,
+      "description": "Auf zum nächsten Ziel: Bei 10\u2009000 Unterstützern schaffen wir ein Budget, damit wir für die Republik hervorragende Reporterinnen, Experten, Schriftstellerinnen, Rechercheure im Ausland für einmalige oder ständige Mitarbeit gewinnen können."
     }
   ]
 }
