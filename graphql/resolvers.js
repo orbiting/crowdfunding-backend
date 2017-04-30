@@ -163,8 +163,8 @@ const resolveFunctions = {
       })
     },
     async status(crowdfunding, args, {pgdb}) {
-      const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`)
-      const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`)
+      const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`) || 0
+      const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`) || 0
       return {money, people}
     }
   },
