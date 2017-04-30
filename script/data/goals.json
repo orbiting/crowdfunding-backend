@@ -23,7 +23,12 @@
     { "name": "SG4",
       "people": 10000,
       "money": 75000000,
-      "description": "Auf zum nächsten Ziel: Bei 10\u2009000 Unterstützern schaffen wir ein Budget, damit wir für die Republik hervorragende Reporterinnen, Experten, Schriftstellerinnen, Rechercheure im Ausland für einmalige oder ständige Mitarbeit gewinnen können."
+      "description": "Ziel erreicht – 10\u2009000 Unterstützer! Danke! Damit haben wir gemeinsam mit Ihnen ein fixes Budget geschaffen, um herausragende internationale Autorinnen und Autoren für die Republik zu gewinnen."
+    },
+    { "name": "SG5",
+      "people": 12000,
+      "money": 75000000,
+      "description": "Wir setzen ein nächstes Ziel: 12\u2009000 Unterstützerinnen und Unterstützer. Unterdessen tourt die Republik-Crew durchs Land und arbeitet an der Einführung der Demokratie. Danke fürs Mitmachen und Weitersagen!"
     }
   ]
 }
