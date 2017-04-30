@@ -71,14 +71,15 @@ exports.configure = ({
   // authenticate a token sent by email
   server.get('/auth/email/signin/:token?', async (req, res) => {
     const {FRONTEND_BASE_URL} = process.env
-    const {emailFromQuery, context} = req.query
+    const {context} = req.query
+    const emailFromQuery = req.query.email
     //old links may still contain the token as param
     const token = req.query.token || req.params.token
 
     if(!token) {
       logger.error('auth: no token', { req: req._log(), emailFromQuery, context })
       return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
-        + querystring.stringify({emailFromQuery, context}))
+        + querystring.stringify({email: emailFromQuery, context}))
     }
 
     try {
@@ -87,7 +88,7 @@ exports.configure = ({
       if (!session) {
         logger.error('auth: no session', { req: req._log(), token, emailFromQuery, context })
         return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
-          + querystring.stringify({emailFromQuery, context}))
+          + querystring.stringify({email: emailFromQuery, context}))
       }
 
       const email = session.sess.email
