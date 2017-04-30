@@ -71,30 +71,29 @@ exports.configure = ({
   // authenticate a token sent by email
   server.get('/auth/email/signin/:token?', async (req, res) => {
     const {FRONTEND_BASE_URL} = process.env
-    console.log(req.query)
-    const {email, context} = req.query
+    const {emailFromQuery, context} = req.query
     //old links may still contain the token as param
     const token = req.query.token || req.params.token
 
     if(!token) {
-      logger.error('auth: no token', { req: req._log() })
-      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
-        + querystring.stringify({email, context}))
+      logger.error('auth: no token', { req: req._log(), emailFromQuery, context })
+      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
+        + querystring.stringify({emailFromQuery, context}))
     }
 
     try {
       // Look up session by token
       const session = await Sessions.findOne({'sess @>': {token}})
       if (!session) {
-        logger.error('auth: no session', { req: req._log(), token })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
-          + querystring.stringify({email, context}))
+        logger.error('auth: no session', { req: req._log(), token, emailFromQuery, context })
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
+          + querystring.stringify({emailFromQuery, context}))
       }
 
-      const sessionEmail = session.sess.email
-      if(sessionEmail !== email) { //tampered request
-        logger.error('auth: session.email and query email dont match', { req: req._log(), sessionEmail })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalidToken?'
+      const email = session.sess.email
+      if(emailFromQuery && email !== emailFromQuery) { //emailFromQuery might be null for old links
+        logger.error('auth: session.email and query email dont match', { req: req._log(), email, emailFromQuery, context })
+        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
           + querystring.stringify({email, context}))
       }
 
@@ -122,7 +121,7 @@ exports.configure = ({
         + querystring.stringify({email, context}))
 
     } catch(e) {
-      logger.error('auth: exception', { req: req._log(), e })
+      logger.error('auth: exception', { req: req._log(), emailFromQuery, context, e })
       return res.redirect(FRONTEND_BASE_URL+'/notifications/unavailable?'
         + querystring.stringify({email, context}))
     }
