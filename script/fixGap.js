@@ -9,7 +9,7 @@ require('dotenv').config()
 
 const PgDb = require('../lib/pgdb')
 
-const ABO_PRICE = 24000
+const ABO_PRICE = 0
 
 PgDb.connect().then( async (pgdb) => {
   //gather data
@@ -23,23 +23,23 @@ PgDb.connect().then( async (pgdb) => {
     console.error('jefferson not found')
   }
 
+  const pledge = await pgdb.public.pledges.insertAndGet({
+    packageId: package.id,
+    userId: user.id,
+    status: 'SUCCESSFUL',
+    total: ABO_PRICE,
+    donation: 0,
+    sendConfirmMail: false
+  })
+  const pledgeOption = await pgdb.public.pledgeOptions.insertAndGet({
+    templateId: packageOption.id,
+    pledgeId: pledge.id,
+    amount: 5780-5748, //32
+    price: ABO_PRICE
+  })
   let sequenceNumber
   for (sequenceNumber = 5748; sequenceNumber < 5780; sequenceNumber++) {
     if(!(await pgdb.public.memberships.findFirst({sequenceNumber}))) {
-      const pledge = await pgdb.public.pledges.insertAndGet({
-        packageId: package.id,
-        userId: user.id,
-        status: 'SUCCESSFUL',
-        total: ABO_PRICE,
-        donation: 0,
-        sendConfirmMail: false
-      })
-      const pledgeOption = await pgdb.public.pledgeOptions.insertAndGet({
-        templateId: packageOption.id,
-        pledgeId: pledge.id,
-        amount: 1,
-        price: ABO_PRICE
-      })
 
       const membership = await pgdb.public.memberships.insertAndGet({
         userId: user.id,
