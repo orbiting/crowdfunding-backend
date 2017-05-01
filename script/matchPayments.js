@@ -76,38 +76,6 @@ const parsePostfinanceExport = (path) => {
 }
 
 const writeReport = async (pgdb) => {
-  const unmatchedPF = await pgdb.public.postfinancePayments.find({
-    matched: false
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_PF.csv',
-    text: csvFormat(unmatchedPF)
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_PF.json',
-    text: JSON.stringify(unmatchedPF)
-  })
-
-  const unmatchedCash = await pgdb.public.cashPayments.find({
-    matched: false
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_CASH.csv',
-    text: csvFormat(unmatchedCash)
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_CASH.json',
-    text: JSON.stringify(unmatchedCash)
-  })
-
   let investigatePledges = await pgdb.public.pledges.find({
     status: 'PAID_INVESTIGATE'
   })
