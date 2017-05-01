@@ -3,7 +3,7 @@
 // owned by Project R Genossenschaft
 //
 // usage
-// cf_server   node script/importMembers.js
+// cf_server   node script/fixGap.js
 //
 require('dotenv').config()
 

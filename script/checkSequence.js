@@ -1,14 +1,8 @@
 //
-// This script imports postfinance exports and our cash record exports
-// check the examples folder to see the supported formats.
-// Reports about unmatched payments, pledges in need for investigation
-// and overdue payments are written to scripts/exports/
+// This script checks if the sequenceNumber of memeberships are gapless
 //
-// usage Postfinance
-// cf_server  cat script/examples/export_pf.csv | node script/matchPayments.js pf
-//
-// usage Cash
-// cf_server  cat script/examples/export_cash.csv | node script/matchPayments.js cash
+// usage
+// cf_server  node script/checkSequence.js
 
 
 const PgDb = require('../lib/pgdb')
