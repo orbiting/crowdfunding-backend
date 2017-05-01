@@ -253,7 +253,7 @@ PgDb.connect().then( async (pgdb) => {
         }
 
         if(newStatus === 'SUCCESSFUL') {
-          //await sendPaymentSuccessful(pledge.id, transaction, t)
+          await sendPaymentSuccessful(pledge.id, transaction, t)
           numPaymentsSuccessful += 1
         }
 
