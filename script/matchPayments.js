@@ -9,6 +9,10 @@
 //
 // usage Cash
 // cf_server  cat script/examples/export_cash.csv | node script/matchPayments.js cash
+//
+// if you just want to rematch payments from postfinancePayments/cashPayments
+// without reading new ones, provide no-input as the second argument
+// cf_server  node script/matchPayments.js pf no-input
 
 require('dotenv').config()
 
@@ -164,26 +168,39 @@ PgDb.connect().then( async (pgdb) => {
   }
   const PF = MODE === 'pf'
 
-  let input
+
   let tName
   if(PF) {
-    input = parsePostfinanceExport('/dev/stdin')
     tName = 'postfinancePayments'
   }
   else {
-    input = parseCashExport('/dev/stdin')
     tName = 'cashPayments'
   }
-  const paymentsInput = input
   const tableName = tName
   console.log(`importing new ${tableName}...`)
 
-  //insert into db
-  //this is done outside of transaction because it's
-  //ment to throw on duplicate rows and doesn't change other records
-  const numPaymentsBefore = await insertPayments(paymentsInput, tableName, pgdb)
-  const numPaymentsAfter = await pgdb.public[tableName].count()
-  console.log(`${numPaymentsAfter-numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
+
+  if(process.argv[3] === 'no-input') {
+    console.log('not reading from input!')
+  } else {
+    console.log('reading from /dev/stdin')
+    let input
+    if(PF) {
+      input = parsePostfinanceExport('/dev/stdin')
+    }
+    else {
+      input = parseCashExport('/dev/stdin')
+    }
+    const paymentsInput = input
+
+    //insert into db
+    //this is done outside of transaction because it's
+    //ment to throw on duplicate rows and doesn't change other records
+    const numPaymentsBefore = await insertPayments(paymentsInput, tableName, pgdb)
+    const numPaymentsAfter = await pgdb.public[tableName].count()
+    console.log(`${numPaymentsAfter-numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
+  }
+
 
   const transaction = await pgdb.transactionBegin()
   try {
