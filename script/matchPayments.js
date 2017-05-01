@@ -10,11 +10,12 @@
 // usage Cash
 // cf_server  cat script/examples/export_cash.csv | node script/matchPayments.js cash
 
+require('dotenv').config()
 
 const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
-const csvParse = dsvFormat(';').parse
+const csvParse = dsvFormat(',').parse
 const csvFormat = dsvFormat(';').format
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
@@ -23,8 +24,6 @@ const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
 const sendMail = require('../lib/sendMail')
 
 const t = getFormatter(MESSAGES)
-
-require('dotenv').config()
 
 const LOG_FAILED_INSERTS = false
 
@@ -36,7 +35,6 @@ const parseCashExport = (path) => {
 
 const parsePostfinanceExport = (path) => {
   //sanitize input
-  //trash first 4 lines as they contain another table with (Buchungsart, Konto, etc)
   //trash rows without gutschrift (such as lastschrift and footer)
   //keys to lower case
   //trash uninteresting columns
@@ -46,7 +44,7 @@ const parsePostfinanceExport = (path) => {
   const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
   const parseDate = ['Buchungsdatum', 'Valuta']
   const parseAmount = ['Gutschrift']
-  return csvParse( inputFile.split('\n').slice(4).join('\n') )
+  return csvParse( inputFile )
     .filter( row => row.Gutschrift )
     .map( row => {
       let newRow = {}
