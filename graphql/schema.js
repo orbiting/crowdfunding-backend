@@ -22,6 +22,8 @@ type RootQuery {
   events: [Event!]!
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
+
+  membershipsByInterval(interval: TimeInterval!): [TimeSeries!]!
 }
 
 type RootMutation {
@@ -293,6 +295,18 @@ type Video {
   mp4: String!
   youtube: String
   subtitles: String
+}
+
+
+enum TimeInterval {
+  hour
+  minute
+  day
+}
+
+type TimeSeries {
+  datetime: DateTime!
+  value: Int
 }
 `
 module.exports = [typeDefinitions]
