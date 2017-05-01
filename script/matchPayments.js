@@ -61,7 +61,7 @@ const parsePostfinanceExport = (path) => {
           else {
             if(key==='Avisierungstext') {
               try {
-                newRow['mitteilung'] = /.*?MITTEILUNGEN:\s(.*?)(\s|$)/g.exec(value)[1]
+                newRow['mitteilung'] = /.*?MITTEILUNGEN:.*?\s([A-Za-z0-9]{6})(\s.*?|$)/g.exec(value)[1]
               } catch(e) {
                 console.log("Cloud not extract mitteilung from row:")
                 console.log(row)
