@@ -1,8 +1,9 @@
 //
 // This script exports open payments which needs to be send by postal service
+// if the param 'dry' is added, printed payments are not marked as exported.
 //
 // usage
-// cf_server  node script/printPayments.js > script/exports/printPayments.csv
+// cf_server  node script/printPayments.js > script/exports/printPayments.csv [dry]
 //
 
 
@@ -25,6 +26,11 @@ formatPrice = (price) => price/100
 PgDb.connect().then( async (pgdb) => {
   //console.log('starting export...')
 
+  const DRY_MODE = process.argv[2] === 'dry'
+  if(DRY_MODE) {
+    console.log("RUN IN DRY MODE!!!")
+  }
+
   //console.log('reading data...')
   const payments = await pgdb.public.payments.find({
     paperInvoice: 'true',
@@ -41,6 +47,8 @@ PgDb.connect().then( async (pgdb) => {
 
   let users = await pgdb.public.users.find({id: pledges.map( p => p.userId )})
   const addresses = await pgdb.public.addresses.find({id: users.map( p => p.addressId )})
+
+  const memberships = await pgdb.public.memberships.find({pledgeId: pledges.map( p => p.id )})
   //console.log('data ready. assembling...')
 
   //assemble tree
@@ -81,6 +89,10 @@ PgDb.connect().then( async (pgdb) => {
         template: packageOption
       })
     })
+    const sequenceNumbers = memberships
+      .filter( m => m.pledgeId === pledge.id )
+      .map( m => m.sequenceNumber)
+      .join(' ')
 
     let spendeCountedAsPledgeOption = false
     const produkte = _pledgeOptions.map( pledgeOption => {
@@ -94,6 +106,8 @@ PgDb.connect().then( async (pgdb) => {
             preis: formatPrice(pledgeOption.price)
           }
         } else {// if(pledgeOption.template.reward.goodie) {
+          if(pledgeOption.amount === 0) //omit 0 Notizbuch
+            return null
           return {
             anzahl: pledgeOption.amount,
             beschrieb: t('option/NOTEBOOK/label/1'),
@@ -109,7 +123,7 @@ PgDb.connect().then( async (pgdb) => {
           preis: formatPrice(pledge.total)
         }
       }
-    })
+    }).filter( p => p !== null ) //filter emptys
     if(pledge.donation > 0 && !spendeCountedAsPledgeOption) {
       produkte.push({
         anzahl: '1',
@@ -140,14 +154,18 @@ PgDb.connect().then( async (pgdb) => {
       'DatumTimestamp':    dateTimeFormat(payment.createdAt),
       'Payment ID':        payment.id.substring(0, 13),
       'HRID':              payment.hrid,
+      'UserId':            user.id.substring(0, 13),
       'Vorname':           user.firstName,
       'Nachname':          user.lastName,
+      'email':             user.email,
+      'Tel':               user.phoneNumber,
       'Anschrift':         user.address.name,
       'Adresse1':          user.address.line1,
       'Adresse2':          user.address.line2,
       'PLZ':               user.address.postalCode,
       'Ort':               user.address.city,
       'Land':              user.address.country,
+      'Abo#':              sequenceNumbers,
       'BetragTotal':       formatPrice(payment.total),
       'Produkt1Anzahl':    produkte[0].anzahl,
       'Produkt1Beschrieb': produkte[0].beschrieb,
@@ -161,9 +179,11 @@ PgDb.connect().then( async (pgdb) => {
     }
   })
 
-  await pgdb.public.payments.update({id: payments.map( p => p.id )}, {
-    exported: true
-  })
+  if(!DRY_MODE) {
+    await pgdb.public.payments.update({id: payments.map( p => p.id )}, {
+      exported: true
+    })
+  }
 
   //console.log('writing file...')
   rw.writeFileSync('/dev/stdout', csvFormat(exportData), 'utf8')
