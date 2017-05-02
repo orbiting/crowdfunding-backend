@@ -158,6 +158,7 @@ PgDb.connect().then( async (pgdb) => {
       'Vorname':           user.firstName,
       'Nachname':          user.lastName,
       'email':             user.email,
+      'verified':          user.verified,
       'Tel':               user.phoneNumber,
       'Anschrift':         user.address.name,
       'Adresse1':          user.address.line1,
