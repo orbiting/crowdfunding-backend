@@ -9,12 +9,17 @@
 //
 // usage Cash
 // cf_server  cat script/examples/export_cash.csv | node script/matchPayments.js cash
+//
+// if you just want to rematch payments from postfinancePayments/cashPayments
+// without reading new ones, provide no-input as the second argument
+// cf_server  node script/matchPayments.js pf no-input
 
+require('dotenv').config()
 
 const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
-const csvParse = dsvFormat(';').parse
+const csvParse = dsvFormat(',').parse
 const csvFormat = dsvFormat(';').format
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
@@ -23,8 +28,6 @@ const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
 const sendMail = require('../lib/sendMail')
 
 const t = getFormatter(MESSAGES)
-
-require('dotenv').config()
 
 const LOG_FAILED_INSERTS = false
 
@@ -36,7 +39,6 @@ const parseCashExport = (path) => {
 
 const parsePostfinanceExport = (path) => {
   //sanitize input
-  //trash first 4 lines as they contain another table with (Buchungsart, Konto, etc)
   //trash rows without gutschrift (such as lastschrift and footer)
   //keys to lower case
   //trash uninteresting columns
@@ -46,7 +48,7 @@ const parsePostfinanceExport = (path) => {
   const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
   const parseDate = ['Buchungsdatum', 'Valuta']
   const parseAmount = ['Gutschrift']
-  return csvParse( inputFile.split('\n').slice(4).join('\n') )
+  return csvParse( inputFile )
     .filter( row => row.Gutschrift )
     .map( row => {
       let newRow = {}
@@ -63,7 +65,7 @@ const parsePostfinanceExport = (path) => {
           else {
             if(key==='Avisierungstext') {
               try {
-                newRow['mitteilung'] = /.*?MITTEILUNGEN:\s(.*?)(\s|$)/g.exec(value)[1]
+                newRow['mitteilung'] = /.*?MITTEILUNGEN:.*?\s([A-Za-z0-9]{6})(\s.*?|$)/g.exec(value)[1]
               } catch(e) {
                 console.log("Cloud not extract mitteilung from row:")
                 console.log(row)
@@ -78,38 +80,6 @@ const parsePostfinanceExport = (path) => {
 }
 
 const writeReport = async (pgdb) => {
-  const unmatchedPF = await pgdb.public.postfinancePayments.find({
-    matched: false
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_PF.csv',
-    text: csvFormat(unmatchedPF)
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_PF.json',
-    text: JSON.stringify(unmatchedPF)
-  })
-
-  const unmatchedCash = await pgdb.public.cashPayments.find({
-    matched: false
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_CASH.csv',
-    text: csvFormat(unmatchedCash)
-  })
-  sendMail({
-    to: 'admin@project-r.construction',
-    from: 'admin@project-r.construction',
-    subject: 'unmatched_CASH.json',
-    text: JSON.stringify(unmatchedCash)
-  })
-
   let investigatePledges = await pgdb.public.pledges.find({
     status: 'PAID_INVESTIGATE'
   })
@@ -198,26 +168,39 @@ PgDb.connect().then( async (pgdb) => {
   }
   const PF = MODE === 'pf'
 
-  let input
+
   let tName
   if(PF) {
-    input = parsePostfinanceExport('/dev/stdin')
     tName = 'postfinancePayments'
   }
   else {
-    input = parseCashExport('/dev/stdin')
     tName = 'cashPayments'
   }
-  const paymentsInput = input
   const tableName = tName
   console.log(`importing new ${tableName}...`)
 
-  //insert into db
-  //this is done outside of transaction because it's
-  //ment to throw on duplicate rows and doesn't change other records
-  const numPaymentsBefore = await insertPayments(paymentsInput, tableName, pgdb)
-  const numPaymentsAfter = await pgdb.public[tableName].count()
-  console.log(`${numPaymentsAfter-numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
+
+  if(process.argv[3] === 'no-input') {
+    console.log('not reading from input!')
+  } else {
+    console.log('reading from /dev/stdin')
+    let input
+    if(PF) {
+      input = parsePostfinanceExport('/dev/stdin')
+    }
+    else {
+      input = parseCashExport('/dev/stdin')
+    }
+    const paymentsInput = input
+
+    //insert into db
+    //this is done outside of transaction because it's
+    //ment to throw on duplicate rows and doesn't change other records
+    const numPaymentsBefore = await insertPayments(paymentsInput, tableName, pgdb)
+    const numPaymentsAfter = await pgdb.public[tableName].count()
+    console.log(`${numPaymentsAfter-numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
+  }
+
 
   const transaction = await pgdb.transactionBegin()
   try {
