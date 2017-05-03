@@ -37,7 +37,7 @@ PgDb.connect().then( async (pgdb) => {
         lastName:  users.map( u => u.lastName ).filter(Boolean)[0],
         birthday: users.map( u => u.birthday ).filter(Boolean)[0],
         addressId: users.map( u => u.addressId ).filter(Boolean)[0]
-      })
+      }, {skipUndefined: true})
 
       console.log('updated infos:--------------------------------')
       console.log(newUser)
