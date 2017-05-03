@@ -24,14 +24,8 @@ PgDb.connect().then( async (pgdb) => {
     console.log(`cleaning up ${emails.length} users`)
 
     for(let email of emails) {
-      const users = await transaction.query(`SELECT * FROM users WHERE email ILIKE :email`, {email})
-      let electedUser
-      for(let userCandidate of users) {
-        if(userCandidate.email.toLowerCase() === userCandidate.email)
-          electedUser = userCandidate
-      }
-      if(!electedUser)
-        electedUser = users[0]
+      const users = await transaction.query(`SELECT * FROM users WHERE LOWER(email) = :email ORDER BY "createdAt" DESC`, {email: email.toLowerCase()})
+      const electedUser = users[0]
 
       console.log('electedUser:---------------------------------')
       console.log(electedUser)
@@ -46,30 +40,31 @@ PgDb.connect().then( async (pgdb) => {
         if(!addressId && u.addressId)
           addressId = u.addressId
       })
-      electedUser = await transaction.public.users.updateAndGetOne({id: electedUser.id}, {
+      const newUser = await transaction.public.users.updateAndGetOne({id: electedUser.id}, {
         firstName: electedUser.firstName || users.find( u => u.firstName ).firstName || "",
         lastName: electedUser.lastName || users.find( u => u.lastName ).lastName || "",
+        email: electedUser.email.toLowerCase(),
         birthday: birthday,
         addressId: addressId
       })
 
       console.log('updated infos:--------------------------------')
-      console.log(electedUser)
+      console.log(newUser)
 
-      const userIds = users.filter( u => u.id !== electedUser.id).map( u => u.id )
+      const userIds = users.filter( u => u.id !== newUser.id).map( u => u.id )
 
       //transfer belongings
       const paymentSources = await transaction.public.paymentSources.updateAndGet({userId: userIds}, {
-        userId: electedUser.id
+        userId: newUser.id
       })
       const pledges = await transaction.public.pledges.updateAndGet({userId: userIds}, {
-        userId: electedUser.id
+        userId: newUser.id
       })
       const memberships = await transaction.public.memberships.updateAndGet({userId: userIds}, {
-        userId: electedUser.id
+        userId: newUser.id
       })
       const testimonials = await transaction.public.testimonials.updateAndGet({userId: userIds}, {
-        userId: electedUser.id
+        userId: newUser.id
       })
 
       let sessions = []
@@ -77,7 +72,7 @@ PgDb.connect().then( async (pgdb) => {
         let _sessions = await transaction.public.sessions.find({'sess @>': {passport: {user: userId}}})
         for(let session of _sessions) {
           const sess = Object.assign({}, session.sess, {
-            passport: {user: electedUser.id}
+            passport: {user: newUser.id}
           })
           sessions.push(await transaction.public.sessions.updateAndGet({sid: session.sid}, {sess}))
         }
@@ -85,7 +80,7 @@ PgDb.connect().then( async (pgdb) => {
 
 
       //remove addresses
-      const addressIds = users.filter( u => u.addressId && u.addressId !== electedUser.addressId).map( u => u.addressId )
+      const addressIds = users.filter( u => u.addressId && u.addressId !== newUser.addressId).map( u => u.addressId )
       let addresses = []
       if(addressIds.length) {
         addresses = await transaction.public.addresses.deleteAndGet({id: addressIds})
@@ -94,10 +89,6 @@ PgDb.connect().then( async (pgdb) => {
       //remove old users
       const oldUsers = await transaction.public.users.deleteAndGet({id: userIds})
 
-      //make sure email is lower case now
-      await transaction.public.users.update({id: electedUser.id}, {
-        email: electedUser.email.toLowerCase()
-      })
 
       console.log("old userIds")
       console.log(userIds)
@@ -116,7 +107,7 @@ PgDb.connect().then( async (pgdb) => {
       console.log('deleted_addresses----------------------')
       console.log(addresses)
       console.log('remaining address----------------------')
-      console.log(await transaction.public.addresses.findOne({id: electedUser.addressId}))
+      console.log(await transaction.public.addresses.findOne({id: newUser.addressId}))
       console.log('deleted users----------------------')
       console.log(oldUsers)
       console.log('----------------------------------------------------')
