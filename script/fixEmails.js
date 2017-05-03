@@ -32,19 +32,11 @@ PgDb.connect().then( async (pgdb) => {
       console.log('candidates:----------------------------------')
       console.log(users)
 
-      let birthday
-      let addressId
-      users.forEach( u => {
-        if(!birthday && u.birthday)
-          birthday = u.birthday
-        if(!addressId && u.addressId)
-          addressId = u.addressId
-      })
       const newUser = await transaction.public.users.updateAndGetOne({id: electedUser.id}, {
-        firstName: electedUser.firstName || users.find( u => u.firstName ).firstName || "",
-        lastName: electedUser.lastName || users.find( u => u.lastName ).lastName || "",
-        birthday: birthday,
-        addressId: addressId
+        firstName: users.map( u => u.firstName ).filter(Boolean)[0],
+        lastName:  users.map( u => u.lastName ).filter(Boolean)[0],
+        birthday: users.map( u => u.birthday ).filter(Boolean)[0],
+        addressId: users.map( u => u.addressId ).filter(Boolean)[0]
       })
 
       console.log('updated infos:--------------------------------')
@@ -73,7 +65,7 @@ PgDb.connect().then( async (pgdb) => {
           const sess = Object.assign({}, session.sess, {
             passport: {user: newUser.id}
           })
-          sessions.push(await transaction.public.sessions.updateAndGet({sid: session.sid}, {sess}))
+          sessions.push(await transaction.public.sessions.updateAndGetOne({sid: session.sid}, {sess}))
         }
       }
 
@@ -92,7 +84,6 @@ PgDb.connect().then( async (pgdb) => {
       await transaction.public.users.update({id: newUser.id}, {
         email: newUser.email.toLowerCase()
       })
-
 
       console.log("old userIds")
       console.log(userIds)
