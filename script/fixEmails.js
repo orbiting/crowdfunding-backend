@@ -43,7 +43,6 @@ PgDb.connect().then( async (pgdb) => {
       const newUser = await transaction.public.users.updateAndGetOne({id: electedUser.id}, {
         firstName: electedUser.firstName || users.find( u => u.firstName ).firstName || "",
         lastName: electedUser.lastName || users.find( u => u.lastName ).lastName || "",
-        email: electedUser.email.toLowerCase(),
         birthday: birthday,
         addressId: addressId
       })
@@ -88,6 +87,11 @@ PgDb.connect().then( async (pgdb) => {
 
       //remove old users
       const oldUsers = await transaction.public.users.deleteAndGet({id: userIds})
+
+      //make sure email is lower case now
+      await transaction.public.users.update({id: newUser.id}, {
+        email: newUser.email.toLowerCase()
+      })
 
 
       console.log("old userIds")
