@@ -306,9 +306,13 @@ type MembershipStats {
 
 
 enum TimeInterval {
-  hour
   minute
+  hour
   day
+  week
+  month
+  quarter
+  year
 }
 
 type TimeCount {
