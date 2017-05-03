@@ -48,7 +48,7 @@ PgDb.connect().then( (pgdb) => {
   //fetch needs explicit CORS headers otherwise, cookies are not sent
   if(process.env.CORS_WHITELIST_URL) {
     const corsOptions = {
-      origin: process.env.CORS_WHITELIST_URL,
+      origin: process.env.CORS_WHITELIST_URL.split(','),
       credentials: true,
       optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
     }
