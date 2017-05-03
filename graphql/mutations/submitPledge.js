@@ -123,15 +123,19 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       pfAliasId = uuid()
     }
 
-    //buying reduced is only ok if user doesn't have a pledge yet, except donation only
-    if(donation < 0 && !!(await transaction.public.pledges.findFirst({userId: user.id}))) {
-      const pledges = await transaction.public.pledges.find({userId: user.id})
-      const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledges.map( p => p.id )})
-      const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( p => p.templateId )})
-      const rewards = await pgdb.public.rewards.find({id: packageOptions.map( p => p.rewardId )})
-      if(rewards.length) {
-        logger.info('user tried to buy a reduced membership and already pledged before', { req: req._log(), args })
-        throw new Error(t('api/membership/reduced/alreadyHas'))
+    //buying reduced is only ok if user doesn't have a SUCCESSFUL pledge yet, except donation only
+    if(donation < 0 && !!(await transaction.public.pledges.findFirst({userId: user.id, status: 'SUCCESSFUL'}))) {
+      const pledges = await transaction.public.pledges.find({userId: user.id, status: 'SUCCESSFUL'})
+      if(pledges.length) {
+        const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledges.map( p => p.id )})
+        if(pledgeOptions.length) {
+          const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map( p => p.templateId )})
+          const rewards = await pgdb.public.rewards.find({id: packageOptions.map( p => p.rewardId )})
+          if(rewards.length) {
+            logger.info('user tried to buy a reduced membership and already pledged before', { req: req._log(), args })
+            throw new Error(t('api/membership/reduced/alreadyHas'))
+          }
+        }
       }
     }
 
