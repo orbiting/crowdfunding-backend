@@ -25,7 +25,7 @@ PgDb.connect().then( async (pgdb) => {
 
     for(let email of emails) {
       const users = await transaction.query(`SELECT * FROM users WHERE LOWER(email) = :email ORDER BY "createdAt" DESC`, {email: email.toLowerCase()})
-      const electedUser = users[0]
+      const electedUser = users[users.length-1] //oldest user for createdAt
 
       console.log('electedUser:---------------------------------')
       console.log(electedUser)
