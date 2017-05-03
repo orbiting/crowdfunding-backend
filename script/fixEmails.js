@@ -81,7 +81,7 @@ PgDb.connect().then( async (pgdb) => {
       const oldUsers = await transaction.public.users.deleteAndGet({id: userIds})
 
       //make sure email is lower case now
-      await transaction.public.users.update({id: newUser.id}, {
+      await transaction.public.users.updateOne({id: newUser.id}, {
         email: newUser.email.toLowerCase()
       })
 
