@@ -23,7 +23,7 @@ type RootQuery {
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
 
-  membershipsByInterval(interval: TimeInterval!): [TimeSeries!]!
+  membershipStats: MembershipStats!
 }
 
 type RootMutation {
@@ -298,15 +298,35 @@ type Video {
 }
 
 
+type MembershipStats {
+  createdAts(interval: TimeInterval!): [TimeCount!]!
+  ages: [AgeCount!]!
+  countries: [CountryCount!]!
+}
+
+
 enum TimeInterval {
   hour
   minute
   day
 }
 
-type TimeSeries {
+type TimeCount {
   datetime: DateTime!
-  value: Int
+  count: Int!
+}
+type AgeCount {
+  age: Int!
+  count: Int!
+}
+type CountryCount {
+  name: String!
+  count: Int!
+  postalCodes: [PostalCodeCount!]!
+}
+type PostalCodeCount {
+  postalCode: String!
+  count: Int!
 }
 `
 module.exports = [typeDefinitions]
