@@ -1,5 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+CREATE EXTENSION IF NOT EXISTS "citext";
 
 create table "addresses" (
   "id"          uuid primary key not null default uuid_generate_v4(),
@@ -15,7 +16,7 @@ create table "addresses" (
 
 create table "users" (
   "id"          uuid primary key not null default uuid_generate_v4(),
-  "email"       text not null unique,
+  "email"       citext not null unique,
   "verified"    boolean not null default false,
   "firstName"   text,
   "lastName"    text,
