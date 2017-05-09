@@ -287,6 +287,17 @@ const resolveFunctions = {
         Australia: 'Australien',
         México: 'Mexiko'
       }
+      const postalCodeParsers = {
+        Schweiz: code => parseInt(code
+          .replace(/^CH[\s-]*/i, '')
+        ).toString(),
+        Deutschland: code => code
+          .replace(/^D[\s-]*/i, '')
+          .split(' ')[0],
+        'Österreich': code => code
+          .replace(/^A[\s-]*/i, '')
+          .split(' ')[0]
+      }
       const countries = await pgdb.query(`
         SELECT
           initcap(trim(a.country)) as name,
@@ -308,12 +319,21 @@ const resolveFunctions = {
         .key(d => normalizeNames[d.name] || d.name)
         .entries(countries)
         .map(datum => {
+          let postalCodes = datum.values
+          const pcParser = postalCodeParsers[datum.key]
+          if (pcParser) {
+            postalCodes = postalCodes.map(code => ({
+              postalCode: pcParser(code.postalCode),
+              count: code.count
+            }))
+          }
+
           return {
             name: datum.key === 'null'
               ? null
               : datum.key,
-            postalCodes: datum.values,
-            count: datum.values.reduce( (acc, currentValue) => {
+            postalCodes,
+            count: datum.values.reduce((acc, currentValue) => {
               return acc + currentValue.count
             }, 0)
           }
