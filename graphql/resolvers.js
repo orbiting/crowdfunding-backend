@@ -18,7 +18,19 @@ const postalCodeData = {
     .rollup(leaves => Object.assign({}, leaves[0], {
       name: leaves.map(d => d.name).join(' / ')
     }))
-    .object(require('../assets/geography/postalCodesCH.json'))
+    .object(require('../assets/geography/postalCodes/CH.json')),
+  Deutschland: nest()
+    .key(d => d.code)
+    .rollup(leaves => Object.assign({}, leaves[0], {
+      name: leaves.map(d => d.name).join(' / ')
+    }))
+    .object(require('../assets/geography/postalCodes/DE.json')),
+  'Österreich': nest()
+    .key(d => d.code)
+    .rollup(leaves => Object.assign({}, leaves[0], {
+      name: leaves.map(d => d.name).join(' / ')
+    }))
+    .object(require('../assets/geography/postalCodes/AT.json'))
 }
 const postalCodeParsers = {
   Schweiz: code => parseInt(code
