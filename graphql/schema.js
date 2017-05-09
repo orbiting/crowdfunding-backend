@@ -330,6 +330,9 @@ type CountryCount {
 }
 type PostalCodeCount {
   postalCode: String
+  name: String
+  lat: Float!
+  lon: Float!
   count: Int!
 }
 `
