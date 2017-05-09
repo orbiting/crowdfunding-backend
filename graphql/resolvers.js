@@ -130,7 +130,49 @@ const resolveFunctions = {
           adminUnpublished: false
         })
       }
-    }
+    },
+    async paymentStats(_, args, {pgdb}) {
+      const paymentMethods = (await pgdb.query(`
+        SELECT
+          method,
+          count(*) AS count
+        FROM payments
+        GROUP BY 1
+        ORDER BY 1 DESC
+      `)).map( async (datum) => {
+        if(datum.method === 'PAYMENTSLIP') {
+          const numPaperInvoice = await pgdb.queryOneField(`
+            SELECT
+              count(*)
+            FROM payments
+            WHERE
+              method = 'PAYMENTSLIP'
+              AND "paperInvoice" = true
+          `)
+          datum.details = [
+            { detail: 'paperInvoice',
+              count: numPaperInvoice }
+          ]
+        } else if(datum.method === 'STRIPE') {
+          const num3dsecure = await pgdb.queryOneField(`
+            SELECT
+              count(*)
+            FROM payments
+            WHERE
+              method = 'STRIPE'
+              AND "pspPayload" @> '{"source": {"card": {"three_d_secure": "required"}}}'
+          `)
+          datum.details = [
+            { detail: '3dsecure',
+              count: num3dsecure }
+          ]
+        } else {
+          datum.details = []
+        }
+        return datum
+      })
+      return {paymentMethods}
+    },
   }),
 
   User: {

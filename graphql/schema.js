@@ -25,6 +25,7 @@ type RootQuery {
 
   membershipStats: MembershipStats!
   testimonialStats: TestimonialStats!
+  paymentStats: PaymentStats!
 }
 
 type RootMutation {
@@ -305,7 +306,6 @@ type MembershipStats {
   countries: [CountryCount!]!
 }
 
-
 enum TimeInterval {
   minute
   hour
@@ -339,5 +339,19 @@ type TestimonialStats {
   count: Int!
 }
 
+
+type PaymentStats {
+  paymentMethods: [PaymentMethodCount!]!
+}
+
+type PaymentMethodCount {
+  method: PaymentMethod!
+  count: Int!
+  details: [DetailCount!]!
+}
+type DetailCount {
+  detail: String
+  count: Int!
+}
 `
 module.exports = [typeDefinitions]
