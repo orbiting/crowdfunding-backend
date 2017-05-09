@@ -121,7 +121,15 @@ const resolveFunctions = {
         .sort( (a,b) => new Date(b.publishedDateTime) - new Date(a.publishedDateTime) )
     },
     async membershipStats(_, args) {
-      return {}
+      return {} //see detail resolvers below
+    },
+    async testimonialStats(_, args, {pgdb}) {
+      return {
+        count: await pgdb.public.testimonials.count({
+          published: true,
+          adminUnpublished: false
+        })
+      }
     }
   }),
 

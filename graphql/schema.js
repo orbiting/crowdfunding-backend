@@ -24,6 +24,7 @@ type RootQuery {
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
 
   membershipStats: MembershipStats!
+  testimonialStats: TestimonialStats!
 }
 
 type RootMutation {
@@ -332,5 +333,11 @@ type PostalCodeCount {
   postalCode: String
   count: Int!
 }
+
+
+type TestimonialStats {
+  count: Int!
+}
+
 `
 module.exports = [typeDefinitions]
