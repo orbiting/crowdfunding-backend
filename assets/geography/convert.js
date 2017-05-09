@@ -9,12 +9,13 @@ const input = rw.readFileSync(
 rw.writeFileSync(__dirname + '/postalCodesCH.json',
   JSON.stringify(
     require('d3-dsv')
-      .tsvParse('country\tcode\tname\tcanton\tcantonAbbr\tname2\tcode2\tname3\tcode3\tlat\tlon\n' + input)
+      .tsvParse('country\tcode\tname\tstate\tstateAbbr\tname2\tcode2\tname3\tcode3\tlat\tlon\n' + input)
       .map(d => ({
         country: d.country,
         code: d.code,
         name: d.name,
-        cantonAbbr: d.cantonAbbr,
+        state: d.state,
+        stateAbbr: d.stateAbbr,
         lat: +d.lat,
         lon: +d.lon
       })),

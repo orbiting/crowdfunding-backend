@@ -10,6 +10,28 @@ const {descending, ascending} = require('d3-array')
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
+// ToDo: Refactor to country definitions with all in one object
+const postalCodeData = {
+  // handle postalCodes with two names
+  Schweiz: nest()
+    .key(d => d.code)
+    .rollup(leaves => Object.assign({}, leaves[0], {
+      name: leaves.map(d => d.name).join(' / ')
+    }))
+    .object(require('../assets/geography/postalCodesCH.json'))
+}
+const postalCodeParsers = {
+  Schweiz: code => parseInt(code
+    .replace(/^CH[\s-]*/i, '')
+  ).toString(),
+  Deutschland: code => code
+    .replace(/^D[\s-]*/i, '')
+    .split(' ')[0],
+  'Österreich': code => code
+    .replace(/^A[\s-]*/i, '')
+    .split(' ')[0]
+}
+
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -337,17 +359,6 @@ const resolveFunctions = {
         Australia: 'Australien',
         México: 'Mexiko'
       }
-      const postalCodeParsers = {
-        Schweiz: code => parseInt(code
-          .replace(/^CH[\s-]*/i, '')
-        ).toString(),
-        Deutschland: code => code
-          .replace(/^D[\s-]*/i, '')
-          .split(' ')[0],
-        'Österreich': code => code
-          .replace(/^A[\s-]*/i, '')
-          .split(' ')[0]
-      }
       const countries = await pgdb.query(`
         SELECT
           initcap(trim(a.country)) as name,
@@ -369,20 +380,68 @@ const resolveFunctions = {
         .key(d => normalizeNames[d.name] || d.name)
         .entries(countries)
         .map(datum => {
-          let postalCodes = datum.values
+          const pcData = postalCodeData[datum.key]
           const pcParser = postalCodeParsers[datum.key]
-          if (pcParser) {
-            postalCodes = postalCodes.map(code => ({
-              postalCode: pcParser(code.postalCode),
-              count: code.count
-            }))
+          let postalCodes = []
+          let unkownCount = 0
+          if (!pcData) {
+            unkownCount = datum.values.reduce(
+              (sum, row) => row.count,
+              0
+            )
+          } else {
+            datum.values.forEach(row => {
+              const postalCode = pcParser
+                ? pcParser(row.postalCode)
+                : row.postalCode
+
+              const baseData = pcData[postalCode]
+              if (baseData) {
+                postalCodes.push({
+                  postalCode: baseData.code,
+                  name: baseData.name,
+                  lat: baseData.lat,
+                  lon: baseData.lon,
+                  count: row.count,
+                  state: baseData.state,
+                  stateAbbr: baseData.stateAbbr
+                })
+              } else {
+                unkownCount += row.count
+              }
+            })
           }
+          if (unkownCount) {
+            postalCodes.push({
+              postalCode: null,
+              name: null,
+              // ToDo: fallback to country centroid
+              lat: 46.801111,
+              lon: 8.226667,
+              count: unkownCount
+            })
+          }
+
 
           return {
             name: datum.key === 'null'
               ? null
               : datum.key,
             postalCodes,
+            states () {
+              return nest()
+                .key(d => d.stateAbbr || undefined)
+                .rollup(values => ({
+                  name: values[0].state || null,
+                  abbr: values[0].stateAbbr || null,
+                  count: values.reduce(
+                    (sum, d) => sum + d.count,
+                    0
+                  )
+                }))
+                .entries(postalCodes)
+                .map(d => d.value)
+            },
             count: datum.values.reduce((acc, currentValue) => {
               return acc + currentValue.count
             }, 0)

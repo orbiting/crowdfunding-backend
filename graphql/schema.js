@@ -327,10 +327,19 @@ type AgeCount {
 type CountryCount {
   name: String
   count: Int!
+  states: [StateCount!]!
   postalCodes: [PostalCodeCount!]!
+}
+type StateCount {
+  name: String
+  abbr: String
+  count: Int!
 }
 type PostalCodeCount {
   postalCode: String
+  name: String
+  lat: Float!
+  lon: Float!
   count: Int!
 }
 
