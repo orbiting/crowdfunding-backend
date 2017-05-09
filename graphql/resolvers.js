@@ -352,7 +352,9 @@ const resolveFunctions = {
                   name: baseData.name,
                   lat: baseData.lat,
                   lon: baseData.lon,
-                  count: row.count
+                  count: row.count,
+                  state: baseData.state,
+                  stateAbbr: baseData.stateAbbr
                 })
               } else {
                 unkownCount += row.count
@@ -376,6 +378,20 @@ const resolveFunctions = {
               ? null
               : datum.key,
             postalCodes,
+            states () {
+              return nest()
+                .key(d => d.stateAbbr || undefined)
+                .rollup(values => ({
+                  name: values[0].state || null,
+                  abbr: values[0].stateAbbr || null,
+                  count: values.reduce(
+                    (sum, d) => sum + d.count,
+                    0
+                  )
+                }))
+                .entries(postalCodes)
+                .map(d => d.value)
+            },
             count: datum.values.reduce((acc, currentValue) => {
               return acc + currentValue.count
             }, 0)
