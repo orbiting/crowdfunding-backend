@@ -320,16 +320,16 @@ type TimeCount {
   count: Int!
 }
 type AgeCount {
-  age: Int!
+  age: Int
   count: Int!
 }
 type CountryCount {
-  name: String!
+  name: String
   count: Int!
   postalCodes: [PostalCodeCount!]!
 }
 type PostalCodeCount {
-  postalCode: String!
+  postalCode: String
   count: Int!
 }
 `

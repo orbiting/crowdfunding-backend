@@ -5,6 +5,7 @@ const mutations = require('./mutations/index')
 const queries = require('./queries/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
 const nest = require('d3-collection').nest
+const {descending, ascending} = require('d3-array')
 
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
@@ -259,46 +260,68 @@ const resolveFunctions = {
       return pgdb.query(`
         SELECT
           extract(year from age(birthday)) AS age,
-          count(*) AS count
+          count(distinct u.id) AS count
         FROM users u
         JOIN
           memberships m
           ON m."userId" = u.id
-        WHERE
-          birthday IS NOT NULL
         GROUP BY 1
         ORDER BY 1
       `)
     },
-    async countries(_, args, {pgdb}) {
+    async countries(_, {maxCreatedAt}, {pgdb}) {
+      const normalizeNames = {
+        Switzerland: 'Schweiz',
+        Ch: 'Schweiz',
+        Suisse: 'Schweiz',
+        Brd: 'Deutschland',
+        D: 'Deutschland',
+        Uk: 'United Kingdom',
+        'España / Cádiz': 'Spanien',
+        Italia: 'Italien',
+        Daenemark: 'Dänemark',
+        'Die Niederlande': 'Niederlande',
+        France: 'Frankreich',
+        Greece: 'Griechenland',
+        Norway: 'Norwegen',
+        Australia: 'Australien',
+        México: 'Mexiko'
+      }
       const countries = await pgdb.query(`
         SELECT
-          a.country as name,
-          a."postalCode" as "postalCode",
-          count(*) AS count
+          initcap(trim(a.country)) as name,
+          trim(a."postalCode") as "postalCode",
+          count(distinct u.id) AS count
         FROM memberships m
         JOIN users u
           ON m."userId" = u.id
-        JOIN addresses a
+        LEFT JOIN addresses a
           ON u."addressId" = a.id
         GROUP BY a."postalCode", a.country
+        ORDER BY count DESC
       `)
       // Schweiz         | 8165         |     4
       // Deutschland     | 24119        |     7
       // Schweiz         | 8932         |     7
       // Schweiz         | 1202         |     3
       const countriesWithPostalCodes = nest()
-        .key( d => d.name )
+        .key(d => normalizeNames[d.name] || d.name)
         .entries(countries)
-        .map( datum => {
+        .map(datum => {
           return {
-            name: datum.key,
+            name: datum.key === 'null'
+              ? null
+              : datum.key,
             postalCodes: datum.values,
             count: datum.values.reduce( (acc, currentValue) => {
               return acc + currentValue.count
             }, 0)
           }
         })
+        .sort((a, b) => (
+          descending(a.count, b.count) ||
+          ascending(a.name, b.name)
+        ))
       return countriesWithPostalCodes
     }
   },
