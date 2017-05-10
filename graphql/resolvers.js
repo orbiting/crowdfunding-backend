@@ -10,47 +10,10 @@ const {descending, ascending} = require('d3-array')
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
-const countriesWithNames = require('../assets/geography/countries/countriesWithNames.json')
-
-const normalizeCountryName = (name) => {
-  const country = countriesWithNames.find( country => {
-    return country.searchNames.indexOf(name) > -1
-  })
-  return country ? country.name : null
-}
-// ToDo: Refactor to country definitions with all in one object
-const postalCodeData = {
-  // handle postalCodes with two names
-  Schweiz: nest()
-    .key(d => d.code)
-    .rollup(leaves => Object.assign({}, leaves[0], {
-      name: leaves.map(d => d.name).join(' / ')
-    }))
-    .object(require('../assets/geography/postalCodes/CH.json')),
-  Deutschland: nest()
-    .key(d => d.code)
-    .rollup(leaves => Object.assign({}, leaves[0], {
-      name: leaves.map(d => d.name).join(' / ')
-    }))
-    .object(require('../assets/geography/postalCodes/DE.json')),
-  'Österreich': nest()
-    .key(d => d.code)
-    .rollup(leaves => Object.assign({}, leaves[0], {
-      name: leaves.map(d => d.name).join(' / ')
-    }))
-    .object(require('../assets/geography/postalCodes/AT.json'))
-}
-const postalCodeParsers = {
-  Schweiz: code => parseInt(code
-    .replace(/^CH[\s-]*/i, '')
-  ).toString(),
-  Deutschland: code => code
-    .replace(/^D[\s-]*/i, '')
-    .split(' ')[0],
-  'Österreich': code => code
-    .replace(/^A[\s-]*/i, '')
-    .split(' ')[0]
-}
+const postalCodeData = require('../lib/geo/postalCode').data
+const postalCodeParsers = require('../lib/geo/postalCode').parsers
+const countryNameNormalizer = require('../lib/geo/country').nameNormalizer
+const countryDetailsForName = require('../lib/geo/country').detailsForName
 
 const resolveFunctions = {
   Date: new GraphQLScalarType({
@@ -380,7 +343,7 @@ const resolveFunctions = {
       // Schweiz         | 8932         |     7
       // Schweiz         | 1202         |     3
       const countriesWithPostalCodes = nest()
-        .key(d => normalizeCountryName(d.name) || d.name)
+        .key(d => countryNameNormalizer(d.name) || d.name)
         .entries(countries)
         .map(datum => {
           // { key: 'Frankreich',
@@ -390,9 +353,7 @@ const resolveFunctions = {
           //      anonymous { name: 'France', postalCode: '74350', count: 1 } ] }
           const pcData = postalCodeData[datum.key]
           const pcParser = postalCodeParsers[datum.key]
-          const country = countriesWithNames.find( country =>
-            country.name === datum.name
-          )
+          const country = countryDetailsForName(datum.key)
           let postalCodes = []
           let unkownCount = 0
           if (!pcData) {
