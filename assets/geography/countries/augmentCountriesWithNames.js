@@ -52,14 +52,20 @@ Promise.resolve().then( async () => {
           if(geonameIds.indexOf(geonameId) > -1) {
             let country = countries.find( c => c.geonameId === geonameId )
             if(row.isoLaguage === 'de') {
-              country.name = row.alternateName
+              country.name = row.alternateName.replace(/ß/g, 'ss') //de-CH
             }
-            if(
-              (row.isoLaguage === 'de' ||
-               row.isoLaguage === 'en' ||
-               country.languages.indexOf(row.isoLaguage) > -1) &&
-              country.searchNames.indexOf(row.alternateName) === -1) {
+            if( (row.isoLaguage === 'de' ||
+                 row.isoLaguage === 'en' ||
+                 country.languages.indexOf(row.isoLaguage) > -1) &&
+                country.searchNames.indexOf(row.alternateName) === -1
+            ) {
               country.searchNames.push(row.alternateName)
+              if(row.alternateName.indexOf('ß') > -1) {
+                const deCHName = row.alternateName.replace(/ß/g, 'ss')
+                if(country.searchNames.indexOf(deCHName) === -1) {
+                  country.searchNames.push(deCHName)
+                }
+              }
             }
           }
         }

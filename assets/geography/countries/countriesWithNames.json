@@ -448,6 +448,7 @@
       "Беларусь",
       "Belarus",
       "Weißrussland",
+      "Weissrussland",
       "Белоруссия",
       "Republic of Belarus",
       "Respublika Belarus’",
@@ -1044,7 +1045,7 @@
   },
   {
     "code": "GB",
-    "name": "Großbritannien und Nordirland",
+    "name": "Grossbritannien und Nordirland",
     "searchNames": [
       "Great Britain",
       "Britain",
@@ -1052,10 +1053,12 @@
       "Vereinigtes Königreich",
       "United Kingdom",
       "Großbritannien",
+      "Grossbritannien",
       "Y Deyrnas Unedig",
       "An Rìoghachd Aonaichte",
       "UK",
       "Großbritannien und Nordirland",
+      "Grossbritannien und Nordirland",
       "U.K.",
       "United Kingdom of Great Britain and Northern Ireland",
       "Uk"
@@ -1839,7 +1842,7 @@
   },
   {
     "code": "LU",
-    "name": "Großherzogtum Luxemburg",
+    "name": "Grossherzogtum Luxemburg",
     "searchNames": [
       "Grand-Duché de Luxembourg",
       "Luxemburg",
@@ -1847,7 +1850,8 @@
       "Lëtzebuerg",
       "Grand Duchy of Luxembourg",
       "Groussherzogtum Lëtzebuerg",
-      "Großherzogtum Luxemburg"
+      "Großherzogtum Luxemburg",
+      "Grossherzogtum Luxemburg"
     ],
     "lat": "49.61167",
     "lon": "6.13"
