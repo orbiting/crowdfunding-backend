@@ -37,6 +37,11 @@ Promise.resolve().then( async () => {
   let countries = require('./countries.json')
   const geonameIds = countries.map( c => c.geonameId )
 
+  const manualNames = [
+    { code: 'MM',
+      name: 'Burma (Myanmar)' },
+  ]
+
   await new Promise( (resolve, reject) => {
     const s = fs.createReadStream(__dirname+'/alternateNames.txt')
       .pipe(es.split())
@@ -52,7 +57,11 @@ Promise.resolve().then( async () => {
           if(geonameIds.indexOf(geonameId) > -1) {
             let country = countries.find( c => c.geonameId === geonameId )
             if(row.isoLaguage === 'de') {
-              country.name = row.alternateName.replace(/ß/g, 'ss') //de-CH
+              const manualName = manualNames.find( name => name.code === country.code)
+              if(manualName)
+                country.name = manualName.name
+              else
+                country.name = row.alternateName.replace(/ß/g, 'ss') //de-CH
             }
             if( (row.isoLaguage === 'de' ||
                  row.isoLaguage === 'en' ||
@@ -78,7 +87,7 @@ Promise.resolve().then( async () => {
     })
   })
 
-  const manualNames = [
+  const manualSearchNames = [
     { code: 'CH',
       searchNames: ['Ch'] },
     { code: 'DE',
@@ -93,7 +102,7 @@ Promise.resolve().then( async () => {
       searchNames: ['Die Niederlande'] }
   ]
   countries = countries.map( country => {
-    const manualName = manualNames.find( name => name.code === country.code )
+    const manualName = manualSearchNames.find( name => name.code === country.code )
     const searchNames = manualName
       ? country.searchNames.concat(manualName.searchNames)
       : country.searchNames
