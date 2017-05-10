@@ -10,6 +10,14 @@ const {descending, ascending} = require('d3-array')
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
+const countriesWithNames = require('../assets/geography/countries/countriesWithNames.json')
+
+const normalizeCountryName = (name) => {
+  const country = countriesWithNames.find( country => {
+    return country.searchNames.indexOf(name) > -1
+  })
+  return country ? country.name : null
+}
 // ToDo: Refactor to country definitions with all in one object
 const postalCodeData = {
   // handle postalCodes with two names
@@ -354,23 +362,6 @@ const resolveFunctions = {
       `)
     },
     async countries(_, {maxCreatedAt}, {pgdb}) {
-      const normalizeNames = {
-        Switzerland: 'Schweiz',
-        Ch: 'Schweiz',
-        Suisse: 'Schweiz',
-        Brd: 'Deutschland',
-        D: 'Deutschland',
-        Uk: 'United Kingdom',
-        'España / Cádiz': 'Spanien',
-        Italia: 'Italien',
-        Daenemark: 'Dänemark',
-        'Die Niederlande': 'Niederlande',
-        France: 'Frankreich',
-        Greece: 'Griechenland',
-        Norway: 'Norwegen',
-        Australia: 'Australien',
-        México: 'Mexiko'
-      }
       const countries = await pgdb.query(`
         SELECT
           initcap(trim(a.country)) as name,
@@ -389,7 +380,7 @@ const resolveFunctions = {
       // Schweiz         | 8932         |     7
       // Schweiz         | 1202         |     3
       const countriesWithPostalCodes = nest()
-        .key(d => normalizeNames[d.name] || d.name)
+        .key(d => normalizeCountryName(d.name) || d.name)
         .entries(countries)
         .map(datum => {
           const pcData = postalCodeData[datum.key]
