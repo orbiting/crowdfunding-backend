@@ -413,6 +413,19 @@ const resolveFunctions = {
                 unkownCount += row.count
               }
             })
+
+            if (pcParser) {
+              postalCodes = nest()
+                .key(d => d.postalCode)
+                .rollup(values => Object.assign({}, values[0], {
+                  count: values.reduce(
+                    (sum, d) => sum + d.count,
+                    0
+                  )
+                }))
+                .entries(postalCodes)
+                .map(d => d.value)
+            }
           }
           if (unkownCount) {
             postalCodes.push({
