@@ -383,8 +383,16 @@ const resolveFunctions = {
         .key(d => normalizeCountryName(d.name) || d.name)
         .entries(countries)
         .map(datum => {
+          // { key: 'Frankreich',
+          //   values:
+          //    [ anonymous { name: 'Frankreich', postalCode: '92100', count: 1 },
+          //      anonymous { name: 'Frankreich', postalCode: '32450', count: 1 },
+          //      anonymous { name: 'France', postalCode: '74350', count: 1 } ] }
           const pcData = postalCodeData[datum.key]
           const pcParser = postalCodeParsers[datum.key]
+          const country = countriesWithNames.find( country =>
+            country.name === datum.name
+          )
           let postalCodes = []
           let unkownCount = 0
           if (!pcData) {
@@ -428,12 +436,14 @@ const resolveFunctions = {
             }
           }
           if (unkownCount) {
+            const {lat, lon} = country
+              ? {lat: country.lat, lon: country.lon}
+              : {lat: 47.00016, lon: 8.01427}
             postalCodes.push({
               postalCode: null,
               name: null,
-              // ToDo: fallback to country centroid
-              lat: 46.801111,
-              lon: 8.226667,
+              lat,
+              lon,
               count: unkownCount
             })
           }
