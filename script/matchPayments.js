@@ -19,7 +19,7 @@ require('dotenv').config()
 const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
-const csvParse = dsvFormat(',').parse
+const csvParse = dsvFormat(';').parse
 const csvFormat = dsvFormat(';').format
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
@@ -39,7 +39,6 @@ const parseCashExport = (path) => {
 
 const parsePostfinanceExport = (path) => {
   //sanitize input
-  //trash rows without gutschrift (such as lastschrift and footer)
   //keys to lower case
   //trash uninteresting columns
   //parse columns
@@ -49,7 +48,10 @@ const parsePostfinanceExport = (path) => {
   const parseDate = ['Buchungsdatum', 'Valuta']
   const parseAmount = ['Gutschrift']
   return csvParse( inputFile )
-    .filter( row => row.Gutschrift )
+    .filter( row => row.Gutschrift ) //trash rows without gutschrift (such as lastschrift and footer)
+    .filter( row => !/^EINZAHLUNGSSCHEIN/g.exec(row.Avisierungstext) ) //trash useless EINZAHLUNGSSCHEIN
+    .filter( row => !/^GUTSCHRIFT E-PAYMENT TRANSAKTION POSTFINANCE CARD/g.exec(row.Avisierungstext) ) //trash PF CARD
+    .filter( row => !/^GUTSCHRIFT VON FREMDBANK (.*?) AUFTRAGGEBER: STRIPE/g.exec(row.Avisierungstext) ) //trash stripe payments
     .map( row => {
       let newRow = {}
       Object.keys(row).forEach( key => {
@@ -67,8 +69,8 @@ const parsePostfinanceExport = (path) => {
               try {
                 newRow['mitteilung'] = /.*?MITTEILUNGEN:.*?\s([A-Za-z0-9]{6})(\s.*?|$)/g.exec(value)[1]
               } catch(e) {
-                console.log("Cloud not extract mitteilung from row:")
-                console.log(row)
+                //console.log("Cloud not extract mitteilung from row:")
+                //console.log(row)
               }
             }
             newRow[newKey] = value
@@ -123,6 +125,7 @@ const writeReport = async (pgdb) => {
       payment.pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
     })
   }
+  /*
   sendMail({
     to: 'admin@project-r.construction',
     from: 'admin@project-r.construction',
@@ -135,15 +138,29 @@ const writeReport = async (pgdb) => {
     subject: 'overdue_payments.json',
     text: JSON.stringify(overduePayments)
   })
+  */
+  const unmatchedPayments = await pgdb.public.postfinancePayments.find({
+    matched: false
+  })
+  console.log("-------------------")
+  console.log("investigatePledges")
+  console.log(JSON.stringify(investigatePledges))
+  console.log("-------------------")
+  console.log("overduePayments")
+  console.log(JSON.stringify(overduePayments))
+  console.log("-------------------")
+  console.log("unmatchedPayments")
+  console.log(JSON.stringify(unmatchedPayments))
 }
 
 const insertPayments = async (paymentsInput, tableName, pgdb) => {
   const numPaymentsBefore = await pgdb.public[tableName].count()
+  let numFailed = 0
   await Promise.all(
     paymentsInput.map( payment => {
       return pgdb.public[tableName].insert(payment)
         .then( v => { return {payment, status: "resolved"} })
-        .catch( e => { return {payment, e, status: "rejected"} })
+        .catch( e => { numFailed+=1; return {payment, e, status: "rejected"} })
     })
   ).then( results => {
     if(LOG_FAILED_INSERTS) {
@@ -156,6 +173,7 @@ const insertPayments = async (paymentsInput, tableName, pgdb) => {
       })
     }
   })
+  console.log(`Failed to insert ${numFailed} payments.`)
   return numPaymentsBefore
 }
 
