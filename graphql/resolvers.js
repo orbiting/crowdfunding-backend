@@ -10,7 +10,7 @@ const {descending, ascending} = require('d3-array')
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
-const postalCodeData = require('../lib/geo/postalCode').data
+const {hasPostalCodesForCountry, postalCodeData} = require('../lib/geo/postalCode')
 const postalCodeParsers = require('../lib/geo/postalCode').parsers
 const countryNameNormalizer = require('../lib/geo/country').nameNormalizer
 const countryDetailsForName = require('../lib/geo/country').detailsForName
@@ -351,12 +351,14 @@ const resolveFunctions = {
           //    [ anonymous { name: 'Frankreich', postalCode: '92100', count: 1 },
           //      anonymous { name: 'Frankreich', postalCode: '32450', count: 1 },
           //      anonymous { name: 'France', postalCode: '74350', count: 1 } ] }
-          const pcData = postalCodeData[datum.key]
-          const pcParser = postalCodeParsers[datum.key]
           const country = countryDetailsForName(datum.key)
+          const hasPostalCodes = country
+            ? hasPostalCodesForCountry(country.code)
+            : false
+          const pcParser = postalCodeParsers[datum.key]
           let postalCodes = []
           let unkownCount = 0
-          if (!pcData) {
+          if (!hasPostalCodes) {
             unkownCount = datum.values.reduce(
               (sum, row) => row.count,
               0
@@ -367,7 +369,7 @@ const resolveFunctions = {
                 ? pcParser(row.postalCode)
                 : row.postalCode
 
-              const baseData = pcData[postalCode]
+              const baseData = postalCodeData(country.code, postalCode)
               if (baseData) {
                 postalCodes.push({
                   postalCode: baseData.code,
