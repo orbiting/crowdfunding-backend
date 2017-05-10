@@ -10,8 +10,7 @@ const {descending, ascending} = require('d3-array')
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
 
-const {hasPostalCodesForCountry, postalCodeData} = require('../lib/geo/postalCode')
-const postalCodeParsers = require('../lib/geo/postalCode').parsers
+const {hasPostalCodesForCountry, postalCodeData, postalCodeParsers} = require('../lib/geo/postalCode')
 const countryNameNormalizer = require('../lib/geo/country').nameNormalizer
 const countryDetailsForName = require('../lib/geo/country').detailsForName
 
@@ -355,7 +354,9 @@ const resolveFunctions = {
           const hasPostalCodes = country
             ? hasPostalCodesForCountry(country.code)
             : false
-          const pcParser = postalCodeParsers[datum.key]
+          const pcParser = country
+            ? postalCodeParsers[country.code]
+            : null
           let postalCodes = []
           let unkownCount = 0
           if (!hasPostalCodes) {
