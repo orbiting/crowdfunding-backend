@@ -1,23 +1,23 @@
 //
 // This script augments countries.json (see getCountries.js)
-// with the name in german, the names by the countries languages
+// with the name in german, searchSearch names (name in en,
+// de and the the countries languages), some manual name-fixes
 // and saves a cleaned countriesWithNames.json
 // data based on alternateNames.txt from http://download.geonames.org/export/dump/
 // format
 // [ {
 //    "code": "CH",
-//    "names": {
-//      "en": "Switzerland",
-//      "de": "Schweiz"
-//    },
+//    "name": "Schweiz",
 //    "searchNames": [
 //      "Schweizerische Eidgenossenschaft",
 //      "Confédération Suisse",
 //      "Confederazione Svizzera",
 //      "Schweiz",
+//      "Switzerland",
 //      "Suisse",
 //      "Svizzera",
-//      "Svizra"
+//      "Svizra",
+//      "Ch"
 //    ],
 //    "lat": "47.00016",
 //    "lon": "8.01427"
@@ -52,9 +52,12 @@ Promise.resolve().then( async () => {
           if(geonameIds.indexOf(geonameId) > -1) {
             let country = countries.find( c => c.geonameId === geonameId )
             if(row.isoLaguage === 'de') {
-              country.names.de = row.alternateName
+              country.name = row.alternateName
             }
-            if(country.languages.indexOf(row.isoLaguage) > -1 &&
+            if(
+              (row.isoLaguage === 'de' ||
+               row.isoLaguage === 'en' ||
+               country.languages.indexOf(row.isoLaguage) > -1) &&
               country.searchNames.indexOf(row.alternateName) === -1) {
               country.searchNames.push(row.alternateName)
             }
@@ -69,11 +72,29 @@ Promise.resolve().then( async () => {
     })
   })
 
+  const manualNames = [
+    { code: 'CH',
+      searchNames: ['Ch'] },
+    { code: 'DE',
+      searchNames: ['Brd', 'D'] },
+    { code: 'GB',
+      searchNames: ['Uk'] },
+    { code: 'ES',
+      searchNames: ['España / Cádiz'] },
+    { code: 'DK',
+      searchNames: ['Daenemark'] },
+    { code: 'NL',
+      searchNames: ['Die Niederlande'] }
+  ]
   countries = countries.map( country => {
+    const manualName = manualNames.find( name => name.code === country.code )
+    const searchNames = manualName
+      ? country.searchNames.concat(manualName.searchNames)
+      : country.searchNames
     return {
       code: country.code,
-      names: country.names,
-      searchNames: country.searchNames,
+      name: country.name,
+      searchNames,
       lat: country.lat,
       lon: country.lon
     }
