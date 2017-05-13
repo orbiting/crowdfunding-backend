@@ -25,6 +25,7 @@
     "geoip-database": "^1.0.2",
     "graphql": "^0.9.3",
     "graphql-server-express": "^0.7.2",
+    "graphql-subscriptions": "^0.3.1",
     "graphql-tag": "^2.0.0",
     "graphql-tools": "^0.11.0",
     "gsheets": "^2.0.0",
@@ -41,6 +42,7 @@
     "sharp": "^0.17.3",
     "slugify": "^1.1.0",
     "stripe": "^4.18.0",
+    "subscriptions-transport-ws": "^0.6.0",
     "uuid": "^3.0.1",
     "winston": "^2.3.1"
   },

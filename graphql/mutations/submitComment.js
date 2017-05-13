@@ -1,7 +1,7 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const logger = require('../../lib/logger')
 
-module.exports = async (_, args, {pgdb, user, req, t}) => {
+module.exports = async (_, args, {pgdb, user, req, t, pubsub}) => {
   ensureSignedIn(req, t)
 
   const { feedName, content } = args
@@ -46,13 +46,14 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
     }
 
-    await pgdb.public.comments.insert({
+    const comment = await pgdb.public.comments.insertAndGet({
       feedId: feed.id,
       userId: user.id,
       content
     })
 
     await transaction.transactionCommit()
+    pubsub.publish('commentAdded', comment)
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })

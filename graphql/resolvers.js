@@ -261,7 +261,14 @@ const resolveFunctions = {
     }
   },
 
-  RootMutation: mutations
+  RootMutation: mutations,
+
+  RootSubscription: {
+    commentAdded: comment => {
+      console.log('resolvers subscription')
+      return comment
+    },
+  },
 }
 
 module.exports = resolveFunctions

@@ -5,6 +5,7 @@ scalar DateTime
 schema {
   query: RootQuery
   mutation: RootMutation
+  subscription: RootSubscription
 }
 
 type RootQuery {
@@ -47,6 +48,11 @@ type RootMutation {
   upvoteComment(commentId: ID!): Boolean
   downvoteComment(commentId: ID!): Boolean
 }
+
+type RootSubscription {
+  commentAdded(feedName: String!): Comment
+}
+
 
 type MutationResult {
   success: Boolean!
@@ -325,6 +331,7 @@ type Comment {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
 
 `
 module.exports = [typeDefinitions]
