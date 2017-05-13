@@ -22,6 +22,9 @@ type RootQuery {
   events: [Event!]!
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
+
+  feeds: [Feed!]!
+  feed(name: String!, offset: Int, limit: Int): Feed!
 }
 
 type RootMutation {
@@ -39,6 +42,10 @@ type RootMutation {
 
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
   unpublishTestimonial: Boolean
+
+  submitComment(feedId: ID!, content: String!): Boolean
+  upvoteComment(commentId: ID!): Boolean
+  downvoteComment(commentId: ID!): Boolean
 }
 
 type MutationResult {
@@ -294,5 +301,30 @@ type Video {
   youtube: String
   subtitles: String
 }
+
+
+type Feed {
+  id: ID!
+  name: String!
+  # max length in chars of comment content
+  commentMaxLength: Int
+  # waiting time to submit a new comment (in milliseconds)
+  newCommentWaitingTime: Int
+  # comments in this feed in natual order
+  comments: [Comment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+type Comment {
+  id: ID!
+  content: String!
+  # score based on votes
+  score: Int!
+  # vote of the signedin user (0 - no vote, 1 - upvoted, -1 - downvoted)
+  usersVote: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 `
 module.exports = [typeDefinitions]

@@ -117,7 +117,13 @@ const resolveFunctions = {
       return data
         .filter( d => (new Date(d.publishedDateTime) < now) )
         .sort( (a,b) => new Date(b.publishedDateTime) - new Date(a.publishedDateTime) )
-    }
+    },
+    async feeds(_, args, {pgdb, req}) {
+      return pgdb.public.feeds.find()
+    },
+    async feed(_, args, {pgdb}) {
+      return pgdb.public.feeds.findOne( args )
+    },
   }),
 
   User: {
@@ -238,6 +244,20 @@ const resolveFunctions = {
   Membership: {
     async type(membership, args, {pgdb}) {
       return pgdb.public.membershipTypes.findOne({id: membership.membershipTypeId})
+    }
+  },
+  Feed: {
+    async comments(feed, args, {pgdb, user}) {
+      const comments = (await pgdb.public.comments.find({feedId: feed.id},{
+        orderBy: ['createdAt desc']
+      })).map( comment => {
+        const usersVote = comment.votes.find( vote => vote.userId === user.id )
+        return Object.assign({}, comment, {
+          score: comment.upVotes - comment.downVotes,
+          usersVote: usersVote ? usersVote.vote : null
+        })
+      })
+      return comments
     }
   },
 
