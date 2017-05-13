@@ -43,7 +43,7 @@ type RootMutation {
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
   unpublishTestimonial: Boolean
 
-  submitComment(feedId: ID!, content: String!): Boolean
+  submitComment(feedName: String!, content: String!): Boolean
   upvoteComment(commentId: ID!): Boolean
   downvoteComment(commentId: ID!): Boolean
 }

@@ -4,10 +4,10 @@ const logger = require('../../lib/logger')
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
-  const { feedId, content } = args
+  const { feedName, content } = args
 
   //ensure feed exists
-  const feed = await pgdb.public.feeds.findOne({id: feedId})
+  const feed = await pgdb.public.feeds.findOne({name: feedName})
   if(!feed) {
     logger.error('submitComment: feed not found', { req: req._log(), args })
     throw new Error(t('api/comment/feedNotFound'))
