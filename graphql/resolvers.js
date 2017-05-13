@@ -5,10 +5,11 @@ const mutations = require('./mutations/index')
 const queries = require('./queries/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
 const nest = require('d3-collection').nest
-const {descending, ascending} = require('d3-array')
+const {descending} = require('d3-array')
 
 const dateFormat = utcTimeFormat('%x') //%x - the locale’s date
 const dateParse = utcTimeParse('%x %H %Z') //%x - the locale’s date, %H and %Z for timezone normalization
+const collator = new Intl.Collator('de')
 
 const {hasPostalCodesForCountry, postalCodeData, postalCodeParsers} = require('../lib/geo/postalCode')
 const countryNameNormalizer = require('../lib/geo/country').nameNormalizer
@@ -439,7 +440,7 @@ const resolveFunctions = {
         })
         .sort((a, b) => (
           descending(a.count, b.count) ||
-          ascending(a.name, b.name)
+          collator.compare(a.name, b.name)
         ))
       return countriesWithPostalCodes
     }
