@@ -1,7 +1,7 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const logger = require('../../lib/logger')
 
-module.exports = async (_, args, {pgdb, user, req, t, pubsub}) => {
+module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
   ensureSignedIn(req, t)
 
   const { feedName, content } = args
@@ -53,7 +53,7 @@ module.exports = async (_, args, {pgdb, user, req, t, pubsub}) => {
     })
 
     await transaction.transactionCommit()
-    pubsub.publish('commentAdded', comment)
+    await publish('commentAdded', comment)
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
