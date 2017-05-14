@@ -26,6 +26,7 @@
 // usage
 // download alternateNames.txt and place it along side this script
 // cf_server  node assets/geography/countries/augmentCountriesWithNames.js
+// this can take some time (3min on 3.2 GHz) enjoy a coffee...
 
 const fetch = require('isomorphic-unfetch')
 const fs = require('fs')
@@ -55,6 +56,7 @@ Promise.resolve().then( async () => {
         if(row && row.isoLaguage && row.geonameId) {
           const geonameId = parseInt(row.geonameId)
           if(geonameIds.indexOf(geonameId) > -1) {
+
             let country = countries.find( c => c.geonameId === geonameId )
             if(row.isoLaguage === 'de') {
               const manualName = manualNames.find( name => name.code === country.code)
@@ -63,14 +65,21 @@ Promise.resolve().then( async () => {
               else
                 country.name = row.alternateName.replace(/ß/g, 'ss') //de-CH
             }
+
+            const lowerCode = country.code.toLowerCase()
+            if(country.searchNames.indexOf(lowerCode) === -1) {
+              country.searchNames.push(lowerCode)
+            }
+
+            const lowerName = row.alternateName.toLowerCase()
             if( (row.isoLaguage === 'de' ||
                  row.isoLaguage === 'en' ||
                  country.languages.indexOf(row.isoLaguage) > -1) &&
-                country.searchNames.indexOf(row.alternateName) === -1
+                country.searchNames.indexOf(lowerName) === -1
             ) {
-              country.searchNames.push(row.alternateName)
-              if(row.alternateName.indexOf('ß') > -1) {
-                const deCHName = row.alternateName.replace(/ß/g, 'ss')
+              country.searchNames.push(lowerName)
+              if(lowerName.indexOf('ß') > -1) {
+                const deCHName = lowerName.replace(/ß/g, 'ss')
                 if(country.searchNames.indexOf(deCHName) === -1) {
                   country.searchNames.push(deCHName)
                 }
@@ -88,25 +97,21 @@ Promise.resolve().then( async () => {
   })
 
   const manualSearchNames = [
-    { code: 'CH',
-      searchNames: ['Ch'] },
     { code: 'DE',
       searchNames: ['Brd', 'D'] },
     { code: 'GB',
-      searchNames: ['Uk'] },
+      searchNames: ['uk'] },
     { code: 'ES',
       searchNames: ['España / Cádiz'] },
     { code: 'DK',
       searchNames: ['Daenemark'] },
     { code: 'NL',
       searchNames: ['Die Niederlande'] },
-    { code: 'US',
-      searchNames: ['Usa'] }
   ]
   countries = countries.map( country => {
     const manualName = manualSearchNames.find( name => name.code === country.code )
     const searchNames = manualName
-      ? country.searchNames.concat(manualName.searchNames)
+      ? country.searchNames.concat(manualName.searchNames.map( name => name.toLowerCase() ))
       : country.searchNames
     return {
       code: country.code,

@@ -327,7 +327,7 @@ const resolveFunctions = {
     async countries(_, {maxCreatedAt}, {pgdb}) {
       const countries = await pgdb.query(`
         SELECT
-          initcap(trim(a.country)) as name,
+          lower(trim(a.country)) as name,
           trim(a."postalCode") as "postalCode",
           count(distinct u.id) AS count
         FROM memberships m
