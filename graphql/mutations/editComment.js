@@ -11,7 +11,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
     //ensure comment exists and belongs to user
     const comment = await pgdb.public.comments.findOne({id: commentId})
     if(!comment) {
-      logger.error('comment not found', { req: req._log(), commentId, vote })
+      logger.error('comment not found', { req: req._log(), commentId })
       throw new Error(t('api/comment/commentNotFound'))
     }
     if(comment.userId !== user.id) {
