@@ -11,11 +11,11 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
     //ensure comment exists and belongs to user
     const comment = await pgdb.public.comments.findOne({id: commentId})
     if(!comment) {
-      logger.error('editComment: comment not found', { req: req._log(), commentId, vote })
+      logger.error('comment not found', { req: req._log(), commentId, vote })
       throw new Error(t('api/comment/commentNotFound'))
     }
     if(comment.userId !== user.id) {
-      logger.error('editComment: comment does not belong user', { req: req._log(), args })
+      logger.error('comment does not belong user', { req: req._log(), args })
       throw new Error(t('api/comment/notYours'))
     }
 
@@ -23,7 +23,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
     //ensure comment length is within limit
     if(content.length > feed.commentMaxLength) {
-      logger.error('editComment: content too long', { req: req._log(), args })
+      logger.error('content too long', { req: req._log(), args })
       throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
     }
 

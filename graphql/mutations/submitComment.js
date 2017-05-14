@@ -9,14 +9,14 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
   //ensure feed exists
   const feed = await pgdb.public.feeds.findOne({name: feedName})
   if(!feed) {
-    logger.error('submitComment: feed not found', { req: req._log(), args })
+    logger.error('feed not found', { req: req._log(), args })
     throw new Error(t('api/comment/feedNotFound'))
   }
 
   //ensure user has membership
   const membership = await pgdb.public.memberships.findFirst({userId: user.id})
   if(!membership) {
-    logger.error('submitComment: membership required', { req: req._log(), args })
+    logger.error('membership required', { req: req._log(), args })
     throw new Error(t('api/comment/membershipRequired'))
   }
 
@@ -33,7 +33,7 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
         orderBy: ['createdAt desc']
       })
       if(lastCommentByUser && lastCommentByUser.createdAt > now-feed.newCommentWaitingTime) {
-        logger.error('submitComment: too early', { req: req._log(), args })
+        logger.error('too early', { req: req._log(), args })
         throw new Error(t('api/comment/tooEarly'), {
           waitFor: lastCommentByUser.createdAt+feed.newCommentWaitingTime-now
         })
@@ -42,7 +42,7 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
 
     //ensure comment length is within limit
     if(content.length > feed.commentMaxLength) {
-      logger.error('submitComment: content too long', { req: req._log(), args })
+      logger.error('content too long', { req: req._log(), args })
       throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
     }
 
