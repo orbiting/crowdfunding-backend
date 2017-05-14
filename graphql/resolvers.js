@@ -403,7 +403,7 @@ const resolveFunctions = {
           if (unkownCount) {
             const {lat, lon} = country
               ? {lat: country.lat, lon: country.lon}
-              : {lat: 47.00016, lon: 8.01427}
+              : {lat: 0, lon: 0}
             postalCodes.push({
               postalCode: null,
               name: null,
