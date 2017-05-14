@@ -158,19 +158,6 @@ const resolveFunctions = {
             { detail: 'paperInvoice',
               count: numPaperInvoice }
           ]
-        } else if(datum.method === 'STRIPE') {
-          const num3dsecure = await pgdb.queryOneField(`
-            SELECT
-              count(*)
-            FROM payments
-            WHERE
-              method = 'STRIPE'
-              AND "pspPayload" @> '{"source": {"card": {"three_d_secure": "required"}}}'
-          `)
-          datum.details = [
-            { detail: '3dsecure',
-              count: num3dsecure }
-          ]
         } else {
           datum.details = []
         }
