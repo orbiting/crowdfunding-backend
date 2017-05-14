@@ -1,5 +1,5 @@
 {
-  "updated": "2017-04-26T02:17:34.837Z",
+  "updated": "2017-05-14T16:27:00.071Z",
   "title": "live",
   "data": [
     {
@@ -12,6 +12,10 @@
     },
     {
       "key": "menu/updates",
+      "value": "Neues"
+    },
+    {
+      "key": "menu/updates/wer-sind-sie",
       "value": "Neues"
     },
     {
@@ -29,6 +33,10 @@
     {
       "key": "menu/pledge",
       "value": "Mitmachen"
+    },
+    {
+      "key": "menu/merci",
+      "value": "Merci"
     },
     {
       "key": "header/button",
@@ -335,16 +343,16 @@
       "value": "E-Mail ungültig"
     },
     {
-      "key": "signIn/loading",
-      "value": "Lädt"
-    },
-    {
-      "key": "signOut/loading",
-      "value": "Lädt"
+      "key": "signOut/label",
+      "value": "abmelden"
     },
     {
       "key": "signOut/error",
       "value": "Unbekannter Fehler"
+    },
+    {
+      "key": "me/signedinAs",
+      "value": "Sie sind angemeldet als: {nameOrEmail}"
     },
     {
       "key": "pledge/title",
@@ -488,7 +496,11 @@
     },
     {
       "key": "pledge/submit/emailVerify/note",
-      "value": "Diese Mailadresse wurde schon einmal verwendet. Wir haben ein Mail geschickt. Falls das Ihre Mailadresse ist, klicken Sie bitte auf «anmelden»."
+      "value": "Diese E-Mail-Adresse wurde schon einmal verwendet. Falls das Ihre Adresse ist, klicken Sie bitte auf «anmelden»."
+    },
+    {
+      "key": "pledge/submit/emailVerify/done",
+      "value": "Vielen Dank für das Verifizieren Ihrer E-Mail-Adresse."
     },
     {
       "key": "pledge/submit/error/title",
@@ -695,6 +707,10 @@
       "value": "Leider hat etwas nicht ganz geklappt. Bitte versuchen Sie, den Link zur Anmeldung erneut zu klicken. Klappt das ein zweites Mal nicht, stehen wir Ihnen gerne mit Rat zur Verfügung. Schreiben Sie uns Ihr Problem an kontakt@republik.ch."
     },
     {
+      "key": "api/auth/errorSavingSession",
+      "value": "Ups, da ist was schiefgelaufen. Sorry!"
+    },
+    {
       "key": "api/email/invalid",
       "value": "E-Mail ungültig"
     },
@@ -873,6 +889,10 @@
     {
       "key": "footer/legal/imprint",
       "value": "Impressum"
+    },
+    {
+      "key": "footer/media",
+      "value": "Medieninformationen"
     },
     {
       "key": "me/addressForm/title",
@@ -1212,7 +1232,7 @@
     },
     {
       "key": "testimonial/pickImage/tooBig",
-      "value": "Maximal 2 MB"
+      "value": "Maximal 4 MB"
     },
     {
       "key": "testimonial/pickImage/empty",
@@ -1229,6 +1249,22 @@
     {
       "key": "testimonial/search/videosOnly",
       "value": "Nur Videos"
+    },
+    {
+      "key": "testimonial/search/seed",
+      "value": "Neu Mischen"
+    },
+    {
+      "key": "testimonial/infinite/endless",
+      "value": "Das waren {count} Statements. Alle weiteren Statements anschauen?"
+    },
+    {
+      "key": "testimonial/infinite/end",
+      "value": "Sie haben gerade {count} Statements angeschaut. Sind Sie selber schon dabei? {pledgeLink}"
+    },
+    {
+      "key": "testimonial/infinite/end/pledgeLink",
+      "value": "Sonst jetzt Mitmachen!"
     },
     {
       "key": "testimonial/detail/share/emailSubject",
@@ -1257,6 +1293,10 @@
     {
       "key": "testimonial/unpublish/user",
       "value": "Statement zurücknehmen"
+    },
+    {
+      "key": "testimonial/viewLive",
+      "value": "Ansehen"
     },
     {
       "key": "testimonial/unpublished/user",
@@ -1325,6 +1365,86 @@
     {
       "key": "TODO",
       "value": "Wollen Sie nochmal mitmachen? Sie können Abos und Mitgliedschaften verschenken oder auch einfach spenden."
+    },
+    {
+      "key": "notifications/pageTitle",
+      "value": "Mitteilung — Republik"
+    },
+    {
+      "key": "notifications/email-confirmed/title",
+      "value": "E-Mail-Adresse ist bestätigt"
+    },
+    {
+      "key": "notifications/email-confirmed/text",
+      "value": "Perfekt! Ihre E-Mail-Adresse ist somit bestätigt. Sie können dieses Fenster wieder schliessen."
+    },
+    {
+      "key": "notifications/invalid-token/title",
+      "value": "Ungültiger Link"
+    },
+    {
+      "key": "notifications/invalid-token/text",
+      "value": "Der von Ihnen aufgerufene Link ist nicht gültig. Links zur Anmeldung sind nur einmal gültig."
+    },
+    {
+      "key": "notifications/unavailable/title",
+      "value": "System nicht verfügbar"
+    },
+    {
+      "key": "notifications/unavailable/text",
+      "value": "Leider kann unser System Ihre Anfrage zur Zeit nicht bearbeiten. Versuchen Sie es in 10 Minuten erneut. Klappt es ein zweites Mal nicht, stehen wir Ihnen gerne mit Rat zur Verfügung. Schreiben Sie uns an <a href=\"mailto:kontakt@republik.ch?subject=Anmeldung%20nicht%20verf%C3%BCgbar\">kontakt@republik.ch</a>."
+    },
+    {
+      "key": "notifications/links/home",
+      "value": "Startseite"
+    },
+    {
+      "key": "notifications/links/merci",
+      "value": "Ihre persönliche Übersicht"
+    },
+    {
+      "key": "merci/postpay/signInError/title",
+      "value": "E-Mail-Verifizierung fehlgeschlagen"
+    },
+    {
+      "key": "merci/postpay/signInError/text",
+      "value": "Ihre Zahlungsinformationen wurden gespeichert. Leider konnte das System aber Ihre E-Mail-Adresse «{email}» zur Zeit nicht verifizieren. Versuchen Sie es in 10 Minuten erneut. Klappt das ein zweites Mal nicht, stehen wir Ihnen gerne mit Rat zur Verfügung. Schreiben Sie uns Ihr Problem an <a href=\"{mailto}\">kontakt@republik.ch</a>."
+    },
+    {
+      "key": "merci/postpay/signInError/email/subject",
+      "value": "E-Mail-Verifizierung fehlgeschlagen nach dem Bezahlen"
+    },
+    {
+      "key": "merci/postpay/signInError/email/body",
+      "value": "E-Mail-Adresse:\n{email}\n\nBuchungsreferenz:\n{pledgeId}\n\nFehler:\n{error}"
+    },
+    {
+      "key": "merci/postpay/signInError/retry",
+      "value": "erneut versuchen"
+    },
+    {
+      "key": "api/comment/commentNotFound",
+      "value": "Der Kommentar konnte nicht gefunden werden."
+    },
+    {
+      "key": "api/comment/notYours",
+      "value": "Sie können nur ihre eigenen Kommentare bearbeiten."
+    },
+    {
+      "key": "api/comment/tooLong",
+      "value": "Ihr Kommentar darf höchstens {commentMaxLength} Zeichen lang sein."
+    },
+    {
+      "key": "api/comment/feedNotFound",
+      "value": "Der Feed konnte nicht gefunden werden."
+    },
+    {
+      "key": "api/comment/membershipRequired",
+      "value": "Sie müssen Mitglied sein um zu kommentieren."
+    },
+    {
+      "key": "api/comment/tooEarly",
+      "value": "Sie sind zu früh. Bitte warten sie {waitFor} bevor sie wieder kommentieren."
     }
   ]
 }
