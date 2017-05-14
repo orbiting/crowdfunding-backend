@@ -143,7 +143,7 @@ const resolveFunctions = {
           count(*) AS count
         FROM payments
         GROUP BY 1
-        ORDER BY 1 DESC
+        ORDER BY 2 DESC
       `)).map( async (datum) => {
         if(datum.method === 'PAYMENTSLIP') {
           const numPaperInvoice = await pgdb.queryOneField(`
