@@ -10,7 +10,6 @@ const pg  = require('pg')
 
 
 exports.start = (executableSchema) => {
-
   const subscriptionManager = new SubscriptionManager({
     schema: executableSchema,
     pubsub,
@@ -42,7 +41,6 @@ exports.start = (executableSchema) => {
     })
     const query = client.query('LISTEN crowdfunding')
   })
-
 }
 
 exports.publish = (pgdb) => async (channel, payload) => {
