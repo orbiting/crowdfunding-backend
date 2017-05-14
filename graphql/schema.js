@@ -307,7 +307,6 @@ type MembershipStats {
 }
 
 enum TimeInterval {
-  minute
   hour
   day
   week
