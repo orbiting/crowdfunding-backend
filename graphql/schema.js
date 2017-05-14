@@ -22,6 +22,10 @@ type RootQuery {
   events: [Event!]!
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
+
+  membershipStats: MembershipStats!
+  testimonialStats: TestimonialStats!
+  paymentStats: PaymentStats!
 }
 
 type RootMutation {
@@ -293,6 +297,69 @@ type Video {
   mp4: String!
   youtube: String
   subtitles: String
+}
+
+
+type MembershipStats {
+  createdAts(interval: TimeInterval!): [TimeCount!]!
+  ages: [AgeCount!]!
+  countries: [CountryCount!]!
+}
+
+enum TimeInterval {
+  hour
+  day
+  week
+  month
+  quarter
+  year
+}
+
+type TimeCount {
+  datetime: DateTime!
+  count: Int!
+}
+type AgeCount {
+  age: Int
+  count: Int!
+}
+type CountryCount {
+  name: String
+  count: Int!
+  states: [StateCount!]!
+  postalCodes: [PostalCodeCount!]!
+}
+type StateCount {
+  name: String
+  abbr: String
+  count: Int!
+}
+type PostalCodeCount {
+  postalCode: String
+  name: String
+  lat: Float!
+  lon: Float!
+  count: Int!
+}
+
+
+type TestimonialStats {
+  count: Int!
+}
+
+
+type PaymentStats {
+  paymentMethods: [PaymentMethodCount!]!
+}
+
+type PaymentMethodCount {
+  method: PaymentMethod!
+  count: Int!
+  details: [DetailCount!]!
+}
+type DetailCount {
+  detail: String
+  count: Int!
 }
 `
 module.exports = [typeDefinitions]
