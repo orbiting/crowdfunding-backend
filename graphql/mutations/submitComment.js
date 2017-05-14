@@ -28,7 +28,8 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       const now = new Date().getTime()
       const lastCommentByUser = await pgdb.public.comments.findFirst({
         userId: user.id,
-        feedId: feed.id
+        feedId: feed.id,
+        published: true
       }, {
         orderBy: ['createdAt desc']
       })

@@ -19,6 +19,8 @@ create table "comments" (
   "upVotes"               integer not null default 0,
   "downVotes"             integer not null default 0,
   "votes"                 jsonb not null default '[]',
+  "published"             boolean not null default true,
+  "adminUnpublished"      boolean not null default false,
   "createdAt"             timestamptz default now(),
   "updatedAt"             timestamptz default now()
 );

@@ -453,7 +453,11 @@ const resolveFunctions = {
   },
   Feed: {
     async comments(feed, args, {pgdb, user}) {
-      const comments = (await pgdb.public.comments.find({feedId: feed.id},{
+      const comments = (await pgdb.public.comments.find({
+        feedId: feed.id,
+        published: true,
+        adminUnpublished: false
+      },{
         orderBy: ['createdAt desc']
       })).map( comment => {
         const usersVote = comment.votes.find( vote => vote.userId === user.id )

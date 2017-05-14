@@ -52,6 +52,7 @@ type RootMutation {
   upvoteComment(commentId: ID!): Boolean
   downvoteComment(commentId: ID!): Boolean
   editComment(commentId: ID!, content: String!): Boolean
+  unpublishComment(commentId: ID!): Boolean
 }
 
 type RootSubscription {

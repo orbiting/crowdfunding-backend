@@ -4,7 +4,7 @@ const logger = require('../../lib/logger')
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
-  const { commentId, content } = args
+  const { commentId } = args
 
   const transaction = await pgdb.transactionBegin()
   try {
@@ -19,19 +19,10 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/comment/notYours'))
     }
 
-    const feed = await pgdb.public.feeds.findOne({id: comment.feedId})
-
-    //ensure comment length is within limit
-    if(content.length > feed.commentMaxLength) {
-      logger.error('content too long', { req: req._log(), args })
-      throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
-    }
-
     await pgdb.public.comments.update({
       id: comment.id,
     }, {
-      content,
-      updatedAt: new Date()
+      published: false
     })
 
     await transaction.transactionCommit()
