@@ -11,9 +11,7 @@ if (DEV) {
   require('dotenv').config()
 }
 
-const { createServer } = DEV
-  ? require('http')
-  : require('https')
+const { createServer } = require('http')
 
 process.env.PORT = process.env.PORT || 3001
 
