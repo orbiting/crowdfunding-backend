@@ -41,6 +41,8 @@ Promise.resolve().then( async () => {
   const manualNames = [
     { code: 'MM',
       name: 'Burma (Myanmar)' },
+    { code: 'KR',
+      name: 'Südkorea' },
   ]
 
   await new Promise( (resolve, reject) => {
@@ -107,6 +109,8 @@ Promise.resolve().then( async () => {
       searchNames: ['Daenemark'] },
     { code: 'NL',
       searchNames: ['Die Niederlande'] },
+    { code: 'KR',
+      searchNames: ['korea'] },
   ]
   countries = countries.map( country => {
     const manualName = manualSearchNames.find( name => name.code === country.code )
