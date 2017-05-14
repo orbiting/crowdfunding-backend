@@ -3,32 +3,20 @@ const { SubscriptionServer } = require('subscriptions-transport-ws')
 const pubsub = new PubSub()
 const {WS_PORT, DATABASE_URL, NODE_ENV} = process.env
 const DEV = NODE_ENV && NODE_ENV !== 'production'
-const { createServer } = DEV
-  ? require('http')
-  : require('https')
 const pg  = require('pg')
 
-
-exports.start = (executableSchema) => {
+exports.start = (httpServer, executableSchema) => {
   const subscriptionManager = new SubscriptionManager({
     schema: executableSchema,
     pubsub,
   })
 
-  const websocketServer = createServer((request, response) => {
-    response.writeHead(404)
-    response.end()
-  })
-  websocketServer.listen(WS_PORT, () => console.log(
-    `Websocket Server is now running on port ${WS_PORT}`
-  ))
-
   const subscriptionServer = new SubscriptionServer(
     {
-      subscriptionManager: subscriptionManager
+      subscriptionManager
     },
     {
-      server: websocketServer,
+      server: httpServer,
       path: '/'
     }
   )

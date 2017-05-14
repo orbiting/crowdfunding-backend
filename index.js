@@ -6,11 +6,14 @@ const logger = require('./lib/logger')
 const {getFormatter} = require('./lib/translate')
 const MESSAGES = require('./lib/translations.json').data
 const util = require('util')
-
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
   require('dotenv').config()
 }
+
+const { createServer } = DEV
+  ? require('http')
+  : require('https')
 
 process.env.PORT = process.env.PORT || 3001
 
@@ -80,10 +83,12 @@ PgDb.connect().then( (pgdb) => {
     logger
   })
 
-  graphql(server, pgdb, t)
+  const httpServer = createServer(server)
+
+  graphql(server, pgdb, t, httpServer)
 
   // start the server
-  server.listen(process.env.PORT, () => {
+  httpServer.listen(process.env.PORT, () => {
     logger.info('server is running on http://localhost:'+process.env.PORT)
   })
 })

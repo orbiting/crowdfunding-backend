@@ -19,8 +19,8 @@ OpticsAgent.configureAgent({
 })
 OpticsAgent.instrumentSchema(executableSchema)
 
-module.exports = (server, pgdb, t) => {
-  subscriptions.start(executableSchema)
+module.exports = (server, pgdb, t, httpServer) => {
+  subscriptions.start(httpServer, executableSchema)
 
   server.use(OpticsAgent.middleware())
 
