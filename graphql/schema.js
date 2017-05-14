@@ -396,7 +396,7 @@ type Comment {
   content: String!
   # score based on votes
   score: Int!
-  # vote of the signedin user (0 - no vote, 1 - upvoted, -1 - downvoted)
+  # vote of the signedIn user (null - no vote, 1 - upvoted, -1 - downvoted)
   usersVote: Int
   createdAt: DateTime!
   updatedAt: DateTime!

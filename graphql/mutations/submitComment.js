@@ -33,18 +33,22 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       }, {
         orderBy: ['createdAt desc']
       })
-      if(lastCommentByUser && lastCommentByUser.createdAt > now-feed.newCommentWaitingTime) {
+      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.newCommentWaitingTime) {
+        const waitForMinutes = (lastCommentByUser.createdAt.getTime()+feed.newCommentWaitingTime-now)/1000/60
+        let waitFor
+        if(waitForMinutes <= 60)
+          waitFor = Math.ceil(waitForMinutes)+'m'
+        else
+          waitFor = Math.ceil(waitForMinutes/60)+'h'
         logger.error('too early', { req: req._log(), args })
-        throw new Error(t('api/comment/tooEarly'), {
-          waitFor: lastCommentByUser.createdAt+feed.newCommentWaitingTime-now
-        })
+        throw new Error( t('api/comment/tooEarly', { waitFor }) )
       }
     }
 
     //ensure comment length is within limit
     if(content.length > feed.commentMaxLength) {
       logger.error('content too long', { req: req._log(), args })
-      throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
+      throw new Error(t('api/comment/tooLong', {commentMaxLength: feed.commentMaxLength}))
     }
 
     const comment = await pgdb.public.comments.insertAndGet({
