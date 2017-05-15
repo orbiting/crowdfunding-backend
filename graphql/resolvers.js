@@ -311,8 +311,8 @@ const resolveFunctions = {
         ORDER BY 1
       `)
     },
-    async countries(_, args, {pgdb, lruCache}) {
-      const result = lruCache.get('countriesWithPostalCodes')
+    async countries(_, args, {pgdb, membershipStatsCountriesCache}) {
+      const result = membershipStatsCountriesCache.get('all')
       if(result) {
         return result
       }
@@ -435,7 +435,7 @@ const resolveFunctions = {
           collator.compare(a.name, b.name)
         ))
 
-      lruCache.set('countriesWithPostalCodes', countriesWithPostalCodes)
+      membershipStatsCountriesCache.set('all', countriesWithPostalCodes)
 
       return countriesWithPostalCodes
     }

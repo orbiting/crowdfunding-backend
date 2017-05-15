@@ -19,8 +19,8 @@ OpticsAgent.configureAgent({
 })
 OpticsAgent.instrumentSchema(executableSchema)
 
-//only used for MembershipStats.Countries thus max 1
-const lruCache = LRU({
+//no args, thus max 1
+const membershipStatsCountriesCache = LRU({
   max: 1,
   maxAge: 30*1000
 })
@@ -44,7 +44,7 @@ module.exports = (server, pgdb, t) => {
           user: req.user,
           req,
           t,
-          lruCache
+          membershipStatsCountriesCache
         }
       }
     })
