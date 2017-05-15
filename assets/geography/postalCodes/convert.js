@@ -1,0 +1,61 @@
+//
+// This script takes allCountries.txt from http://download.geonames.org/export/zip/
+// and converts it into separate json files for each country
+//
+// usage
+// download allCountries.txt and place it beside this script
+// cf_server  node assets/geography/postalCodes
+// this can take some time (7s on 3.2 GHz) enjoy an espresso...
+
+const rw = require('rw')
+const nest = require('d3-collection').nest
+
+//EU + CH
+const countriesOfInterest = [
+  'BE', 'EL', 'LT', 'PT',
+  'BG', 'ES', 'LU', 'RO',
+  'CZ', 'FR', 'HU', 'SI',
+  'DK', 'HR', 'MT', 'SK',
+  'DE', 'IT', 'NL', 'FI',
+  'EE', 'CY', 'AT', 'SE',
+  'IE', 'LV', 'PL', 'UK', 'CH'
+]
+
+// source
+const input = rw.readFileSync(
+  __dirname + '/allCountries.txt',
+  'utf8'
+)
+
+const countries = require('d3-dsv')
+  .tsvParse('country\tcode\tname\tstate\tstateAbbr\tname2\tcode2\tname3\tcode3\tlat\tlon\n' + input)
+  .filter( d => countriesOfInterest.indexOf(d.country) > -1 )
+  .map(d => ({
+    country: d.country,
+    code: d.code,
+    name: d.name,
+    state: d.state,
+    stateAbbr: d.stateAbbr,
+    lat: +d.lat,
+    lon: +d.lon
+  }))
+
+const result = nest()
+  .key( d => d.country )
+  .entries(countries)
+  .map( n => ({
+    country: n.key,
+    postalCodes: n.values.map( d => ({
+      code: d.code,
+      name: d.name,
+      state: d.state,
+      stateAbbr: d.stateAbbr,
+      lat: +d.lat,
+      lon: +d.lon
+    }))
+  }))
+
+rw.writeFileSync(`${__dirname}/postalCodesByCountries.json`,
+  JSON.stringify(result, null, 2),
+  'utf8'
+)
