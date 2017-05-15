@@ -298,7 +298,7 @@ const resolveFunctions = {
         ORDER BY 1 ASC
       `)
     },
-    async ages(_, {interval}, {pgdb}) {
+    async ages(_, args, {pgdb}) {
       return pgdb.query(`
         SELECT
           extract(year from age(birthday)) AS age,
@@ -311,7 +311,12 @@ const resolveFunctions = {
         ORDER BY 1
       `)
     },
-    async countries(_, {maxCreatedAt}, {pgdb}) {
+    async countries(_, args, {pgdb, membershipStatsCountriesCache}) {
+      const result = membershipStatsCountriesCache.get('all')
+      if(result) {
+        return result
+      }
+
       const countries = await pgdb.query(`
         SELECT
           lower(trim(a.country)) as name,
@@ -429,6 +434,9 @@ const resolveFunctions = {
           descending(a.count, b.count) ||
           collator.compare(a.name, b.name)
         ))
+
+      membershipStatsCountriesCache.set('all', countriesWithPostalCodes)
+
       return countriesWithPostalCodes
     }
   },
