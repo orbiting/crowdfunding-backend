@@ -33,7 +33,7 @@ const countries = require('d3-dsv')
   .map(d => ({
     country: d.country,
     code: d.code,
-    name: d.name,
+    name: d.name3 || d.name,
     state: d.state,
     stateAbbr: d.stateAbbr,
     lat: d.lat,
@@ -48,7 +48,10 @@ const result = nest()
     country: n.key,
     postalCodes: n.values.map( d => ({
       code: d.key,
-      name: d.values.map( x => x.name ).join(' / '),
+      name: d.values
+        .map(x => x.name)
+        .filter((x, i, array) => array.indexOf(x) === i)
+        .join(' / '),
       state: d.values[0].state,
       stateAbbr: d.values[0].stateAbbr,
       lat: d.values[0].lat,
