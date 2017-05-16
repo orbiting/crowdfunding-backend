@@ -324,26 +324,15 @@ const resolveFunctions = {
         GROUP BY a."postalCode", a.country
         ORDER BY count DESC
       `)
-      // Schweiz         | 8165         |     4
-      // Deutschland     | 24119        |     7
-      // Schweiz         | 8932         |     7
-      // Schweiz         | 1202         |     3
+
       const countriesWithPostalCodes = nest()
-        .key(d => countryNameNormalizer(d.name) || d.name)
+        .key(d => countryNameNormalizer(d.name))
         .entries(countries)
         .map(datum => {
-          // { key: 'Frankreich',
-          //   values:
-          //    [ anonymous { name: 'Frankreich', postalCode: '92100', count: 1 },
-          //      anonymous { name: 'Frankreich', postalCode: '32450', count: 1 },
-          //      anonymous { name: 'France', postalCode: '74350', count: 1 } ] }
           const country = countryDetailsForName(datum.key)
           const hasPostalCodes = country
             ? hasPostalCodesForCountry(country.code)
             : false
-          const pcParser = country
-            ? postalCodeParsers[country.code]
-            : null
           let postalCodes = []
           let unkownCount = 0
           if (!hasPostalCodes) {
@@ -352,6 +341,10 @@ const resolveFunctions = {
               0
             )
           } else {
+            const pcParser = country
+              ? postalCodeParsers[country.code]
+              : null
+
             datum.values.forEach(row => {
               const postalCode = pcParser
                 ? pcParser(row.postalCode)
