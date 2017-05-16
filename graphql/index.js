@@ -48,6 +48,7 @@ module.exports = (server, pgdb, t, httpServer) => {
           user: req.user,
           req,
           t,
+          publish: subscriptions.publish(pgdb),
           membershipStatsCountriesCache
         }
       }
