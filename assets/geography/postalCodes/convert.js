@@ -33,7 +33,9 @@ const countries = require('d3-dsv')
   .map(d => ({
     country: d.country,
     code: d.code,
-    name: d.name3 || d.name,
+    name: d.country === 'CH'
+      ? d.name3 || d.name
+      : d.name,
     state: d.state,
     stateAbbr: d.stateAbbr,
     lat: d.lat,
