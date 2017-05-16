@@ -4,6 +4,8 @@ const {makeExecutableSchema} = require('graphql-tools')
 const OpticsAgent = require('optics-agent')
 const logger = require('../lib/logger')
 const subscriptions = require('./subscriptions')
+const LRU = require("lru-cache")
+const {MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS} = process.env
 
 const Schema = require('./schema')
 const Resolvers = require('./resolvers')
@@ -18,6 +20,12 @@ OpticsAgent.configureAgent({
   reportIntervalMs: 20*1000
 })
 OpticsAgent.instrumentSchema(executableSchema)
+
+//no args, thus max 1
+const membershipStatsCountriesCache = LRU({
+  max: 1,
+  maxAge: (MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS || 30 ) * 1000
+})
 
 module.exports = (server, pgdb, t, httpServer) => {
   subscriptions.start(httpServer, executableSchema)
@@ -40,7 +48,7 @@ module.exports = (server, pgdb, t, httpServer) => {
           user: req.user,
           req,
           t,
-					publish: subscriptions.publish(pgdb)
+          membershipStatsCountriesCache
         }
       }
     })
