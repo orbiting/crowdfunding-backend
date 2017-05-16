@@ -83,27 +83,21 @@ const resolveFunctions = {
         const user = await pgdb.public.users.findOne({id: pledge.userId})
         if(!user.verified) {
           return pledge
+        } else {
+          //user not logged in, but verified. Return pledge only if draft and user has no non-draft pledges
+          //this is for:
+          //a verified user without pledges can submit a new pledge without email verify,
+          //so he must be able to retreive them later.
+          const hasNonDraftPledges = await pgdb.public.pledges.findFirst({
+            userId: user.id,
+            'status !=': 'DRAFT'
+          })
+          if(pledge.status === 'DRAFT' && !hasNonDraftPledges) {
+            return pledge
+          }
         }
       }
       return null
-    },
-    async draftPledge(_, args, {pgdb, req}) {
-      //used after payPledge, when user comes back from PSP to load pledge again on
-      //pledge site, then client sends the psp payment information it received via
-      //query params. Pledge must not be successfull in this state, otherwise user
-      //clicked back and we want to show him a nice error.
-      const pledge = await pgdb.public.pledges.findOne({id: args.id})
-      if(pledge.status === 'SUCCESSFUL') {
-        logger.error('draftPledge for successfull pledge', { req: req._log(), args, pledge })
-        throw new Error(t('api/pledge/alreadyPaid'))
-      }
-      const user = await pgdb.public.users.findOne({id: pledge.userId})
-      if(req.user.id === user.id || !user.verified) {
-        return pledge
-      } else {
-        logger.error('unauthorized draftPledge', { req: req._log(), args, pledge })
-        throw new Error(t('api/unauthorized'))
-      }
     },
     async faqs(_, args, {pgdb}) {
       const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'faqs'}, 'data')
@@ -330,26 +324,15 @@ const resolveFunctions = {
         GROUP BY a."postalCode", a.country
         ORDER BY count DESC
       `)
-      // Schweiz         | 8165         |     4
-      // Deutschland     | 24119        |     7
-      // Schweiz         | 8932         |     7
-      // Schweiz         | 1202         |     3
+
       const countriesWithPostalCodes = nest()
-        .key(d => countryNameNormalizer(d.name) || d.name)
+        .key(d => countryNameNormalizer(d.name))
         .entries(countries)
         .map(datum => {
-          // { key: 'Frankreich',
-          //   values:
-          //    [ anonymous { name: 'Frankreich', postalCode: '92100', count: 1 },
-          //      anonymous { name: 'Frankreich', postalCode: '32450', count: 1 },
-          //      anonymous { name: 'France', postalCode: '74350', count: 1 } ] }
           const country = countryDetailsForName(datum.key)
           const hasPostalCodes = country
             ? hasPostalCodesForCountry(country.code)
             : false
-          const pcParser = country
-            ? postalCodeParsers[country.code]
-            : null
           let postalCodes = []
           let unkownCount = 0
           if (!hasPostalCodes) {
@@ -358,6 +341,10 @@ const resolveFunctions = {
               0
             )
           } else {
+            const pcParser = country
+              ? postalCodeParsers[country.code]
+              : null
+
             datum.values.forEach(row => {
               const postalCode = pcParser
                 ? pcParser(row.postalCode)
