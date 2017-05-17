@@ -165,6 +165,12 @@ const resolveFunctions = {
     async feed(_, args, {pgdb}) {
       return pgdb.public.feeds.findOne( args )
     },
+    async votings(_, args, {pgdb, req}) {
+      return pgdb.public.votings.find()
+    },
+    async voting(_, args, {pgdb}) {
+      return pgdb.public.votings.findOne( args )
+    },
   }),
 
   User: {
@@ -490,6 +496,11 @@ const resolveFunctions = {
           hottnes: hottnes(comment)
         })
       }).sort( (a, b)  => descending(a.hottnes, b.hottnes) )
+    }
+  },
+  Voting: {
+    async options(voting, args, {pgdb, user}) {
+      return pgdb.public.votingOptions.find({votingId: voting.id})
     }
   },
 

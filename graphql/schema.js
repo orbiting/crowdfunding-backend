@@ -31,8 +31,8 @@ type RootQuery {
   feeds: [Feed!]!
   feed(name: String!, offset: Int, limit: Int): Feed!
 
-  votes: [Vote!]!
-  vote(name: String!): Vote!
+  votings: [Voting!]!
+  voting(name: String!): Voting!
 }
 
 type RootMutation {
@@ -419,7 +419,7 @@ type Comment {
   updatedAt: DateTime!
 }
 
-type Vote {
+type Voting {
   id: ID!
   name: String!
   beginDate: DateTime!
