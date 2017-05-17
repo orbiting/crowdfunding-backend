@@ -9,7 +9,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
   const transaction = await pgdb.transactionBegin()
   try {
     //ensure comment exists and belongs to user
-    const comment = await pgdb.public.comments.findOne({id: commentId})
+    const comment = await transaction.public.comments.findOne({id: commentId})
     if(!comment) {
       logger.error('comment not found', { req: req._log(), commentId })
       throw new Error(t('api/comment/commentNotFound'))
@@ -19,7 +19,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/comment/notYours'))
     }
 
-    await pgdb.public.comments.update({
+    await transaction.public.comments.update({
       id: comment.id,
     }, {
       published: false
