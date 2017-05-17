@@ -30,6 +30,9 @@ type RootQuery {
 
   feeds: [Feed!]!
   feed(name: String!, offset: Int, limit: Int): Feed!
+
+  votes: [Vote!]!
+  vote(name: String!): Vote!
 }
 
 type RootMutation {
@@ -53,6 +56,8 @@ type RootMutation {
   downvoteComment(commentId: ID!): Boolean
   editComment(commentId: ID!, content: String!): Boolean
   unpublishComment(commentId: ID!): Boolean
+
+  submitBallot(optionId: ID!): Boolean!
 }
 
 type RootSubscription {
@@ -381,24 +386,68 @@ type DetailCount {
 type Feed {
   id: ID!
   name: String!
-  # max length in chars of comment content
-  commentMaxLength: Int
-  # waiting time to submit a new comment (in milliseconds)
-  newCommentWaitingTime: Int
   # comments in this feed in natual order
-  comments: [Comment!]!
+  comments(offset: Int!, limit: Int!): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+  userCanComment: Boolean!
+  # in milliseconds
+  userWaitingTime: Int!
+  # max length in chars of comment content
+  commentMaxLength: Int!
+  # waiting time to submit a new comment (in milliseconds)
+  commentInterval: Int!
+}
+enum CommentVote {
+  UP
+  DOWN
 }
 type Comment {
   id: ID!
   content: String!
+  tags: [String!]!
+  authorName: String!
   # score based on votes
   score: Int!
-  # vote of the signedIn user (null - no vote, 1 - upvoted, -1 - downvoted)
-  usersVote: Int
+  # vote of the signedIn user (null - no vote)
+  userVote: CommentVote
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+type Vote {
+  id: ID!
+  name: String!
+  beginDate: DateTime!
+  endDate: DateTime!
+  options: [VoteOption!]!
+  turnout: VoteTurnout!
+  result: VoteResult
+  # current user (me) is eligitable to submit a ballot
+  userIsEligitable: Boolean
+  # current user (me) has submitted a ballot
+  userHasSubmitted: Boolean
+}
+type VoteTurnout {
+  eligitable: Int!
+  submitted: Int!
+}
+type VoteOption {
+  id: ID!
+  name: String!
+}
+type VoteOptionResult {
+  id: ID!
+  name: String!
+  count: Int!
+  winner: Boolean
+}
+type VoteResult {
+  options: [VoteOptionResult!]!
+  message: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 `
 module.exports = [typeDefinitions]
