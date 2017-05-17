@@ -6,27 +6,26 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
 
   const { feedName, content, tags } = args
 
-  //ensure feed exists
-  const feed = await pgdb.public.feeds.findOne({name: feedName})
-  if(!feed) {
-    logger.error('feed not found', { req: req._log(), args })
-    throw new Error(t('api/comment/feedNotFound'))
-  }
-
-  //ensure user has membership
-  const membership = await pgdb.public.memberships.findFirst({userId: user.id})
-  if(!membership) {
-    logger.error('membership required', { req: req._log(), args })
-    throw new Error(t('api/comment/membershipRequired'))
-  }
-
   const transaction = await pgdb.transactionBegin()
   try {
+    //ensure feed exists
+    const feed = await transaction.public.feeds.findOne({name: feedName})
+    if(!feed) {
+      logger.error('feed not found', { req: req._log(), args })
+      throw new Error(t('api/comment/feedNotFound'))
+    }
 
-    //ensure user is withing commentInterval
+    //ensure user has membership
+    const membership = await transaction.public.memberships.findFirst({userId: user.id})
+    if(!membership) {
+      logger.error('membership required', { req: req._log(), args })
+      throw new Error(t('api/comment/membershipRequired'))
+    }
+
+    //ensure user is within commentInterval
     if(feed.commentInterval) {
       const now = new Date().getTime()
-      const lastCommentByUser = await pgdb.public.comments.findFirst({
+      const lastCommentByUser = await transaction.public.comments.findFirst({
         userId: user.id,
         feedId: feed.id,
         published: true
@@ -51,7 +50,7 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       throw new Error(t('api/comment/tooLong', {commentMaxLength: feed.commentMaxLength}))
     }
 
-    const comment = await pgdb.public.comments.insertAndGet({
+    const comment = await transaction.public.comments.insertAndGet({
       feedId: feed.id,
       userId: user.id,
       content,
