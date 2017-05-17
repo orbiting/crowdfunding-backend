@@ -2,7 +2,7 @@
 // This script counts the ballots of a vote and upserts vote.result
 // required params
 //   1) vote name
-//   2) optional message
+//   2) optional: message
 //   3) optional: winner's votingOption.name (in case of final vote)
 //
 // usage
@@ -61,7 +61,7 @@ PgDb.connect().then( async (pgdb) => {
     winner = counts[0]
   }
 
-  await pgdb.public.votings.updateOne({
+  const newVoting = await pgdb.public.votings.updateAndGetOne({
     id: voting.id
   }, {
     result: {
@@ -73,6 +73,9 @@ PgDb.connect().then( async (pgdb) => {
       message: MESSAGE //ignored by postgres is null
     }
   })
+  console.log("finished! The result is:")
+  console.log(newVoting.result)
+  console.log("🎉🎉🎉🎉🎉🎉")
 
 }).then( () => {
   process.exit()
