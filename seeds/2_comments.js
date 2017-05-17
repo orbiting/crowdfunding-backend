@@ -3,17 +3,17 @@ exports.seed = async function(knex, Promise) {
   await knex('feeds').del()
 
   await knex('feeds').insert({
-    name: "endGoal",
+    name: "END_GOAL",
     commentMaxLength: 300,
-    newCommentWaitingTime: 24*60*60*1000,
+    commentInterval: 24*60*60*1000,
     createdAt: new Date(),
     updatedAt: new Date()
   })
 
   await knex('feeds').insert({
-    name: "chat",
+    name: "CHAT",
     commentMaxLength: 300,
-    newCommentWaitingTime: 1000,
+    commentInterval: 1000,
     createdAt: new Date(),
     updatedAt: new Date()
   })

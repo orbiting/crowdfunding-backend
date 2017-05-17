@@ -51,7 +51,7 @@ type RootMutation {
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
   unpublishTestimonial: Boolean
 
-  submitComment(feedName: String!, content: String!): Boolean
+  submitComment(feedName: String!, content: String!, tags: [String!]): Boolean
   upvoteComment(commentId: ID!): Boolean
   downvoteComment(commentId: ID!): Boolean
   editComment(commentId: ID!, content: String!): Boolean
@@ -387,7 +387,7 @@ type Feed {
   id: ID!
   name: String!
   # comments in this feed in natual order
-  comments(offset: Int!, limit: Int!): [Comment!]!
+  comments(offset: Int, limit: Int): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   userCanComment: Boolean!
@@ -407,8 +407,12 @@ type Comment {
   content: String!
   tags: [String!]!
   authorName: String!
+  upVotes: Int!
+  downVotes: Int!
   # score based on votes
   score: Int!
+  # reddit's hottness
+  hottnes: Float!
   # vote of the signedIn user (null - no vote)
   userVote: CommentVote
   createdAt: DateTime!

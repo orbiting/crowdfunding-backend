@@ -434,21 +434,62 @@ const resolveFunctions = {
     }
   },
   Feed: {
+    async userCanComment(feed, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
+    },
+    async userWaitingTime(feed, args, {pgdb, user}) {
+      if(!user || !feed.commentInterval)
+        return 0
+      const now = new Date().getTime()
+      const lastCommentByUser = await pgdb.public.comments.findFirst({
+        userId: user.id,
+        feedId: feed.id,
+        published: true
+      }, {
+        orderBy: ['createdAt desc']
+      })
+      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval)
+        return (lastCommentByUser.createdAt.getTime()+feed.commentInterval-now)
+      return 0
+    },
     async comments(feed, args, {pgdb, user}) {
-      const comments = (await pgdb.public.comments.find({
+      //https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9
+      const hottnes = comment => {
+        const {log, max, abs, round} = Math
+        const score = comment.upVotes - comment.downVotes
+        const order = log( max(abs(score), 1), 10 )
+        const sign = (score > 0) ? 1 : ( (score < 0) ? -1 : 0)
+        const seconds = comment.createdAt.getTime() - 1493190000 //republik epoch
+        return (sign * order + seconds / 45000.0).toFixed(7)
+      }
+      return (await pgdb.public.comments.query(`
+        SELECT
+          c.*,
+          concat_ws(', ', u."firstName"::text, u."lastName"::text) AS "authorName"
+        FROM
+          comments c
+        JOIN
+          users u ON c."userId"=u.id
+        WHERE
+          c."feedId"=:feedId AND
+          c.published=:published AND
+          c."adminUnpublished"=:adminUnpublished
+        ORDER BY :orderBy
+      `, {
         feedId: feed.id,
         published: true,
-        adminUnpublished: false
-      },{
+        adminUnpublished: false,
         orderBy: ['createdAt desc']
       })).map( comment => {
-        const usersVote = comment.votes.find( vote => vote.userId === user.id )
+        const userVote = comment.votes.find( vote => vote.userId === user.id )
         return Object.assign({}, comment, {
+          userVote: !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN'),
           score: comment.upVotes - comment.downVotes,
-          usersVote: usersVote ? usersVote.vote : null
+          hottnes: hottnes(comment)
         })
-      })
-      return comments
+      }).sort( (a, b)  => descending(a.hottnes, b.hottnes) )
     }
   },
 

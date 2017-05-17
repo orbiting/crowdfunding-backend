@@ -4,7 +4,7 @@ const logger = require('../../lib/logger')
 module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
   ensureSignedIn(req, t)
 
-  const { feedName, content } = args
+  const { feedName, content, tags } = args
 
   //ensure feed exists
   const feed = await pgdb.public.feeds.findOne({name: feedName})
@@ -23,8 +23,8 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
   const transaction = await pgdb.transactionBegin()
   try {
 
-    //ensure user is withing newCommentWaitingTime
-    if(feed.newCommentWaitingTime) {
+    //ensure user is withing commentInterval
+    if(feed.commentInterval) {
       const now = new Date().getTime()
       const lastCommentByUser = await pgdb.public.comments.findFirst({
         userId: user.id,
@@ -33,8 +33,8 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       }, {
         orderBy: ['createdAt desc']
       })
-      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.newCommentWaitingTime) {
-        const waitForMinutes = (lastCommentByUser.createdAt.getTime()+feed.newCommentWaitingTime-now)/1000/60
+      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval) {
+        const waitForMinutes = (lastCommentByUser.createdAt.getTime()+feed.commentInterval-now)/1000/60
         let waitFor
         if(waitForMinutes <= 60)
           waitFor = Math.ceil(waitForMinutes)+'m'
@@ -54,7 +54,8 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
     const comment = await pgdb.public.comments.insertAndGet({
       feedId: feed.id,
       userId: user.id,
-      content
+      content,
+      tags: tags ? tags : []
     })
 
     await transaction.transactionCommit()
