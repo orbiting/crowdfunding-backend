@@ -501,7 +501,26 @@ const resolveFunctions = {
   Voting: {
     async options(voting, args, {pgdb, user}) {
       return pgdb.public.votingOptions.find({votingId: voting.id})
-    }
+    },
+    async turnout(voting, args, {pgdb, user}) {
+      return {
+        eligitable: pgdb.public.memberships.count(),
+        submitted: pgdb.public.ballotIssuances.count({votingId: voting.id})
+      }
+    },
+    async userIsEligitable(voting, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
+    },
+    async userHasSubmitted(voting, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.ballotIssuances.findFirst({
+        userId: user.id,
+        votingId: voting.id
+      }))
+    },
   },
 
   RootMutation: mutations,
