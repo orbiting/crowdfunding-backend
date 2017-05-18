@@ -20,8 +20,8 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/voting/membershipRequired'))
     }
 
-    //ensure has not voted yet
-    if(!!(await transaction.public.ballotIssuances.findFirst({
+    //ensure user has not voted yet
+    if(!!(await transaction.public.ballots.findFirst({
       userId: user.id,
       votingId: votingOption.votingId
     }))) {
@@ -29,13 +29,10 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/voting/alreadyVoted'))
     }
 
-    await transaction.public.ballotIssuances.insert({
-      votingId: votingOption.votingId,
-      userId: user.id
-    })
-
     await transaction.public.ballots.insert({
-      votingOptionId: optionId
+      votingId: votingOption.votingId,
+      votingOptionId: optionId,
+      userId: user.id
     })
 
     await transaction.transactionCommit()

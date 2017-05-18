@@ -505,7 +505,7 @@ const resolveFunctions = {
     async turnout(voting, args, {pgdb, user}) {
       return {
         eligitable: pgdb.public.memberships.count(),
-        submitted: pgdb.public.ballotIssuances.count({votingId: voting.id})
+        submitted: pgdb.public.ballots.count({votingId: voting.id})
       }
     },
     async userIsEligitable(voting, args, {pgdb, user}) {
@@ -516,7 +516,7 @@ const resolveFunctions = {
     async userHasSubmitted(voting, args, {pgdb, user}) {
       if(!user)
         return false
-      return !!(await pgdb.public.ballotIssuances.findFirst({
+      return !!(await pgdb.public.ballots.findFirst({
         userId: user.id,
         votingId: voting.id
       }))
