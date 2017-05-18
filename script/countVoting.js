@@ -71,7 +71,7 @@ PgDb.connect().then( async (pgdb) => {
           winner: (c.id === winner.id)
         })),
         updatedAt: new Date(),
-        createdAt: voting.result.createdAt || new Date(),
+        createdAt: voting.result ? voting.result.createdAt : new Date(),
         message: MESSAGE //ignored by postgres is null
       }
     })

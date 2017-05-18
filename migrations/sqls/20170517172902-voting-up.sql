@@ -6,7 +6,7 @@ create table "votings" (
   "name"                  text not null,
   "beginDate"             timestamptz not null,
   "endDate"               timestamptz not null,
-  "result"                jsonb not null default '{}',
+  "result"                jsonb,
   "createdAt"             timestamptz default now(),
   "updatedAt"             timestamptz default now(),
   unique("id", "name")
