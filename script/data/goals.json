@@ -28,7 +28,13 @@
     { "name": "SG5",
       "people": 12000,
       "money": 75000000,
-      "description": "Wir setzen ein nächstes Ziel: 12\u2009000 Unterstützerinnen und Unterstützer. Unterdessen tourt die Republik-Crew durchs Land. Und arbeitet an einer Idee für die Erreichung des nächsten Ziels: Demokratie in der Republik. Danke fürs Mitmachen und Weitersagen!"
+      "description": "12\u2009000 Unterstützerinnen! Damit haben wir gemeinsam mehr als die Hälfte der 22\u2009000 Abonnenten geschafft, die nötig sind, bis die Republik selbsttragend funktioniert. Danke!"
+
+    },
+    { "name": "SG6",
+      "people": 14000,
+      "money": 75000000,
+      "description": "Das Crowdfunding läuft bis am 31. Mai. Das nächste Ziel: 14\u2009000 Unterstützer. Die Republik-Crew tourt unterdessen weiter durchs Land und arbeitet an einer Idee: Demokratie in der Republik. Danke fürs Mitmachen und Weitersagen!"
     }
   ]
 }
