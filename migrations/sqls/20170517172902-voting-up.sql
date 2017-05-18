@@ -9,7 +9,7 @@ create table "votings" (
   "result"                jsonb not null default '{}',
   "createdAt"             timestamptz default now(),
   "updatedAt"             timestamptz default now(),
-  unique("name")
+  unique("id", "name")
 );
 create index "votings_result_idx" ON "votings" using GIN ("result");
 
@@ -19,7 +19,7 @@ create table "votingOptions" (
   "name"                  text not null,
   "createdAt"             timestamptz default now(),
   "updatedAt"             timestamptz default now(),
-  unique("name")
+  unique("votingId", "name")
 );
 
 create table "ballots" (
@@ -28,9 +28,9 @@ create table "ballots" (
 );
 
 create table "ballotIssuances" (
-  "id"                    uuid primary key not null default uuid_generate_v4(),
   "votingId"              uuid not null references "votings" on update cascade on delete cascade,
   "userId"                uuid not null references "users" on update cascade on delete cascade,
   "createdAt"             timestamptz default now(),
-  "updatedAt"             timestamptz default now()
+  "updatedAt"             timestamptz default now(),
+  PRIMARY KEY ("votingId", "userId")
 );
