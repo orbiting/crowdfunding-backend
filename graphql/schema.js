@@ -407,6 +407,7 @@ type Comment {
   content: String!
   tags: [String!]!
   authorName: String!
+  authorImage(size: ImageSize): String
   upVotes: Int!
   downVotes: Int!
   # score based on votes

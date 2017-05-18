@@ -498,6 +498,18 @@ const resolveFunctions = {
       }).sort( (a, b)  => descending(a.hottnes, b.hottnes) )
     }
   },
+  Comment: {
+    async authorImage(comment, {size}, {pgdb}) {
+      const testimonial = await pgdb.public.testimonials.findOne({userId: comment.userId})
+      if(!testimonial)
+        return null
+      let image = testimonial.image
+      if (size === 'SHARE') {
+        image = image.replace('384x384.jpeg', '1000x1000.jpeg')
+      }
+      return image
+    }
+  },
   Voting: {
     async options(voting, args, {pgdb, user}) {
       return pgdb.public.votingOptions.find({votingId: voting.id})
