@@ -464,11 +464,16 @@ const resolveFunctions = {
       //https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9
       const hottnes = comment => {
         const {log, max, abs, round} = Math
+
         const score = comment.upVotes - comment.downVotes
         const order = log( max(abs(score), 1), 10 )
         const sign = (score > 0) ? 1 : ( (score < 0) ? -1 : 0)
+
+        const absVotes = comment.upVotes + comment.downVotes
+        const orderReactions = log( max(abs(absVotes/10.0), 1), 10 )
+
         const seconds = comment.createdAt.getTime() - 1493190000 //republik epoch
-        return (sign * order + seconds / 45000.0).toFixed(7)
+        return (sign * order + orderReactions + seconds / 45000.0).toFixed(7)
       }
       return (await pgdb.public.comments.query(`
         SELECT
