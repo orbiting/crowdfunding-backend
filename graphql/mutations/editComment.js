@@ -1,5 +1,6 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const logger = require('../../lib/logger')
+const slack = require('../../lib/slack')
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
@@ -27,12 +28,13 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
     }
 
-    await transaction.public.comments.update({
+    const newComment = await transaction.public.comments.updateAndGetOne({
       id: comment.id,
     }, {
       content,
       updatedAt: new Date()
     })
+    await slack.publishComment(user, newComment, comment)
 
     await transaction.transactionCommit()
   } catch(e) {
