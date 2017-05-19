@@ -478,7 +478,7 @@ const resolveFunctions = {
       return (await pgdb.public.comments.query(`
         SELECT
           c.*,
-          concat_ws(', ', u."firstName"::text, u."lastName"::text) AS "authorName"
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
         FROM
           comments c
         JOIN
@@ -497,6 +497,7 @@ const resolveFunctions = {
         const userVote = comment.votes.find( vote => vote.userId === user.id )
         return Object.assign({}, comment, {
           userVote: !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN'),
+          userCanEdit: comment.userId === user.id,
           score: comment.upVotes - comment.downVotes,
           hottnes: hottnes(comment)
         })
