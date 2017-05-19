@@ -32,9 +32,10 @@ exports.start = (httpServer, executableSchema) => {
 }
 
 exports.publish = (pgdb) => async (channel, payload) => {
+  //TODO: proper sql escaping
   const notification = JSON.stringify({
     channel,
     payload
-  })
+  }).replace(/'/g, '')
   return pgdb.query(`NOTIFY crowdfunding, '${notification}'`)
 }
