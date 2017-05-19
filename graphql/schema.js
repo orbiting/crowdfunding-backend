@@ -416,6 +416,7 @@ type Comment {
   hottnes: Float!
   # vote of the signedIn user (null - no vote)
   userVote: CommentVote
+  userCanEdit: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
 }
