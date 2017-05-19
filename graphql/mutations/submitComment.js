@@ -63,7 +63,6 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       tags: tags ? tags : []
     })
 
-    await transaction.transactionCommit()
     await publish('commentAdded', comment)
 
     if(SlackWebClient) {
@@ -74,6 +73,8 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
         }
       })
     }
+
+    await transaction.transactionCommit()
 
   } catch(e) {
     await transaction.transactionRollback()
