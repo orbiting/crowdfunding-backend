@@ -494,10 +494,11 @@ const resolveFunctions = {
         adminUnpublished: false,
         orderBy: ['createdAt desc']
       })).map( comment => {
-        const userVote = user ? comment.votes.find( vote => vote.userId === user.id ) : null
+        const userId = user ? user.id : null
+        const userVote = comment.votes.find( vote => vote.userId === userId )
         return Object.assign({}, comment, {
           userVote: !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN'),
-          userCanEdit: comment.userId === user.id,
+          userCanEdit: comment.userId === userId,
           score: comment.upVotes - comment.downVotes,
           hottnes: hottnes(comment)
         })
