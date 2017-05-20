@@ -494,7 +494,7 @@ const resolveFunctions = {
         adminUnpublished: false,
         orderBy: ['createdAt desc']
       })).map( comment => {
-        const userVote = comment.votes.find( vote => vote.userId === user.id )
+        const userVote = user ? comment.votes.find( vote => vote.userId === user.id ) : null
         return Object.assign({}, comment, {
           userVote: !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN'),
           userCanEdit: comment.userId === user.id,
