@@ -453,14 +453,14 @@ const resolveFunctions = {
     }
   },
   Feed: {
-    async userCanComment(feed, args, {pgdb, user}) {
+    async userIsEligitable(feed, args, {pgdb, user}) {
       if(!user)
         return false
       return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
     },
-    async userWaitingTime(feed, args, {pgdb, user}) {
+    async userWaitUntil(feed, args, {pgdb, user}) {
       if(!user || !feed.commentInterval)
-        return 0
+        return
       const now = new Date().getTime()
       const lastCommentByUser = await pgdb.public.comments.findFirst({
         userId: user.id,
@@ -470,8 +470,8 @@ const resolveFunctions = {
         orderBy: ['createdAt desc']
       })
       if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval)
-        return (lastCommentByUser.createdAt.getTime()+feed.commentInterval-now)
-      return 0
+        return new Date((lastCommentByUser.createdAt.getTime()+feed.commentInterval))
+      return
     },
     async comments(feed, args, {pgdb}) {
       //https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9

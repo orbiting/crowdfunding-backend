@@ -391,9 +391,9 @@ type Feed {
   comments(offset: Int, limit: Int): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
-  userCanComment: Boolean!
-  # in milliseconds
-  userWaitingTime: Int!
+  userIsEligitable: Boolean!
+  # user must wait until that date to submit a new comment
+  userWaitUntil: DateTime
   # max length in chars of comment content
   commentMaxLength: Int!
   # waiting time to submit a new comment (in milliseconds)
