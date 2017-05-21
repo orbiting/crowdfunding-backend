@@ -461,7 +461,32 @@ const resolveFunctions = {
       return
     },
     async comments(feed, args, {pgdb}) {
-      return await pgdb.public.comments.query(`
+      const {offset, limit, firstId} = args
+
+      let firstComment
+      if(firstId) {
+        firstComment = (await pgdb.public.comments.query(`
+          SELECT
+            c.*,
+            concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
+          FROM
+            comments c
+          JOIN
+            users u ON c."userId"=u.id
+          WHERE
+            c."feedId"=:feedId AND
+            c.published=:published AND
+            c."adminUnpublished"=:adminUnpublished AND
+            c.id=:firstId
+        `, {
+          feedId: feed.id,
+          published: true,
+          adminUnpublished: false,
+          firstId
+        }))[0]
+      }
+
+      const comments = await pgdb.public.comments.query(`
         SELECT
           c.*,
           concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
@@ -474,12 +499,22 @@ const resolveFunctions = {
           c.published=:published AND
           c."adminUnpublished"=:adminUnpublished
         ORDER BY :orderBy
+        OFFSET :offset
+        LIMIT :limit
       `, {
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
-        orderBy: ['c.hottnes DESC']
+        orderBy: ['c.hottnes DESC'],
+        offset,
+        limit
       })
+
+      if(firstComment) {
+        return [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
+      }
+      return comments
+
     }
   },
   Comment: {

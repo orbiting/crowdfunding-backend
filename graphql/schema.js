@@ -382,7 +382,7 @@ type Feed {
   id: ID!
   name: String!
   # comments in this feed in natual order
-  comments(offset: Int, limit: Int): [Comment!]!
+  comments(offset: Int, limit: Int, firstId: ID): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   userIsEligitable: Boolean!
