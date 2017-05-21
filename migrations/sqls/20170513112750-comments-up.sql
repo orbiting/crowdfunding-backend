@@ -21,6 +21,7 @@ create table "comments" (
   "downVotes"             integer not null default 0,
   "votes"                 jsonb not null default '[]',
   "hottnes"               float not null,
+  "smImage"               text,
   "published"             boolean not null default true,
   "adminUnpublished"      boolean not null default false,
   "createdAt"             timestamptz default now(),

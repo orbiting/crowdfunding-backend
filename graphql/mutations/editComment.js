@@ -1,6 +1,12 @@
 const ensureSignedIn = require('../../lib/ensureSignedIn')
 const logger = require('../../lib/logger')
 const slack = require('../../lib/slack')
+const uuid = require('uuid/v4')
+const renderUrl = require('../../lib/renderUrl')
+const uploadExoscale = require('../../lib/uploadExoscale')
+
+const FOLDER = 'comments'
+const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
@@ -38,6 +44,27 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
     await slack.publishCommentUpdate(user, newComment, comment)
 
     await transaction.transactionCommit()
+
+    //generate sm picture
+    try {
+      const smImagePath = `/${FOLDER}/sm/${uuid()}_sm.png`
+      await renderUrl(`${FRONTEND_BASE_URL}/vote?share=${newComment.id}`, 1200, 628)
+        .then( async (data) => {
+          return uploadExoscale({
+            stream: data,
+            path: smImagePath,
+            mimeType: 'image/png',
+            bucket: S3BUCKET
+          }).then( async () => {
+            return pgdb.public.comments.updateOne({id: newComment.id}, {
+              smImage: ASSETS_BASE_URL+smImagePath
+            })
+          })
+        })
+    } catch(e) {
+      logger.error('sm image render failed', { req: req._log(), args, e })
+    }
+
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
