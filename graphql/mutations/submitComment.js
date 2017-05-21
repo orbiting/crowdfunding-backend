@@ -2,7 +2,7 @@ const ensureSignedIn = require('../../lib/ensureSignedIn')
 const logger = require('../../lib/logger')
 const slack = require('../../lib/slack')
 
-module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
+module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
 
   const { feedName, content, tags } = args
@@ -58,7 +58,6 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       tags: tags ? tags : []
     })
 
-    await publish('commentUpdate', comment)
     await slack.publishComment(user, comment)
 
     await transaction.transactionCommit()

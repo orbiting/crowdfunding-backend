@@ -11,8 +11,6 @@ if (DEV) {
   require('dotenv').config()
 }
 
-const { createServer } = require('http')
-
 process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
@@ -81,12 +79,10 @@ PgDb.connect().then( (pgdb) => {
     logger
   })
 
-  const httpServer = createServer(server)
-
-  graphql(server, pgdb, t, httpServer)
+  graphql(server, pgdb, t)
 
   // start the server
-  httpServer.listen(process.env.PORT, () => {
+  server.listen(process.env.PORT, () => {
     logger.info('server is running on http://localhost:'+process.env.PORT)
   })
 })

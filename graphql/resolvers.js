@@ -556,20 +556,7 @@ const resolveFunctions = {
     },
   },
 
-  RootMutation: mutations,
-
-  RootSubscription: {
-    commentUpdate: comment => {
-      console.log('resolvers commentUpdate')
-      console.log(comment)
-      return comment
-    },
-    commentRemoved: comment => {
-      console.log('resolvers commentRemoved')
-      console.log(comment)
-      return comment
-    },
-  },
+  RootMutation: mutations
 }
 
 module.exports = resolveFunctions

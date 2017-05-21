@@ -5,7 +5,6 @@ scalar DateTime
 schema {
   query: RootQuery
   mutation: RootMutation
-  subscription: RootSubscription
 }
 
 type RootQuery {
@@ -58,11 +57,6 @@ type RootMutation {
   unpublishComment(commentId: ID!): Boolean
 
   submitBallot(optionId: ID!): Boolean!
-}
-
-type RootSubscription {
-  commentUpdate(feedName: String!): Comment
-  commentRemoved(feedName: String!): Comment
 }
 
 

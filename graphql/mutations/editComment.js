@@ -35,7 +35,6 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       updatedAt: new Date()
     })
 
-    await publish('commentUpdate', newComment)
     await slack.publishCommentUpdate(user, newComment, comment)
 
     await transaction.transactionCommit()

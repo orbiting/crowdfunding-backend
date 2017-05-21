@@ -3,7 +3,6 @@ const {graphqlExpress, graphiqlExpress} = require('graphql-server-express')
 const {makeExecutableSchema} = require('graphql-tools')
 const OpticsAgent = require('optics-agent')
 const logger = require('../lib/logger')
-const subscriptions = require('./subscriptions')
 const LRU = require("lru-cache")
 const {MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS} = process.env
 
@@ -27,9 +26,7 @@ const membershipStatsCountriesCache = LRU({
   maxAge: (MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS || 30 ) * 1000
 })
 
-module.exports = (server, pgdb, t, httpServer) => {
-  subscriptions.start(httpServer, executableSchema)
-
+module.exports = (server, pgdb, t) => {
   server.use(OpticsAgent.middleware())
 
   server.use('/graphql',
@@ -48,7 +45,6 @@ module.exports = (server, pgdb, t, httpServer) => {
           user: req.user,
           req,
           t,
-          publish: subscriptions.publish(pgdb),
           membershipStatsCountriesCache
         }
       }
@@ -56,7 +52,6 @@ module.exports = (server, pgdb, t, httpServer) => {
   )
 
   server.use('/graphiql', graphiqlExpress({
-    endpointURL: '/graphql',
-    subscriptionsEndpoint: process.env.PUBLIC_WS_URL
+    endpointURL: '/graphql'
   }))
 }
