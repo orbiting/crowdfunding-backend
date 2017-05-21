@@ -53,7 +53,7 @@
     "start": "node index.js",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
-    "db:reset": "db-migrate reset && db-migrate up && knex seed:run",
+    "db:reset": "db-migrate reset && db-migrate up && knex seed:run && cat script/data/feeds.json | node script/importFeeds.js && cat script/data/votings.json | node script/importVotings.js",
     "seed": "knex seed:run",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",

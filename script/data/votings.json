@@ -8,15 +8,6 @@
         { "name": "CORRESPONDENT" },
         { "name": "SATIRE" }
       ]
-    },
-    { "name": "WTF",
-      "beginDate": "2017-05-22T05:00:00.000Z",
-      "endDate": "2017-05-29T17:00:00.000Z",
-      "options": [
-        { "name": "FICK" },
-        { "name": "FACK" },
-        { "name": "FUCK" }
-      ]
     }
   ]
 }
