@@ -1,0 +1,40 @@
+{
+  "comments": [
+    { "email": "constantin.seibt@project-r.construction",
+      "content": "1. Weil es im Leben überhaupt darum geht, immer unverschämter zu werden. 2. Weil Journalismus das gleiche Wappentier hat wie die Satire: den Aaskäfer. Beide zieht es dorthin, wo es stinkt.",
+      "tags": ["SATIRE"]
+    },
+    { "email": "laurent.burst@project-r.construction",
+      "content": "Satire erweitert Denkhorizonte und zieht neue Verlegerinnen an. Sie sagt, was nicht ausgesprochen werden darf. Sie führt plastisch vor Augen, was aus Vernunft noch unvorstellbar ist. Sie entkrampft Debatten und lässt Angegriffene über sich selbst lachen. Satire macht Spass, auch wenns todernst ist.",
+      "tags": ["SATIRE"]
+    },
+    { "email": "nadja.schnetzler@project-r.construction",
+      "content": "Journalistinnen, die auch hervorragende Programmierer sind: Die Republik hat schon einen der besten Datenjournalisten an Bord, und es braucht mindestens einen weiteren, um aus den verfügbaren Onlinedaten konzentrierte Information zu schaffen und so darzustellen, dass sie uns und unseren Leserinnen hilft, die Welt besser zu verstehen.",
+      "tags": ["DATA"]
+    },
+    { "email": "clara.vuillemin@project-r.construction",
+      "content": "Datenjournalismus und Satire sind etwas Wunderbares. Aber zuerst sollten wir uns getreu dem Motto «no bullshit» um unseren Kern kümmern: eine solide Berichterstattung über die relevantesten Themen in Politik, Gesellschaft und Wirtschaft. Und dafür brauchen wir einen guten Draht ins nahe Ausland.",
+      "tags": ["CORRESPONDENT"]
+    },
+    { "email": "susanne.sugimoto@project-r.construction",
+      "content": "Ich möchte in den Tag starten mit einem Schmunzeln über die Absurditäten der politischen Wirklichkeit, mich ergötzen an Übertreibungen der gesellschaftlichen Logik. Gute Information ist die Grundlage der Satire. Und Satire ist die Krone auf dem endgültigen Artikel – oder die Königin in der Republik.",
+      "tags": ["SATIRE"]
+    },
+    { "email": "thomas.preusse@project-r.construction",
+      "content": "Journalistisches Arbeiten mit Daten gehört zu einer modernen, kompetenten Redaktion. Die dazu dedizierte Stelle ermöglicht es, dies systematisch aufzubauen. Es braucht gekonnten Datenjournalismus, der sich unerschrocken an die grossen Themen traut. Wie Klimawandel, öffentliche Budgets und Korruption.",
+      "tags": ["DATA"]
+    },
+    { "email": "patrick.recher@project-r.construction",
+      "content": "Alle zwei Tage produziert die Menschheit so viele Daten wie bis 2003 gesamthaft (~5 EB). Und aus diesen Daten können wir noch viel lernen. Überlassen wir die Darstellung, die Interpretation und die Nutzung nicht ausschliesslich Grosskonzernen, sondern machen wir das gemeinsam im Namen der öffentlichen Sache.",
+      "tags": ["DATA"]
+    },
+    { "email": "richard.hoechner@project-r.construction",
+      "content": "Rund 300\u2009000 Deutsche leben in der Schweiz. Deutschland ist mit Abstand unser wichtigster Handelspartner. Was in Berlin, Frankfurt, München oder Hamburg passiert, interessiert auch diesseits des Rheins. Ein fixes Fenster in die Bundesrepublik würde gut in unser Magazin passen.",
+      "tags": ["CORRESPONDENT"]
+    },
+    { "email": "andrea.arezina@project-r.construction",
+      "content": "In einer Zeit, in der sich immer mehr Medien in ihrer Auslandsberichterstattung auf Agenturquellen abstützen, wäre eine Korrespondentin für Sie als Leser die Chance, die Verhältnisse im mächtigsten Land der EU näher kennenzulernen.",
+      "tags": ["CORRESPONDENT"]
+    }
+  ]
+}
