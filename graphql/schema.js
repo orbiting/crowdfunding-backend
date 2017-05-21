@@ -407,7 +407,7 @@ type Comment {
   downVotes: Int!
   # score based on votes
   score: Int!
-  # reddit's hottness
+  # reddit's hottnes
   hottnes: Float!
   # vote of the signedIn user (null - no vote)
   userVote: CommentVote

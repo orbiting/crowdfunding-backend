@@ -461,21 +461,7 @@ const resolveFunctions = {
       return
     },
     async comments(feed, args, {pgdb}) {
-      //https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9
-      const hottnes = comment => {
-        const {log, max, abs, round} = Math
-
-        const score = comment.upVotes - comment.downVotes
-        const order = log( max(abs(score), 1), 10 )
-        const sign = (score > 0) ? 1 : ( (score < 0) ? -1 : 0)
-
-        const absVotes = comment.upVotes + comment.downVotes
-        const orderReactions = log( max(abs(absVotes/10.0), 1), 10 )
-
-        const seconds = comment.createdAt.getTime() - 1493190000 //republik epoch
-        return (sign * order + orderReactions + seconds / 45000.0).toFixed(7)
-      }
-      return (await pgdb.public.comments.query(`
+      return await pgdb.public.comments.query(`
         SELECT
           c.*,
           concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
@@ -492,12 +478,8 @@ const resolveFunctions = {
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
-        orderBy: ['createdAt desc']
-      })).map( comment => {
-        return Object.assign({}, comment, {
-          hottnes: hottnes(comment)
-        })
-      }).sort( (a, b)  => descending(a.hottnes, b.hottnes) )
+        orderBy: ['c.hottnes DESC']
+      })
     }
   },
   Comment: {
