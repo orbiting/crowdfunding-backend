@@ -15,6 +15,19 @@ const {hasPostalCodesForCountry, postalCodeData, postalCodeParsers} = require('.
 const countryNameNormalizer = require('../lib/geo/country').nameNormalizer
 const countryDetailsForName = require('../lib/geo/country').detailsForName
 
+const commentHottnes = comment => {
+  const {log, max, abs, round} = Math
+
+  const score = comment.upVotes - comment.downVotes
+  const order = log( max(abs(score), 1), 10 )
+  const sign = (score > 0) ? 1 : ( (score < 0) ? -1 : 0)
+
+  const absVotes = comment.upVotes + comment.downVotes
+  const orderReactions = log( max(abs(absVotes/10.0), 1), 10 )
+
+  const seconds = comment.createdAt.getTime() - 1493190000 //republik epoch
+  return (sign * order + orderReactions + seconds / 45000.0).toFixed(7)
+}
 const resolveFunctions = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -460,21 +473,8 @@ const resolveFunctions = {
         return (lastCommentByUser.createdAt.getTime()+feed.commentInterval-now)
       return 0
     },
-    async comments(feed, args, {pgdb, user}) {
+    async comments(feed, args, {pgdb}) {
       //https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9
-      const hottnes = comment => {
-        const {log, max, abs, round} = Math
-
-        const score = comment.upVotes - comment.downVotes
-        const order = log( max(abs(score), 1), 10 )
-        const sign = (score > 0) ? 1 : ( (score < 0) ? -1 : 0)
-
-        const absVotes = comment.upVotes + comment.downVotes
-        const orderReactions = log( max(abs(absVotes/10.0), 1), 10 )
-
-        const seconds = comment.createdAt.getTime() - 1493190000 //republik epoch
-        return (sign * order + orderReactions + seconds / 45000.0).toFixed(7)
-      }
       return (await pgdb.public.comments.query(`
         SELECT
           c.*,
@@ -494,18 +494,32 @@ const resolveFunctions = {
         adminUnpublished: false,
         orderBy: ['createdAt desc']
       })).map( comment => {
-        const userId = user ? user.id : null
-        const userVote = comment.votes.find( vote => vote.userId === userId )
         return Object.assign({}, comment, {
-          userVote: !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN'),
-          userCanEdit: comment.userId === userId,
-          score: comment.upVotes - comment.downVotes,
-          hottnes: hottnes(comment)
+          hottnes: commentHottnes(comment)
         })
       }).sort( (a, b)  => descending(a.hottnes, b.hottnes) )
     }
   },
   Comment: {
+    async authorName(comment, args, {pgdb}) {
+      const user = await pgdb.public.users.findOne({id: comment.userId})
+      return `${user.firstName} ${user.lastName}`
+    },
+    userVote(comment, args, {pgdb, user}) {
+      const userId = user ? user.id : null
+      const userVote = comment.votes.find( vote => vote.userId === userId )
+      return !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN')
+    },
+    userCanEdit(comment, args, {pgdb, user}) {
+      const userId = user ? user.id : null
+      return comment.userId === userId
+    },
+    score(comment, args, context) {
+      return comment.upVotes - comment.downVotes
+    },
+    hottnes(comment, args, context) {
+      return commentHottnes(comment)
+    },
     async authorImage(comment, {size}, {pgdb}) {
       const testimonial = await pgdb.public.testimonials.findOne({userId: comment.userId})
       if(!testimonial)
@@ -545,8 +559,14 @@ const resolveFunctions = {
   RootMutation: mutations,
 
   RootSubscription: {
-    commentAdded: comment => {
-      console.log('resolvers subscription')
+    commentUpdate: comment => {
+      console.log('resolvers commentUpdate')
+      console.log(comment)
+      return comment
+    },
+    commentRemoved: comment => {
+      console.log('resolvers commentRemoved')
+      console.log(comment)
       return comment
     },
   },

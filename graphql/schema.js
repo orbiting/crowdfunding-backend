@@ -61,7 +61,8 @@ type RootMutation {
 }
 
 type RootSubscription {
-  commentAdded(feedName: String!): Comment
+  commentUpdate(feedName: String!): Comment
+  commentRemoved(feedName: String!): Comment
 }
 
 

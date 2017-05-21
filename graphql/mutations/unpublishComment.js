@@ -26,6 +26,7 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       published: false
     })
 
+    await publish('commentRemoved', comment)
     await slack.publishCommentUnpublish(user, comment)
 
     await transaction.transactionCommit()

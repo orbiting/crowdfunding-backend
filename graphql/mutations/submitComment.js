@@ -58,7 +58,7 @@ module.exports = async (_, args, {pgdb, user, req, t, publish}) => {
       tags: tags ? tags : []
     })
 
-    await publish('commentAdded', comment)
+    await publish('commentUpdate', comment)
     await slack.publishComment(user, comment)
 
     await transaction.transactionCommit()
