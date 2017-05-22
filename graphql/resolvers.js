@@ -498,14 +498,13 @@ const resolveFunctions = {
           c."feedId"=:feedId AND
           c.published=:published AND
           c."adminUnpublished"=:adminUnpublished
-        ORDER BY :orderBy
+        ORDER BY c.hottnes DESC
         OFFSET :offset
         LIMIT :limit
       `, {
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
-        orderBy: ['c.hottnes DESC'],
         offset,
         limit
       })
