@@ -534,7 +534,13 @@ const resolveFunctions = {
       return comment.upVotes - comment.downVotes
     },
     async authorImage(comment, {size}, {pgdb}) {
-      const testimonial = await pgdb.public.testimonials.findOne({userId: comment.userId})
+      const testimonial = await pgdb.public.testimonials.findFirst({
+        userId: comment.userId,
+        published: true,
+        adminUnpublished: false
+      }, {
+        orderBy: ['createdAt desc']
+      })
       if(!testimonial)
         return null
       let image = testimonial.image
