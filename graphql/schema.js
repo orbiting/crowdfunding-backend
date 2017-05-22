@@ -50,10 +50,10 @@ type RootMutation {
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
   unpublishTestimonial: Boolean
 
-  submitComment(feedName: String!, content: String!, tags: [String!]): Boolean
-  upvoteComment(commentId: ID!): Boolean
-  downvoteComment(commentId: ID!): Boolean
-  editComment(commentId: ID!, content: String!): Boolean
+  submitComment(feedName: String!, content: String!, tags: [String!]): Comment!
+  upvoteComment(commentId: ID!): Comment!
+  downvoteComment(commentId: ID!): Comment!
+  editComment(commentId: ID!, content: String!): Comment!
   unpublishComment(commentId: ID!): Boolean
 
   submitBallot(optionId: ID!): Boolean!

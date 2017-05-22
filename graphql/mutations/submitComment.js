@@ -90,6 +90,8 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       logger.error('sm image render failed', { req: req._log(), args, e })
     }
 
+    return comment
+
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
