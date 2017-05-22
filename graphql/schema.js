@@ -26,6 +26,12 @@ type RootQuery {
   membershipStats: MembershipStats!
   testimonialStats: TestimonialStats!
   paymentStats: PaymentStats!
+
+  feeds: [Feed!]!
+  feed(name: String!, offset: Int, limit: Int): Feed!
+
+  votings: [Voting!]!
+  voting(name: String!): Voting!
 }
 
 type RootMutation {
@@ -43,7 +49,16 @@ type RootMutation {
 
   submitTestimonial(role: String, quote: String!, image: String): Testimonial!
   unpublishTestimonial: Boolean
+
+  submitComment(feedName: String!, content: String!, tags: [String!]): Comment!
+  upvoteComment(commentId: ID!): Comment!
+  downvoteComment(commentId: ID!): Comment!
+  editComment(commentId: ID!, content: String!): Comment!
+  unpublishComment(commentId: ID!): Boolean
+
+  submitBallot(optionId: ID!): Boolean!
 }
+
 
 type MutationResult {
   success: Boolean!
@@ -361,5 +376,80 @@ type DetailCount {
   detail: String
   count: Int!
 }
+
+
+type Feed {
+  id: ID!
+  name: String!
+  # comments in this feed in natual order
+  comments(offset: Int, limit: Int, firstId: ID): [Comment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  userIsEligitable: Boolean!
+  # user must wait until that date to submit a new comment
+  userWaitUntil: DateTime
+  # max length in chars of comment content
+  commentMaxLength: Int!
+  # waiting time to submit a new comment (in milliseconds)
+  commentInterval: Int!
+}
+enum CommentVote {
+  UP
+  DOWN
+}
+type Comment {
+  id: ID!
+  content: String!
+  tags: [String!]!
+  authorName: String!
+  authorImage(size: ImageSize): String
+  smImage: String
+  upVotes: Int!
+  downVotes: Int!
+  # score based on votes
+  score: Int!
+  # reddit's hottnes
+  hottnes: Float!
+  # vote of the signedIn user (null - no vote)
+  userVote: CommentVote
+  userCanEdit: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Voting {
+  id: ID!
+  name: String!
+  beginDate: DateTime!
+  endDate: DateTime!
+  options: [VoteOption!]!
+  turnout: VoteTurnout!
+  result: VoteResult
+  # current user (me) is eligitable to submit a ballot
+  userIsEligitable: Boolean
+  # current user (me) has submitted a ballot
+  userHasSubmitted: Boolean
+}
+type VoteTurnout {
+  eligitable: Int!
+  submitted: Int!
+}
+type VoteOption {
+  id: ID!
+  name: String!
+}
+type VoteOptionResult {
+  id: ID!
+  name: String!
+  count: Int!
+  winner: Boolean
+}
+type VoteResult {
+  options: [VoteOptionResult!]!
+  message: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 `
 module.exports = [typeDefinitions]

@@ -159,6 +159,18 @@ const resolveFunctions = {
       })
       return {paymentMethods}
     },
+    async feeds(_, args, {pgdb, req}) {
+      return pgdb.public.feeds.find()
+    },
+    async feed(_, args, {pgdb}) {
+      return pgdb.public.feeds.findOne( args )
+    },
+    async votings(_, args, {pgdb, req}) {
+      return pgdb.public.votings.find()
+    },
+    async voting(_, args, {pgdb}) {
+      return pgdb.public.votings.findOne( args )
+    },
   }),
 
   User: {
@@ -426,6 +438,141 @@ const resolveFunctions = {
 
       return countriesWithPostalCodes
     }
+  },
+  Feed: {
+    async userIsEligitable(feed, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
+    },
+    async userWaitUntil(feed, args, {pgdb, user}) {
+      if(!user || !feed.commentInterval)
+        return
+      const now = new Date().getTime()
+      const lastCommentByUser = await pgdb.public.comments.findFirst({
+        userId: user.id,
+        feedId: feed.id,
+        published: true
+      }, {
+        orderBy: ['createdAt desc']
+      })
+      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval)
+        return new Date((lastCommentByUser.createdAt.getTime()+feed.commentInterval))
+      return
+    },
+    async comments(feed, args, {pgdb}) {
+      const {offset, limit, firstId} = args
+
+      let firstComment
+      if(firstId) {
+        firstComment = (await pgdb.public.comments.query(`
+          SELECT
+            c.*,
+            concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
+          FROM
+            comments c
+          JOIN
+            users u ON c."userId"=u.id
+          WHERE
+            c."feedId"=:feedId AND
+            c.published=:published AND
+            c."adminUnpublished"=:adminUnpublished AND
+            c.id=:firstId
+        `, {
+          feedId: feed.id,
+          published: true,
+          adminUnpublished: false,
+          firstId
+        }))[0]
+      }
+
+      const comments = await pgdb.public.comments.query(`
+        SELECT
+          c.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
+        FROM
+          comments c
+        JOIN
+          users u ON c."userId"=u.id
+        WHERE
+          c."feedId"=:feedId AND
+          c.published=:published AND
+          c."adminUnpublished"=:adminUnpublished
+        ORDER BY c.hottnes DESC
+        OFFSET :offset
+        LIMIT :limit
+      `, {
+        feedId: feed.id,
+        published: true,
+        adminUnpublished: false,
+        offset,
+        limit
+      })
+
+      if(firstComment) {
+        return [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
+      }
+      return comments
+
+    }
+  },
+  Comment: {
+    async authorName(comment, args, {pgdb}) {
+      const user = await pgdb.public.users.findOne({id: comment.userId})
+      return `${user.firstName} ${user.lastName}`
+    },
+    userVote(comment, args, {pgdb, user}) {
+      const userId = user ? user.id : null
+      const userVote = comment.votes.find( vote => vote.userId === userId )
+      return !userVote ? null : (userVote.vote === 1 ? 'UP' : 'DOWN')
+    },
+    userCanEdit(comment, args, {pgdb, user}) {
+      const userId = user ? user.id : null
+      return comment.userId === userId
+    },
+    score(comment, args, context) {
+      return comment.upVotes - comment.downVotes
+    },
+    async authorImage(comment, {size}, {pgdb}) {
+      const testimonial = await pgdb.public.testimonials.findFirst({
+        userId: comment.userId,
+        published: true,
+        adminUnpublished: false
+      }, {
+        orderBy: ['createdAt desc']
+      })
+      if(!testimonial)
+        return null
+      let image = testimonial.image
+      if (size === 'SHARE') {
+        image = image.replace('384x384.jpeg', '1000x1000.jpeg')
+      }
+      return image
+    }
+  },
+  Voting: {
+    async options(voting, args, {pgdb, user}) {
+      return pgdb.public.votingOptions.find({votingId: voting.id})
+    },
+    async turnout(voting, args, {pgdb, user}) {
+      return {
+        eligitable: pgdb.public.memberships.count(),
+        submitted: pgdb.public.ballots.count({votingId: voting.id})
+      }
+    },
+    async userIsEligitable(voting, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
+    },
+    async userHasSubmitted(voting, args, {pgdb, user}) {
+      if(!user)
+        return false
+      return !!(await pgdb.public.ballots.findFirst({
+        userId: user.id,
+        votingId: voting.id
+      }))
+    },
   },
 
   RootMutation: mutations
