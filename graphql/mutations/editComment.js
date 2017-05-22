@@ -41,8 +41,6 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       updatedAt: new Date()
     })
 
-    await slack.publishCommentUpdate(user, newComment, comment)
-
     await transaction.transactionCommit()
 
     //generate sm picture
@@ -63,6 +61,12 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
         })
     } catch(e) {
       logger.error('sm image render failed', { req: req._log(), args, e })
+    }
+
+    try {
+      await slack.publishCommentUpdate(user, newComment, comment)
+    } catch(e) {
+      logger.error('publish commentUpdate on slack failed', { req: req._log(), args, e })
     }
 
     return newComment

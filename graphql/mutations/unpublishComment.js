@@ -26,9 +26,14 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       published: false
     })
 
-    await slack.publishCommentUnpublish(user, comment)
-
     await transaction.transactionCommit()
+
+    try {
+      await slack.publishCommentUnpublish(user, comment)
+    } catch(e) {
+      logger.error('publish unpublishComment on slack failed', { req: req._log(), args, e })
+    }
+
   } catch(e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
