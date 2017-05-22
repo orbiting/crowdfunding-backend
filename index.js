@@ -6,7 +6,6 @@ const logger = require('./lib/logger')
 const {getFormatter} = require('./lib/translate')
 const MESSAGES = require('./lib/translations.json').data
 const util = require('util')
-
 const DEV = process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
 if (DEV) {
   require('dotenv').config()

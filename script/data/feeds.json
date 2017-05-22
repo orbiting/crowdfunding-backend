@@ -1,0 +1,12 @@
+{
+  "feeds": [
+    { "name": "END_GOAL",
+      "commentMaxLength": 300,
+      "commentInterval": 86400000
+    },
+    { "name": "CHAT",
+      "commentMaxLength": 300,
+      "commentInterval": 1000
+    }
+  ]
+}

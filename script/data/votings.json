@@ -1,0 +1,13 @@
+{
+  "votings": [
+    { "name": "END_GOAL",
+      "beginDate": "2017-05-22T05:00:00.000Z",
+      "endDate": "2017-05-28T10:00:00.000Z",
+      "options": [
+        { "name": "DATA" },
+        { "name": "CORRESPONDENT" },
+        { "name": "SATIRE" }
+      ]
+    }
+  ]
+}
