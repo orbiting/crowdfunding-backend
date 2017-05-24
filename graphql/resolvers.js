@@ -461,7 +461,7 @@ const resolveFunctions = {
       return
     },
     async comments(feed, args, {pgdb}) {
-      const {offset, limit, firstId, tags} = args
+      const {offset, limit, firstId, tags, order} = args
 
       const firstComment = firstId
         ? await pgdb.public.comments.find({
@@ -472,7 +472,14 @@ const resolveFunctions = {
           })
         : null
 
-      const comments = await pgdb.public.comments.find({
+
+      let orderBy = 'hottnes DESC'
+      if(order === 'NEW')
+        orderBy = '"createdAt" DESC'
+      if(order === 'TOP')
+        orderBy = '"upVotes" DESC'
+
+      let comments = (await pgdb.public.comments.find({
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
@@ -480,8 +487,13 @@ const resolveFunctions = {
       }, {
         offset,
         limit,
-        orderBy: ['hottnes DESC']
-      })
+        orderBy: [orderBy]
+      })).map( c => Object.assign({}, c, {
+        score: c.upVotes - c.downVotes
+      }))
+
+      if(order === 'TOP')
+        comments = comments.sort( (a, b) => descending(a.score, b.score))
 
       return firstComment
         ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))

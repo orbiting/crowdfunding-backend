@@ -377,6 +377,11 @@ type DetailCount {
   count: Int!
 }
 
+enum OrderType {
+  HOT
+  NEW
+  TOP
+}
 
 type Feed {
   id: ID!
@@ -384,7 +389,7 @@ type Feed {
   # comments in this feed.
   # firstId is always the first object if it exists
   # tags: null - no filter, [] - no tags, ["DATA"] - only DATA tagged objects
-  comments(offset: Int, limit: Int, firstId: ID, tags: [String!]): [Comment!]!
+  comments(offset: Int, limit: Int, firstId: ID, tags: [String!], order: OrderType): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   userIsEligitable: Boolean!
