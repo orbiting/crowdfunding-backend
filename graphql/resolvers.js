@@ -556,7 +556,7 @@ const resolveFunctions = {
     },
     async turnout(voting, args, {pgdb, user}) {
       return {
-        eligitable: pgdb.public.memberships.count(),
+        eligitable: pgdb.queryOneField(`SELECT count(distinct("userId")) FROM memberships`),
         submitted: pgdb.public.ballots.count({votingId: voting.id})
       }
     },
