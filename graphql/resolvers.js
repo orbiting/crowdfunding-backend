@@ -479,7 +479,7 @@ const resolveFunctions = {
       if(order === 'TOP')
         orderBy = '"upVotes" - "downVotes" DESC'
 
-      let comments = (await pgdb.public.comments.find({
+      const comments = (await pgdb.public.comments.find({
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
