@@ -464,7 +464,7 @@ const resolveFunctions = {
       const {offset, limit, firstId, tags, order} = args
 
       const firstComment = firstId
-        ? await pgdb.public.comments.find({
+        ? await pgdb.public.comments.findOne({
             id: firstId,
             feedId: feed.id,
             published: true,
