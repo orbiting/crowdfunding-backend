@@ -499,6 +499,24 @@ const resolveFunctions = {
       return firstComment
         ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
         : comments
+    },
+    async stats(feed, args, {pgdb}) {
+      return {
+        count: pgdb.public.comments.count({feedId: feed.id}),
+        tags: pgdb.query(`
+          SELECT
+            tag as tag,
+            count(*) as count
+          FROM
+            comments c,
+            json_array_elements_text(c.tags::json) tag
+          WHERE
+            c."feedId"=:feedId
+          GROUP BY 1
+        `, {
+          feedId: feed.id
+        })
+      }
     }
   },
   Comment: {

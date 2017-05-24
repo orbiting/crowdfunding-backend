@@ -399,7 +399,18 @@ type Feed {
   commentMaxLength: Int!
   # waiting time to submit a new comment (in milliseconds)
   commentInterval: Int!
+  stats: FeedStats!
 }
+type FeedStats {
+  count: Int!
+  tags: [TagCount!]!
+}
+type TagCount {
+  tag: String!
+  count: Int!
+}
+
+
 enum CommentVote {
   UP
   DOWN
