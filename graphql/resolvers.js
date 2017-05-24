@@ -461,59 +461,89 @@ const resolveFunctions = {
       return
     },
     async comments(feed, args, {pgdb}) {
-      const {offset, limit, firstId} = args
+      const {offset, limit, firstId, tags, order} = args
 
-      let firstComment
-      if(firstId) {
-        firstComment = (await pgdb.public.comments.query(`
-          SELECT
-            c.*,
-            concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
-          FROM
-            comments c
-          JOIN
-            users u ON c."userId"=u.id
-          WHERE
-            c."feedId"=:feedId AND
-            c.published=:published AND
-            c."adminUnpublished"=:adminUnpublished AND
-            c.id=:firstId
-        `, {
-          feedId: feed.id,
-          published: true,
-          adminUnpublished: false,
-          firstId
-        }))[0]
-      }
+      const firstComment = firstId
+        ? await pgdb.public.comments.findOne({
+            id: firstId,
+            feedId: feed.id,
+            published: true,
+            adminUnpublished: false
+          })
+        : null
 
-      const comments = await pgdb.public.comments.query(`
-        SELECT
-          c.*,
-          concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
-        FROM
-          comments c
-        JOIN
-          users u ON c."userId"=u.id
-        WHERE
-          c."feedId"=:feedId AND
-          c.published=:published AND
-          c."adminUnpublished"=:adminUnpublished
-        ORDER BY c.hottnes DESC
-        OFFSET :offset
-        LIMIT :limit
-      `, {
+
+      let orderBy = 'hottnes DESC'
+      if(order === 'NEW')
+        orderBy = '"createdAt" DESC'
+      if(order === 'TOP')
+        orderBy = '"upVotes" - "downVotes" DESC'
+
+      const comments = (await pgdb.public.comments.find({
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
+        'tags @>': tags,
+        tags: (tags && tags.length === 0) ? '[]' : undefined
+      }, {
         offset,
-        limit
-      })
+        limit,
+        orderBy: [orderBy],
+        skipUndefined: true
+      })).map( c => Object.assign({}, c, {
+        score: c.upVotes - c.downVotes
+      }))
 
-      if(firstComment) {
-        return [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
+      return firstComment
+        ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
+        : comments
+    },
+    async stats(feed, args, {pgdb}) {
+      return {
+        count: pgdb.public.comments.count({
+          feedId: feed.id,
+          published: true,
+          adminUnpublished: false
+        }),
+        tags: [
+          {
+            tag: null,
+            count: await pgdb.queryOneField(`
+              SELECT
+                count(*)
+              FROM
+                comments c
+              WHERE
+                c."feedId"=:feedId AND
+                c.tags = '[]' AND
+                c.published=:published AND
+                c."adminUnpublished"=:adminUnpublished
+            `, {
+              feedId: feed.id,
+              published: true,
+              adminUnpublished: false,
+            })
+          }
+        ]
+          .concat(await pgdb.query(`
+            SELECT
+              tag as tag,
+              count(*) as count
+            FROM
+              comments c,
+              json_array_elements_text(c.tags::json) tag
+            WHERE
+              c."feedId"=:feedId AND
+              c.published=:published AND
+              c."adminUnpublished"=:adminUnpublished
+            GROUP BY 1
+          `, {
+            feedId: feed.id,
+            published: true,
+            adminUnpublished: false,
+          }))
+          .sort((a, b) => descending(a.count, b.count))
       }
-      return comments
-
     }
   },
   Comment: {
