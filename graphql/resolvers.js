@@ -484,9 +484,7 @@ const resolveFunctions = {
         published: true,
         adminUnpublished: false,
         'tags @>': tags,
-        'tags ->0': tags && tags.length === 0
-          ? '[]'
-          : undefined
+        tags: (tags && tags.length === 0) ? '[]' : undefined
       }, {
         offset,
         limit,
