@@ -506,7 +506,10 @@ const resolveFunctions = {
     async stats(feed, args, {pgdb}) {
       return {
         count: pgdb.public.comments.count({feedId: feed.id}),
-        tags: pgdb.query(`
+        tags: [
+          { tag: null,
+            count: pgdb.queryOneField(`SELECT count(*) FROM comments c WHERE tags = '[]'`) }
+        ].concat(await pgdb.query(`
           SELECT
             tag as tag,
             count(*) as count
@@ -518,7 +521,7 @@ const resolveFunctions = {
           GROUP BY 1
         `, {
           feedId: feed.id
-        })
+        }))
       }
     }
   },

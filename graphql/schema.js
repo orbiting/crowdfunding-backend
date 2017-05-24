@@ -406,7 +406,7 @@ type FeedStats {
   tags: [TagCount!]!
 }
 type TagCount {
-  tag: String!
+  tag: String
   count: Int!
 }
 
