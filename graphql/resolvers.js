@@ -461,59 +461,31 @@ const resolveFunctions = {
       return
     },
     async comments(feed, args, {pgdb}) {
-      const {offset, limit, firstId} = args
+      const {offset, limit, firstId, tags} = args
 
-      let firstComment
-      if(firstId) {
-        firstComment = (await pgdb.public.comments.query(`
-          SELECT
-            c.*,
-            concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
-          FROM
-            comments c
-          JOIN
-            users u ON c."userId"=u.id
-          WHERE
-            c."feedId"=:feedId AND
-            c.published=:published AND
-            c."adminUnpublished"=:adminUnpublished AND
-            c.id=:firstId
-        `, {
-          feedId: feed.id,
-          published: true,
-          adminUnpublished: false,
-          firstId
-        }))[0]
-      }
+      const firstComment = firstId
+        ? await pgdb.public.comments.find({
+            id: firstId,
+            feedId: feed.id,
+            published: true,
+            adminUnpublished: false
+          })
+        : null
 
-      const comments = await pgdb.public.comments.query(`
-        SELECT
-          c.*,
-          concat_ws(' ', u."firstName"::text, u."lastName"::text) AS "authorName"
-        FROM
-          comments c
-        JOIN
-          users u ON c."userId"=u.id
-        WHERE
-          c."feedId"=:feedId AND
-          c.published=:published AND
-          c."adminUnpublished"=:adminUnpublished
-        ORDER BY c.hottnes DESC
-        OFFSET :offset
-        LIMIT :limit
-      `, {
+      const comments = await pgdb.public.comments.find({
         feedId: feed.id,
         published: true,
         adminUnpublished: false,
+        'tags @>': tags
+      }, {
         offset,
-        limit
+        limit,
+        orderBy: ['hottnes DESC']
       })
 
-      if(firstComment) {
-        return [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
-      }
-      return comments
-
+      return firstComment
+        ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
+        : comments
     }
   },
   Comment: {

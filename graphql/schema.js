@@ -381,8 +381,10 @@ type DetailCount {
 type Feed {
   id: ID!
   name: String!
-  # comments in this feed in natual order
-  comments(offset: Int, limit: Int, firstId: ID): [Comment!]!
+  # comments in this feed.
+  # firstId is always the first object if it exists
+  # tags: null - no filter, [] - no tags, ["DATA"] - only DATA tagged objects
+  comments(offset: Int, limit: Int, firstId: ID, tags: [String!]): [Comment!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   userIsEligitable: Boolean!
