@@ -487,7 +487,8 @@ const resolveFunctions = {
       }, {
         offset,
         limit,
-        orderBy: [orderBy]
+        orderBy: [orderBy],
+        skipUndefined: true
       })).map( c => Object.assign({}, c, {
         score: c.upVotes - c.downVotes
       }))
