@@ -477,7 +477,7 @@ const resolveFunctions = {
       if(order === 'NEW')
         orderBy = '"createdAt" DESC'
       if(order === 'TOP')
-        orderBy = '"upVotes" DESC'
+        orderBy = '"upVotes" - "downVotes" DESC'
 
       let comments = (await pgdb.public.comments.find({
         feedId: feed.id,
@@ -493,9 +493,6 @@ const resolveFunctions = {
       })).map( c => Object.assign({}, c, {
         score: c.upVotes - c.downVotes
       }))
-
-      if(order === 'TOP')
-        comments = comments.sort( (a, b) => descending(a.score, b.score))
 
       return firstComment
         ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
