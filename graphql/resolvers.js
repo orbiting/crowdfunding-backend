@@ -506,7 +506,22 @@ const resolveFunctions = {
         count: pgdb.public.comments.count({feedId: feed.id}),
         tags: [
           { tag: null,
-            count: pgdb.queryOneField(`SELECT count(*) FROM comments c WHERE tags = '[]'`) }
+            count: pgdb.queryOneField(`
+              SELECT
+                count(*)
+              FROM
+                comments c
+              WHERE
+                c."feedId"=:feedId AND
+                c.tags = '[]' AND
+                c.published=:published AND
+                c."adminUnpublished"=:adminUnpublished
+            `, {
+              feedId: feed.id,
+              published: true,
+              adminUnpublished: false,
+            })
+          }
         ].concat(await pgdb.query(`
           SELECT
             tag as tag,
@@ -515,10 +530,14 @@ const resolveFunctions = {
             comments c,
             json_array_elements_text(c.tags::json) tag
           WHERE
-            c."feedId"=:feedId
+            c."feedId"=:feedId AND
+            c.published=:published AND
+            c."adminUnpublished"=:adminUnpublished
           GROUP BY 1
         `, {
-          feedId: feed.id
+          feedId: feed.id,
+          published: true,
+          adminUnpublished: false,
         }))
       }
     }
