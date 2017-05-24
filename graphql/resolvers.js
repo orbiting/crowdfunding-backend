@@ -503,10 +503,15 @@ const resolveFunctions = {
     },
     async stats(feed, args, {pgdb}) {
       return {
-        count: pgdb.public.comments.count({feedId: feed.id}),
+        count: pgdb.public.comments.count({
+          feedId: feed.id,
+          published: true,
+          adminUnpublished: false
+        }),
         tags: [
-          { tag: null,
-            count: pgdb.queryOneField(`
+          {
+            tag: null,
+            count: await pgdb.queryOneField(`
               SELECT
                 count(*)
               FROM
@@ -522,23 +527,25 @@ const resolveFunctions = {
               adminUnpublished: false,
             })
           }
-        ].concat(await pgdb.query(`
-          SELECT
-            tag as tag,
-            count(*) as count
-          FROM
-            comments c,
-            json_array_elements_text(c.tags::json) tag
-          WHERE
-            c."feedId"=:feedId AND
-            c.published=:published AND
-            c."adminUnpublished"=:adminUnpublished
-          GROUP BY 1
-        `, {
-          feedId: feed.id,
-          published: true,
-          adminUnpublished: false,
-        }))
+        ]
+          .concat(await pgdb.query(`
+            SELECT
+              tag as tag,
+              count(*) as count
+            FROM
+              comments c,
+              json_array_elements_text(c.tags::json) tag
+            WHERE
+              c."feedId"=:feedId AND
+              c.published=:published AND
+              c."adminUnpublished"=:adminUnpublished
+            GROUP BY 1
+          `, {
+            feedId: feed.id,
+            published: true,
+            adminUnpublished: false,
+          }))
+          .sort((a, b) => descending(a.count, b.count))
       }
     }
   },
