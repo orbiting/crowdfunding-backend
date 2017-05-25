@@ -604,6 +604,108 @@ const resolveFunctions = {
       }))
     },
   },
+  VoteResult: {
+    async stats(result, args, {pgdb}) {
+      return {}
+    }
+  },
+  VoteStats: {
+    async ages(_, args, {pgdb}) {
+      //no access to voting here, we have one voting and no time: don't constrain to votingId
+
+      //others (no birthday)
+      const otherOptions = await pgdb.query(`
+        SELECT
+          vo.id AS id,
+          vo.name AS name,
+          COUNT(b."votingOptionId") AS count
+        FROM
+          "votingOptions" vo
+        LEFT JOIN
+          ballots b
+          ON vo.id=b."votingOptionId"
+        LEFT JOIN
+          users u
+          ON b."userId"=u.id
+        WHERE
+          u.birthday is null
+        GROUP BY
+          1, 2
+        ORDER BY
+          3 DESC
+      `)
+      const maxOtherOptions = otherOptions.reduce(
+        (prev, current) => prev.count > current.count ? prev : current
+      )
+      const otherStatsCount = {
+        key: 'null',
+        options: otherOptions.map( o => Object.assign({}, o, {
+          winner: o.count === maxOtherOptions.count
+        })),
+        count: otherOptions.reduce(
+          (sum, o) => sum + o.count,
+          0
+        )
+      }
+
+      const ageGroups = [
+        {min: 0, max: 19},
+        {min: 20, max: 29},
+        {min: 30, max: 39},
+        {min: 40, max: 49},
+        {min: 50, max: 59},
+        {min: 60, max: 69},
+        {min: 70, max: 79},
+        {min: 80, max: 99999}
+      ]
+
+      const statsCounts = ageGroups.map( async (ageGroup) => {
+        const options = await pgdb.query(`
+          SELECT
+            vo.id AS id,
+            vo.name AS name,
+            COUNT(b."votingOptionId") AS count
+          FROM
+            "votingOptions" vo
+          LEFT JOIN
+            ballots b
+            ON vo.id=b."votingOptionId"
+          LEFT JOIN
+            users u
+            ON b."userId"=u.id
+          WHERE
+            u.birthday is not null AND
+            extract(year from age(u.birthday)) >= :minAge AND
+            extract(year from age(u.birthday)) <= :maxAge
+          GROUP BY
+            1, 2
+          ORDER BY
+            3 DESC
+        `, {
+          minAge: ageGroup.min,
+          maxAge: ageGroup.max
+        })
+        let maxOption
+        if(options.length) {
+          maxOption = options.reduce(
+            (prev, current) => prev.count > current.count ? prev : current
+          )
+        }
+        return {
+          key: `${ageGroup.min}-${ageGroup.max}`,
+          options: options.map( o => Object.assign({}, o, {
+            winner: maxOption ? o.count === maxOption.count : false
+          })),
+          count: options.reduce(
+            (sum, o) => sum + o.count,
+            0
+          )
+        }
+      })
+
+      return [otherStatsCount].concat(statsCounts)
+    },
+  },
 
   RootMutation: mutations
 }
