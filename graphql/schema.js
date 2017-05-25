@@ -464,9 +464,21 @@ type VoteOptionResult {
 }
 type VoteResult {
   options: [VoteOptionResult!]!
+  stats: VoteStats!
   message: String
   createdAt: DateTime
   updatedAt: DateTime
+}
+type VoteStats {
+  ages: [VoteStatsCount!]!
+  countries: [VoteStatsCount!]!
+  chSlt2012: [VoteStatsCount!]!
+  chCantons: [VoteStatsCount!]!
+}
+type VoteStatsCount {
+  key: String!
+  count: Int!
+  options: [VoteOptionResult!]!
 }
 
 `
