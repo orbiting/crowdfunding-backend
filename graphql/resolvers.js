@@ -705,6 +705,117 @@ const resolveFunctions = {
 
       return [nullStatsCount].concat(statsCounts)
     },
+    async countries(_, args, {pgdb}) {
+      const allCountriesVotingOptions = await pgdb.query(`
+        SELECT
+          "countryName",
+          id,
+          name,
+          count
+        FROM (
+          SELECT
+            lower(trim(a.country)) AS "countryName",
+            array_agg(b.id) AS ballot_ids
+          FROM
+            users u
+          JOIN
+            ballots b
+            ON b."userId"=u.id
+          LEFT JOIN
+            addresses a
+            ON u."addressId" = a.id
+          GROUP BY
+            1
+          ORDER BY
+            1
+        ) e1 JOIN LATERAL (
+          SELECT
+            vo.id AS id,
+            vo.name AS name,
+            COUNT(b."votingOptionId") AS count
+          FROM
+            "votingOptions" vo
+          LEFT JOIN
+            ballots b
+            ON
+              vo.id=b."votingOptionId" AND
+              ARRAY[b.id] && e1.ballot_ids
+          GROUP BY
+            1, 2
+          ORDER BY
+            3 DESC
+        ) e2 ON true;
+      `)
+
+      const reduceOptions = (entries) =>
+        nest()
+          .key( o => o.name )
+          .rollup( values => ({
+            name: values[0].name,
+            id: values[0].id,
+            count: values.reduce(
+              (sum, v) => sum + v.count,
+              0
+            )
+          }))
+          .entries(entries)
+          .map( o => ({
+            key: o.key,
+            name: o.value.name,
+            id: o.value.id,
+            count: o.value.count
+          }))
+
+      const nullCountryOptions = {
+        key: 'null',
+        options: allCountriesVotingOptions.filter( o => o.countryName === null )
+      }
+
+      const countryOptions = nest()
+        .key( d => countryNameNormalizer(d.countryName))
+        .entries(allCountriesVotingOptions.filter( d => d.countryName !== null))
+        .map( d => ({
+          key: d.key,
+          options: reduceOptions(d.values)
+        }))
+
+      let designatedCountryOptions = []
+      let otherCountryOptions = []
+      countryOptions.forEach( c => {
+        const total = c.options.reduce(
+          (sum, v) => sum + v.count,
+          0
+        )
+        if(total >= 7)
+          designatedCountryOptions.push(c)
+        else
+          otherCountryOptions.push(c)
+      })
+
+      const combinedOtherCountryOptions = {
+        key: 'others',
+        options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
+      }
+
+      const allCountryOptions = [].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions)
+        .map( c => {
+          const optionCountMax = c.options.map(o => o.count).reduce(
+            (prev, current) => prev > current ? prev : current,
+            0
+          )
+          return Object.assign({}, c, {
+            count: c.options.reduce(
+              (sum, v) => sum + v.count,
+              0
+            ),
+            options: c.options.map( o => Object.assign({}, o, {
+              winner: o.count === optionCountMax
+            }))
+          })
+        })
+
+      return allCountryOptions
+    },
   },
 
   RootMutation: mutations
