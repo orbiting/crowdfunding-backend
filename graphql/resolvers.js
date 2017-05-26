@@ -614,7 +614,7 @@ const resolveFunctions = {
       //no access to voting here, we have one voting and no time: don't constrain to votingId
 
       //others (no birthday)
-      const otherOptions = await pgdb.query(`
+      const nullOptions = await pgdb.query(`
         SELECT
           vo.id AS id,
           vo.name AS name,
@@ -634,15 +634,15 @@ const resolveFunctions = {
         ORDER BY
           3 DESC
       `)
-      const maxOtherOptions = otherOptions.reduce(
+      const maxNullOptions = nullOptions.reduce(
         (prev, current) => prev.count > current.count ? prev : current
       )
-      const otherStatsCount = {
+      const nullStatsCount = {
         key: 'null',
-        options: otherOptions.map( o => Object.assign({}, o, {
-          winner: o.count === maxOtherOptions.count
+        options: nullOptions.map( o => Object.assign({}, o, {
+          winner: o.count === maxNullOptions.count
         })),
-        count: otherOptions.reduce(
+        count: nullOptions.reduce(
           (sum, o) => sum + o.count,
           0
         )
@@ -703,7 +703,7 @@ const resolveFunctions = {
         }
       })
 
-      return [otherStatsCount].concat(statsCounts)
+      return [nullStatsCount].concat(statsCounts)
     },
   },
 
