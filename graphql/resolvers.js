@@ -797,6 +797,16 @@ const resolveFunctions = {
         options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
       }
 
+      const keyOrder = (key) => {
+        switch (key) {
+          case 'others':
+            return -1
+          case 'null':
+            return -2
+          default:
+            return 0
+        }
+      }
       const allCountryOptions = [].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions)
         .map( c => {
           const optionCountMax = c.options.map(o => o.count).reduce(
@@ -808,11 +818,17 @@ const resolveFunctions = {
               (sum, v) => sum + v.count,
               0
             ),
-            options: c.options.map( o => Object.assign({}, o, {
-              winner: o.count === optionCountMax
-            }))
+            options: c.options
+              .map( o => Object.assign({}, o, {
+                winner: o.count === optionCountMax
+              }))
+              .sort((a, b) => descending(a.count, b.count))
           })
         })
+        .sort((a, b) => (
+          descending(keyOrder(a.key), keyOrder(b.key)) ||
+          descending(a.count, b.count)
+        ))
 
       return allCountryOptions
     },
