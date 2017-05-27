@@ -312,6 +312,7 @@ type Video {
   mp4: String!
   youtube: String
   subtitles: String
+  poster: String
 }
 
 
