@@ -318,8 +318,8 @@ const resolveFunctions = {
         ORDER BY 1
       `)
     },
-    async countries(_, args, {pgdb, membershipStatsCountriesCache}) {
-      const result = membershipStatsCountriesCache.get('all')
+    async countries(_, args, {pgdb, caches: {membershipStatsCountries: cache}}) {
+      const result = cache.get('all')
       if(result) {
         return result
       }
@@ -435,7 +435,7 @@ const resolveFunctions = {
           collator.compare(a.name, b.name)
         ))
 
-      membershipStatsCountriesCache.set('all', countriesWithPostalCodes)
+      cache.set('all', countriesWithPostalCodes)
 
       return countriesWithPostalCodes
     }

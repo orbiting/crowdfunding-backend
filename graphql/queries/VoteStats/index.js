@@ -44,8 +44,12 @@ const countStatsCounts = (statsCounts, sort = true) => {
 }
 
 module.exports = {
-  ages: async (_, args, {pgdb}) => {
+  ages: async (_, args, {pgdb, caches: {votingStatsAges: cache}}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
+    const cachedResult = cache.get('all')
+    if(cachedResult) {
+      return cachedResult
+    }
 
     //others (no birthday)
     const nullOptions = await pgdb.query(`
@@ -152,10 +156,19 @@ module.exports = {
         }
         return d
       })
-    return countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
+
+    const result = countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
+    cache.set('all', result)
+    return result
   },
 
-  countries: async (_, args, {pgdb}) => {
+  countries: async (_, args, {pgdb, caches: {votingStatsCountries: cache}}) => {
+    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    const cachedResult = cache.get('all')
+    if(cachedResult) {
+      return cachedResult
+    }
+
     const allCountriesVotingOptions = await pgdb.query(`
       SELECT
         "countryName",
@@ -247,10 +260,18 @@ module.exports = {
       options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
     }
 
-    return countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
+    const result = countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
+    cache.set('all', result)
+    return result
   },
 
-  chCantons: async (_, args, {pgdb}) => {
+  chCantons: async (_, args, {pgdb, caches: {votingStatsCHCantons: cache}}) => {
+    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    const cachedResult = cache.get('all')
+    if(cachedResult) {
+      return cachedResult
+    }
+
     const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`
       SELECT
         "countryName",
@@ -332,7 +353,7 @@ module.exports = {
         }
       })
 
-    const stateOptions = nest()
+    const stateStatsCount = nest()
       .key( c => c.key)
       .entries(postalCodeOptions)
       .map( c => ({
@@ -340,6 +361,8 @@ module.exports = {
         options: reduceOptions( [].concat.apply([], c.values.map( d => d.options) ) )
       }))
 
-    return countStatsCounts(stateOptions)
+    const result = countStatsCounts(stateStatsCount)
+    cache.set('all', result)
+    return result
   },
 }
