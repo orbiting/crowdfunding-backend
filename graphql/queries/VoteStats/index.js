@@ -3,6 +3,25 @@ const countryNameNormalizer = require('../../../lib/geo/country').nameNormalizer
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
 
+
+const reduceOptions = (entries) =>
+  nest()
+    .key( o => o.name )
+    .rollup( values => ({
+      name: values[0].name,
+      id: values[0].id,
+      count: values.reduce(
+        (sum, v) => sum + v.count,
+        0
+      )
+    }))
+    .entries(entries)
+    .map( o => ({
+      name: o.value.name,
+      id: o.value.id,
+      count: o.value.count
+    }))
+
 const countStatsCounts = (statsCounts, sort = true) => {
   const keyOrder = (key) => {
     switch (key) {
@@ -210,25 +229,6 @@ module.exports = {
       ) e2 ON true;
     `)
 
-    const reduceOptions = (entries) =>
-      nest()
-        .key( o => o.name )
-        .rollup( values => ({
-          name: values[0].name,
-          id: values[0].id,
-          count: values.reduce(
-            (sum, v) => sum + v.count,
-            0
-          )
-        }))
-        .entries(entries)
-        .map( o => ({
-          key: o.key,
-          name: o.value.name,
-          id: o.value.id,
-          count: o.value.count
-        }))
-
     const nullCountryOptions = {
       key: 'null',
       options: allCountriesVotingOptions.filter( o => o.countryName === null )
@@ -316,24 +316,6 @@ module.exports = {
     `)
 
     const pcParser = postalCodeParsers['CH']
-
-    const reduceOptions = (entries) =>
-      nest()
-        .key( o => o.name )
-        .rollup( values => ({
-          name: values[0].name,
-          id: values[0].id,
-          count: values.reduce(
-            (sum, v) => sum + v.count,
-            0
-          )
-        }))
-        .entries(entries)
-        .map( o => ({
-          name: o.value.name,
-          id: o.value.id,
-          count: o.value.count
-        }))
 
     const switzerlandOptions = nest()
       .key( d => countryNameNormalizer(d.countryName))
