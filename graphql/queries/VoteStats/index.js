@@ -154,7 +154,7 @@ module.exports = {
         "votingOptions" vo
     `)
     const ageStatsCount = nest()
-      .key( d => d.max ? `${d.min}-${d.max}` : '80+' )
+      .key( d => d.max ? `${d.min}-${d.max}` : `${d.min}+` )
       .entries(flatAgeOptions)
       .map( d => ({
         key: d.key,
