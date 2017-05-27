@@ -1,7 +1,10 @@
 const {postalCodeData, postalCodeParsers} = require('../../../lib/geo/postalCode')
 const countryNameNormalizer = require('../../../lib/geo/country').nameNormalizer
+const getBFSNr = require('../../../lib/geo/chPostalCode').getBFSNr
+const getSlt = require('../../../lib/geo/chSlt').getSlt
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
+const util = require('util')
 
 
 const reduceOptions = (entries) =>
@@ -344,6 +347,90 @@ module.exports = {
       }))
 
     const result = countStatsCounts(stateStatsCount)
+    cache.set('all', result)
+    return result
+  },
+
+  chSlt2012: async (_, args, {pgdb, caches: {votingStatsCHSlt2012: cache}}) => {
+    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    const cachedResult = cache.get('all')
+    if(cachedResult) {
+      return cachedResult
+    }
+
+    const allCountriesWithPostalCodesAndCityVotingOptions = await pgdb.query(`
+      SELECT
+        "countryName",
+          "postalCode",
+          city,
+          id,
+          name,
+          count
+      FROM (
+          SELECT
+            lower(trim(a.country)) AS "countryName",
+            trim(a."postalCode") as "postalCode",
+            trim(a.city) as city,
+            array_agg(b.id) AS ballot_ids
+          FROM
+            users u
+          JOIN
+            ballots b
+            ON b."userId"=u.id
+          LEFT JOIN
+            addresses a
+            ON u."addressId" = a.id
+          GROUP BY
+            1, 2, 3
+          ORDER BY
+            2, 3
+      ) e1 JOIN LATERAL (
+          SELECT
+            vo.id AS id,
+            vo.name AS name,
+            COUNT(b."votingOptionId") AS count
+          FROM
+            "votingOptions" vo
+          LEFT JOIN
+            ballots b
+            ON
+              vo.id=b."votingOptionId" AND
+              ARRAY[b.id] && e1.ballot_ids
+          GROUP BY
+            1, 2
+          ORDER BY
+            3 DESC
+      ) e2 ON true;
+    `)
+
+    const pcParser = postalCodeParsers['CH']
+
+    const switzerlandOptions = nest()
+      .key( d => countryNameNormalizer(d.countryName))
+      .entries(allCountriesWithPostalCodesAndCityVotingOptions.filter( d => d.countryName !== null))
+      .filter( d => d.key === 'Schweiz')[0]
+
+    const bfsOptions = nest()
+      .key( d => getBFSNr(d.postalCode, d.city.trim()))
+      .entries(switzerlandOptions.values)
+
+    //console.log(util.inspect(bfsOptions, {depth: null}))
+
+    const reducedBfsOptions = bfsOptions
+      .map( d => ({
+        bfsNr: d.key,
+        options: reduceOptions(d.values)
+      }))
+
+    const chSlt2012 = nest()
+      .key( d => getSlt(d.bfsNr))
+      .entries(reducedBfsOptions)
+      .map( d => ({
+        key: d.key === 'undefined' ? 'others' : d.key,
+        options: reduceOptions( [].concat.apply([], d.values.map( c => c.options) ) )
+      }))
+
+    const result = countStatsCounts(chSlt2012)
     cache.set('all', result)
     return result
   },

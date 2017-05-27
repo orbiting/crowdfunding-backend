@@ -38,6 +38,10 @@ const caches = {
     max: 1,
     maxAge: 10*60*1000
   }),
+  votingStatsCHSlt2012: LRU({
+    max: 1,
+    maxAge: 10*60*1000
+  }),
 }
 
 module.exports = (server, pgdb, t) => {
