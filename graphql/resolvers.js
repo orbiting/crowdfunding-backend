@@ -832,6 +832,127 @@ const resolveFunctions = {
 
       return allCountryOptions
     },
+    async chCantons(_, args, {pgdb}) {
+      const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`
+        SELECT
+          "countryName",
+            "postalCode",
+            id,
+            name,
+            count
+        FROM (
+            SELECT
+              lower(trim(a.country)) AS "countryName",
+              trim(a."postalCode") as "postalCode",
+              array_agg(b.id) AS ballot_ids
+            FROM
+              users u
+            JOIN
+              ballots b
+              ON b."userId"=u.id
+            LEFT JOIN
+              addresses a
+              ON u."addressId" = a.id
+            GROUP BY
+              1, 2
+            ORDER BY
+              2
+        ) e1 JOIN LATERAL (
+            SELECT
+              vo.id AS id,
+              vo.name AS name,
+              COUNT(b."votingOptionId") AS count
+            FROM
+              "votingOptions" vo
+            LEFT JOIN
+              ballots b
+              ON
+                vo.id=b."votingOptionId" AND
+                ARRAY[b.id] && e1.ballot_ids
+            GROUP BY
+              1, 2
+            ORDER BY
+              3 DESC
+        ) e2 ON true;
+      `)
+
+      const pcParser = postalCodeParsers['CH']
+
+      const reduceOptions = (entries) =>
+        nest()
+          .key( o => o.name )
+          .rollup( values => ({
+            name: values[0].name,
+            id: values[0].id,
+            count: values.reduce(
+              (sum, v) => sum + v.count,
+              0
+            )
+          }))
+          .entries(entries)
+          .map( o => ({
+            name: o.value.name,
+            id: o.value.id,
+            count: o.value.count
+          }))
+
+      const switzerlandOptions = nest()
+        .key( d => countryNameNormalizer(d.countryName))
+        .entries(allCountriesWithPostalCodesVotingOptions.filter( d => d.countryName !== null))
+        .filter( d => d.key === 'Schweiz')[0]
+
+      const postalCodeOptions = nest()
+        .key( d => pcParser(d.postalCode))
+        .entries(switzerlandOptions.values)
+        .map( d => {
+          const baseData = postalCodeData('CH', d.key) || {state: 'others'}
+          return {
+            key: baseData.state || null,
+            options: reduceOptions(d.values)
+          }
+        })
+
+      const keyOrder = (key) => {
+        switch (key) {
+          case 'others':
+            return -1
+          case 'null':
+            return -2
+          default:
+            return 0
+        }
+      }
+      const stateOptions = nest()
+        .key( c => c.key)
+        .entries(postalCodeOptions)
+        .map( c => ({
+          key: c.key,
+          options: reduceOptions( [].concat.apply([], c.values.map( d => d.options) ) )
+        }))
+        .map( c => {
+          const optionCountMax = c.options.map(o => o.count).reduce(
+            (prev, current) => prev > current ? prev : current,
+            0
+          )
+          return Object.assign({}, c, {
+            count: c.options.reduce(
+              (sum, v) => sum + v.count,
+              0
+            ),
+            options: c.options
+              .map( o => Object.assign({}, o, {
+                winner: o.count === optionCountMax
+              }))
+              .sort((a, b) => descending(a.count, b.count))
+          })
+        })
+        .sort((a, b) => (
+          descending(keyOrder(a.key), keyOrder(b.key)) ||
+          descending(a.count, b.count)
+        ))
+
+      return stateOptions
+    },
   },
 
   RootMutation: mutations
