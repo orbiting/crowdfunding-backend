@@ -30,12 +30,10 @@ PgDb.connect().then( async (pgdb) => {
     }
     VIDEO = {
       hls: argv.hls,
-      mp4: argv.mp4
+      mp4: argv.mp4,
+      youtube: argv.youtube,
+      subtitles: argv.subtitles
     }
-    if(argv.youtube)
-      VIDEO.youtube = argv.youtube
-    if(argv.subtitles)
-      VIDEO.subtitles = argv.subtitles
   }
 
   console.log('counting vote...')
