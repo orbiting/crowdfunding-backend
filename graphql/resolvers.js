@@ -905,9 +905,11 @@ const resolveFunctions = {
         .key( d => pcParser(d.postalCode))
         .entries(switzerlandOptions.values)
         .map( d => {
-          const baseData = postalCodeData('CH', d.key) || {state: 'others'}
+          const baseData = postalCodeData('CH', d.key)
           return {
-            key: baseData.state || null,
+            key: baseData
+                 ? baseData.state
+                 : 'others',
             options: reduceOptions(d.values)
           }
         })
