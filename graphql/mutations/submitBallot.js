@@ -14,12 +14,13 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/unexpected'))
     }
 
+    const now = new Date()
     const voting = await transaction.public.votings.findOne({id: votingOption.votingId})
-    if(voting.beginDate > (new Date())) {
+    if(voting.beginDate > now) {
       logger.error('voting is not yet open', { req: req._log(), args })
       throw new Error(t('api/voting/tooEarly'))
     }
-    if(voting.endDate < (new Date())) {
+    if(voting.endDate < now) {
       logger.error('voting is closed', { req: req._log(), args })
       throw new Error(t('api/voting/tooLate'))
     }
