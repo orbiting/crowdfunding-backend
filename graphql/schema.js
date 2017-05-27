@@ -466,6 +466,7 @@ type VoteResult {
   options: [VoteOptionResult!]!
   stats: VoteStats!
   message: String
+  video: Video
   createdAt: DateTime
   updatedAt: DateTime
 }

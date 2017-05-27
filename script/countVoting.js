@@ -1,12 +1,13 @@
 //
 // This script counts the ballots of a vote and upserts vote.result
-// required params
-//   1) vote name
-//   2) optional: message
-//   3) optional: winner's votingOption.name (in case of final vote)
+// params
+//   vote name
+//   optional: message
+//   optional: winner's votingOption.name (in case of final vote)
+//   optional: video: hls, mp4, youtube, subtitles (if given, hls and mp4 are required)
 //
 // usage
-// cf_server  node script/countVoting.js NAME [MESSAGE] [WINNER]
+// cf_server  node script/countVoting.js --name NAME [--message MESSAGE] [--winner WINNER] [--hls url] [--mp4 url] [--youtube url] [--subtitles url]
 //
 
 
@@ -14,14 +15,30 @@ const PgDb = require('../lib/pgdb')
 require('dotenv').config()
 
 PgDb.connect().then( async (pgdb) => {
-  console.log('counting vote...')
+  const argv = require('minimist')(process.argv.slice(2))
 
-  const NAME = process.argv[2]
-  if(!NAME) {
+  const NAME = argv.name
+  if(!NAME)
     throw new Error('NAME must be provided')
+
+  const MESSAGE = argv.message
+  const WINNER = argv.winner
+  let VIDEO
+  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles) {
+    if(!argv.hls || !argv.mp4) {
+      throw new Error('hls and mp4 are required for video')
+    }
+    VIDEO = {
+      hls: argv.hls,
+      mp4: argv.mp4
+    }
+    if(argv.youtube)
+      VIDEO.youtube = argv.youtube
+    if(argv.subtitles)
+      VIDEO.subtitles = argv.subtitles
   }
-  const MESSAGE = process.argv[3]
-  const WINNER = process.argv[4]
+
+  console.log('counting vote...')
 
   const transaction = await pgdb.transactionBegin()
   try {
@@ -92,7 +109,8 @@ PgDb.connect().then( async (pgdb) => {
         })),
         updatedAt: new Date(),
         createdAt: voting.result ? voting.result.createdAt : new Date(),
-        message: MESSAGE //ignored by postgres is null
+        message: MESSAGE, //ignored by postgres if null
+        video: VIDEO
       }
     })
     console.log("finished! The result is:")
