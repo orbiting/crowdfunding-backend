@@ -252,10 +252,12 @@ module.exports = {
         (sum, v) => sum + v.count,
         0
       )
-      if(total >= 7)
+      if(total >= 7) {
         designatedCountryOptions.push(c)
-      else
+      }
+      else {
         otherCountryOptions.push(c)
+      }
     })
 
     const combinedOtherCountryOptions = {
@@ -323,7 +325,7 @@ module.exports = {
     const switzerlandOptions = nest()
       .key( d => countryNameNormalizer(d.countryName))
       .entries(allCountriesWithPostalCodesVotingOptions.filter( d => d.countryName !== null))
-      .filter( d => d.key === 'Schweiz')[0]
+      .find( d => d.key === 'Schweiz')
 
     const postalCodeOptions = nest()
       .key( d => pcParser(d.postalCode))
@@ -409,7 +411,7 @@ module.exports = {
     const switzerlandOptions = nest()
       .key( d => countryNameNormalizer(d.countryName))
       .entries(allCountriesWithPostalCodesAndCityVotingOptions.filter( d => d.countryName !== null))
-      .filter( d => d.key === 'Schweiz')[0]
+      .find( d => d.key === 'Schweiz')
 
     const bfsOptions = nest()
       .key( d => getBFSNr(d.postalCode, d.city.trim()))
