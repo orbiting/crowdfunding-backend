@@ -22,7 +22,7 @@ PgDb.connect().then( async (pgdb) => {
     throw new Error('name must be provided')
 
   let video
-  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles) {
+  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
     if(!argv.hls || !argv.mp4) {
       throw new Error('hls and mp4 are required for video')
     }
@@ -30,7 +30,8 @@ PgDb.connect().then( async (pgdb) => {
       hls: argv.hls,
       mp4: argv.mp4,
       youtube: argv.youtube,
-      subtitles: argv.subtitles
+      subtitles: argv.subtitles,
+      poster: argv.poster
     }
   }
 
