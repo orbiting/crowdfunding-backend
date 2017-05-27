@@ -47,31 +47,33 @@ PgDb.connect().then( async (pgdb) => {
     const counts = await pgdb.query(`
       SELECT id, name, count FROM (
         SELECT DISTINCT ON (id, name) id, name, count FROM (
-          SELECT
-            vo.id AS id,
-            vo.name AS name,
-            0 AS count
-          FROM
-            "votingOptions" vo
-          WHERE
-            vo."votingId" = :votingId
+
+            SELECT
+              vo.id AS id,
+              vo.name AS name,
+              0 AS count
+            FROM
+              "votingOptions" vo
+            WHERE
+              vo."votingId" = :votingId
 
           UNION ALL
 
-          SELECT
-            vo.id AS id,
-            vo.name AS name,
-            COUNT(DISTINCT(m."userId")) AS count
-          FROM
-            "votingOptions" vo
-          JOIN
-            ballots b
-            ON vo.id=b."votingOptionId"
-          JOIN
-            memberships m
-            ON m."userId" = b."userId"
-          WHERE
-            vo."votingId" = :votingId
+            SELECT
+              vo.id AS id,
+              vo.name AS name,
+              COUNT(DISTINCT(m."userId")) AS count
+            FROM
+              "votingOptions" vo
+            JOIN
+              ballots b
+              ON vo.id=b."votingOptionId"
+            JOIN
+              memberships m
+              ON m."userId" = b."userId"
+            WHERE
+              vo."votingId" = :votingId
+
           GROUP BY
             1, 2
           ORDER BY
