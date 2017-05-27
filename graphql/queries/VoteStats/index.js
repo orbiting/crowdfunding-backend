@@ -76,7 +76,11 @@ module.exports = {
 
     const flatAgeOptions = await pgdb.query(`
       SELECT
-        *
+        min,
+        max,
+        id,
+        name,
+        count
       FROM (
         SELECT
           *
