@@ -473,7 +473,6 @@ type VoteResult {
 type VoteStats {
   ages: [VoteStatsCount!]!
   countries: [VoteStatsCount!]!
-  chSlt2012: [VoteStatsCount!]!
   chCantons: [VoteStatsCount!]!
 }
 type VoteStatsCount {

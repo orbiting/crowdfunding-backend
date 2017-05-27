@@ -351,6 +351,7 @@ module.exports = {
     return result
   },
 
+  /* addresses -> bfsNr matching needs refinement. check lib/geo/chPostalCode.js
   chSlt2012: async (_, args, {pgdb, caches: {votingStatsCHSlt2012: cache}}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
     const cachedResult = cache.get('all')
@@ -434,4 +435,5 @@ module.exports = {
     cache.set('all', result)
     return result
   },
+  */
 }

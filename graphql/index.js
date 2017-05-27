@@ -38,10 +38,12 @@ const caches = {
     max: 1,
     maxAge: 10*60*1000
   }),
+  /* check chSlt2012 in graphql/query/VoteStats/index.js
   votingStatsCHSlt2012: LRU({
     max: 1,
     maxAge: 10*60*1000
   }),
+  */
 }
 
 module.exports = (server, pgdb, t) => {
