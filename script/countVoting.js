@@ -17,18 +17,16 @@ require('dotenv').config()
 PgDb.connect().then( async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
 
-  const NAME = argv.name
-  if(!NAME)
-    throw new Error('NAME must be provided')
+  const {name, message, winner: winnerName} = argv
+  if(!name)
+    throw new Error('name must be provided')
 
-  const MESSAGE = argv.message
-  const WINNER = argv.winner
-  let VIDEO
+  let video
   if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles) {
     if(!argv.hls || !argv.mp4) {
       throw new Error('hls and mp4 are required for video')
     }
-    VIDEO = {
+    video = {
       hls: argv.hls,
       mp4: argv.mp4,
       youtube: argv.youtube,
@@ -40,9 +38,9 @@ PgDb.connect().then( async (pgdb) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-    const voting = await pgdb.public.votings.findOne({ name: NAME })
+    const voting = await pgdb.public.votings.findOne({ name })
     if(!voting) {
-      throw new Error(`a voting with the name '${NAME}' could not be found!`)
+      throw new Error(`a voting with the name '${name}' could not be found!`)
     }
 
     const counts = await pgdb.query(`
@@ -87,12 +85,12 @@ PgDb.connect().then( async (pgdb) => {
 
     let winner
     if(counts[0].count === counts[1].count) { //undecided
-      if(!WINNER) {
-        throw new Error(`voting is undecided you must provide the winners votingOption name as the third parameter!`)
+      if(!winnerName) {
+        throw new Error(`voting is undecided, you must provide the winners votingOption name as a parameter!`)
       }
-      winner = counts.find( c => c.name === WINNER )
+      winner = counts.find( c => c.name === winnerName )
       if(!winner) {
-        throw new Error(`voting is undecided but a votingOption with the name '${WINNER}' could not be found!`)
+        throw new Error(`voting is undecided but a votingOption with the name '${winnerName}' could not be found!`)
       }
     } else {
       winner = counts[0]
@@ -107,8 +105,8 @@ PgDb.connect().then( async (pgdb) => {
         })),
         updatedAt: new Date(),
         createdAt: voting.result ? voting.result.createdAt : new Date(),
-        message: MESSAGE, //ignored by postgres if null
-        video: VIDEO
+        message, //ignored by postgres if null
+        video
       }
     })
     console.log("finished! The result is:")
