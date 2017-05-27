@@ -14,6 +14,16 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       throw new Error(t('api/unexpected'))
     }
 
+    const voting = await transaction.public.votings.findOne({id: votingOption.votingId})
+    if(voting.beginDate > (new Date())) {
+      logger.error('voting is not yet open', { req: req._log(), args })
+      throw new Error(t('api/voting/tooEarly'))
+    }
+    if(voting.endDate < (new Date())) {
+      logger.error('voting is closed', { req: req._log(), args })
+      throw new Error(t('api/voting/tooLate'))
+    }
+
     //ensure user is elegitable
     if(!(await transaction.public.memberships.findFirst({userId: user.id}))) {
       logger.error('membership required', { req: req._log(), args })
