@@ -908,7 +908,7 @@ const resolveFunctions = {
           const baseData = postalCodeData('CH', d.key)
           return {
             key: baseData
-                 ? baseData.state
+                 ? baseData.stateAbbr
                  : 'others',
             options: reduceOptions(d.values)
           }
