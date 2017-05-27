@@ -3,7 +3,7 @@ const countryNameNormalizer = require('../../../lib/geo/country').nameNormalizer
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
 
-const countStatsCounts = (statsCounts, sort = false) => {
+const countStatsCounts = (statsCounts, sort = true) => {
   const keyOrder = (key) => {
     switch (key) {
       case 'others':
@@ -243,40 +243,7 @@ module.exports = {
       options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
     }
 
-    const keyOrder = (key) => {
-      switch (key) {
-        case 'others':
-          return -1
-        case 'null':
-          return -2
-        default:
-          return 0
-      }
-    }
-    const allCountryOptions = [].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions)
-      .map( c => {
-        const optionCountMax = c.options.map(o => o.count).reduce(
-          (prev, current) => prev > current ? prev : current,
-          0
-        )
-        return Object.assign({}, c, {
-          count: c.options.reduce(
-            (sum, v) => sum + v.count,
-            0
-          ),
-          options: c.options
-            .map( o => Object.assign({}, o, {
-              winner: o.count === optionCountMax
-            }))
-            .sort((a, b) => descending(a.count, b.count))
-        })
-      })
-      .sort((a, b) => (
-        descending(keyOrder(a.key), keyOrder(b.key)) ||
-        descending(a.count, b.count)
-      ))
-
-    return allCountryOptions
+    return countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
   },
 
   chCantons: async (_, args, {pgdb}) => {
@@ -361,16 +328,6 @@ module.exports = {
         }
       })
 
-    const keyOrder = (key) => {
-      switch (key) {
-        case 'others':
-          return -1
-        case 'null':
-          return -2
-        default:
-          return 0
-      }
-    }
     const stateOptions = nest()
       .key( c => c.key)
       .entries(postalCodeOptions)
@@ -378,28 +335,7 @@ module.exports = {
         key: c.key,
         options: reduceOptions( [].concat.apply([], c.values.map( d => d.options) ) )
       }))
-      .map( c => {
-        const optionCountMax = c.options.map(o => o.count).reduce(
-          (prev, current) => prev > current ? prev : current,
-          0
-        )
-        return Object.assign({}, c, {
-          count: c.options.reduce(
-            (sum, v) => sum + v.count,
-            0
-          ),
-          options: c.options
-            .map( o => Object.assign({}, o, {
-              winner: o.count === optionCountMax
-            }))
-            .sort((a, b) => descending(a.count, b.count))
-        })
-      })
-      .sort((a, b) => (
-        descending(keyOrder(a.key), keyOrder(b.key)) ||
-        descending(a.count, b.count)
-      ))
 
-    return stateOptions
+    return countStatsCounts(stateOptions)
   },
 }
