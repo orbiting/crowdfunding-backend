@@ -3,6 +3,46 @@ const countryNameNormalizer = require('../../../lib/geo/country').nameNormalizer
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
 
+const countStatsCounts = (statsCounts, sort = false) => {
+  const keyOrder = (key) => {
+    switch (key) {
+      case 'others':
+        return -1
+      case 'null':
+        return -2
+      default:
+        return 0
+    }
+  }
+  const countedStatsCounts = statsCounts
+    .map( c => {
+      const optionCountMax = c.options.map(o => o.count).reduce(
+        (prev, current) => prev > current ? prev : current,
+        0
+      )
+      return Object.assign({}, c, {
+        count: c.options.reduce(
+          (sum, v) => sum + v.count,
+          0
+        ),
+        options: c.options
+          .map( o => Object.assign({}, o, {
+            winner: o.count === optionCountMax
+          }))
+          .sort((a, b) => descending(a.count, b.count))
+      })
+    })
+  if(sort) {
+    return countedStatsCounts
+      .sort((a, b) => (
+        descending(keyOrder(a.key), keyOrder(b.key)) ||
+        descending(a.count, b.count)
+      ))
+  } else {
+    return countedStatsCounts
+  }
+}
+
 module.exports = {
   ages: async (_, args, {pgdb}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
@@ -28,76 +68,87 @@ module.exports = {
       ORDER BY
         3 DESC
     `)
-    const maxNullOptions = nullOptions.reduce(
-      (prev, current) => prev.count > current.count ? prev : current
-    )
+
     const nullStatsCount = {
       key: 'null',
-      options: nullOptions.map( o => Object.assign({}, o, {
-        winner: o.count === maxNullOptions.count
-      })),
-      count: nullOptions.reduce(
-        (sum, o) => sum + o.count,
-        0
-      )
+      options: nullOptions
     }
 
-    const ageGroups = [
-      {min: 0, max: 19},
-      {min: 20, max: 29},
-      {min: 30, max: 39},
-      {min: 40, max: 49},
-      {min: 50, max: 59},
-      {min: 60, max: 69},
-      {min: 70, max: 79},
-      {min: 80, max: 99999}
-    ]
-
-    const statsCounts = ageGroups.map( async (ageGroup) => {
-      const options = await pgdb.query(`
+    const flatAgeOptions = await pgdb.query(`
+      SELECT
+        *
+      FROM (
+        SELECT
+          *
+        FROM
+          json_to_recordset('[
+            {"min": 0, "max": 19},
+            {"min": 20, "max": 29},
+            {"min": 30, "max": 39},
+            {"min": 40, "max": 49},
+            {"min": 50, "max": 59},
+            {"min": 60, "max": 69},
+            {"min": 70, "max": 79},
+            {"min": 80, "max": null}
+          ]') as x("min" int, "max" int)
+      ) e1 JOIN LATERAL (
         SELECT
           vo.id AS id,
           vo.name AS name,
           COUNT(b."votingOptionId") AS count
         FROM
           "votingOptions" vo
-        LEFT JOIN
+        JOIN
           ballots b
           ON vo.id=b."votingOptionId"
-        LEFT JOIN
+        JOIN
           users u
-          ON b."userId"=u.id
-        WHERE
-          u.birthday is not null AND
-          extract(year from age(u.birthday)) >= :minAge AND
-          extract(year from age(u.birthday)) <= :maxAge
+          ON
+            b."userId"=u.id AND
+            u.birthday is not null AND
+            extract(year from age(u.birthday)) >= e1.min AND
+            ((e1.max IS NULL) OR extract(year from age(u.birthday)) <= e1.max)
         GROUP BY
           1, 2
         ORDER BY
           3 DESC
-      `, {
-        minAge: ageGroup.min,
-        maxAge: ageGroup.max
-      })
-      let maxOption
-      if(options.length) {
-        maxOption = options.reduce(
-          (prev, current) => prev.count > current.count ? prev : current
-        )
-      }
-      return {
-        key: `${ageGroup.min}-${ageGroup.max}`,
-        options: options.map( o => Object.assign({}, o, {
-          winner: maxOption ? o.count === maxOption.count : false
-        })),
-        count: options.reduce(
-          (sum, o) => sum + o.count,
-          0
-        )
-      }
-    })
+      ) e2 ON true;
+    `)
 
-    return [nullStatsCount].concat(statsCounts)
+    const allOptions = await pgdb.query(`
+      SELECT
+        vo.id AS id,
+        vo.name AS name,
+        0 AS count
+      FROM
+        "votingOptions" vo
+    `)
+    const ageStatsCount = nest()
+      .key( d => d.max ? `${d.min}-${d.max}` : '80+' )
+      .entries(flatAgeOptions)
+      .map( d => ({
+        key: d.key,
+        options: d.values.map( o => ({
+          id: o.id,
+          name: o.name,
+          count: o.count
+        }))
+      }))
+      .map( d => {
+        if(d.options.length < 3) {
+          let missingOptions = []
+          allOptions.forEach( option => {
+            if(!d.options.find( o => o.id === option.id )) {
+              missingOptions.push(option)
+            }
+          })
+          return Object.assign({}, d, {
+            options: d.options.concat(missingOptions)
+          })
+        }
+        return d
+      })
+    return countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
   },
 
   countries: async (_, args, {pgdb}) => {
