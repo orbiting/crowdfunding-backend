@@ -3,6 +3,7 @@ const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
 const queries = require('./queries/index')
+const Voting = require('./queries/Voting/index')
 const VoteStats = require('./queries/VoteStats/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
 const nest = require('d3-collection').nest
@@ -581,32 +582,12 @@ const resolveFunctions = {
       return image
     }
   },
-  Voting: {
-    async options(voting, args, {pgdb, user}) {
-      return pgdb.public.votingOptions.find({votingId: voting.id})
-    },
-    async turnout(voting, args, {pgdb, user}) {
-      return {
-        eligitable: pgdb.queryOneField(`SELECT count(distinct("userId")) FROM memberships`),
-        submitted: pgdb.public.ballots.count({votingId: voting.id})
-      }
-    },
-    async userIsEligitable(voting, args, {pgdb, user}) {
-      if(!user)
-        return false
-      return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
-    },
-    async userHasSubmitted(voting, args, {pgdb, user}) {
-      if(!user)
-        return false
-      return !!(await pgdb.public.ballots.findFirst({
-        userId: user.id,
-        votingId: voting.id
-      }))
-    },
-  },
+  Voting,
   VoteResult: {
     async stats(result, args, {pgdb}) {
+      if(result && result.stats) {
+        return result.stats
+      }
       return {}
     }
   },
