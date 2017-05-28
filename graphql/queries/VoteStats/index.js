@@ -66,12 +66,8 @@ const countStatsCounts = (statsCounts, sort = true) => {
 }
 
 module.exports = {
-  ages: async (_, args, {pgdb, caches: {votingStatsAges: cache}}) => {
+  ages: async (_, args, {pgdb}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
-    const cachedResult = cache.get('all')
-    if(cachedResult) {
-      return cachedResult
-    }
 
     //others (no birthday)
     const nullOptions = await pgdb.query(`
@@ -179,17 +175,11 @@ module.exports = {
         return d
       })
 
-    const result = countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
-    cache.set('all', result)
-    return result
+    return countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
   },
 
-  countries: async (_, args, {pgdb, caches: {votingStatsCountries: cache}}) => {
+  countries: async (_, args, {pgdb}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
-    const cachedResult = cache.get('all')
-    if(cachedResult) {
-      return cachedResult
-    }
 
     const allCountriesVotingOptions = await pgdb.query(`
       SELECT
@@ -265,17 +255,11 @@ module.exports = {
       options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
     }
 
-    const result = countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
-    cache.set('all', result)
-    return result
+    return countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
   },
 
-  chCantons: async (_, args, {pgdb, caches: {votingStatsCHCantons: cache}}) => {
+  chCantons: async (_, args, {pgdb}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
-    const cachedResult = cache.get('all')
-    if(cachedResult) {
-      return cachedResult
-    }
 
     const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`
       SELECT
@@ -348,18 +332,12 @@ module.exports = {
         options: reduceOptions( [].concat.apply([], c.values.map( d => d.options) ) )
       }))
 
-    const result = countStatsCounts(stateStatsCount)
-    cache.set('all', result)
-    return result
+    return countStatsCounts(stateStatsCount)
   },
 
   /* addresses -> bfsNr matching needs refinement. check lib/geo/chPostalCode.js
-  chSlt2012: async (_, args, {pgdb, caches: {votingStatsCHSlt2012: cache}}) => {
+  chSlt2012: async (_, args, {pgdb}) => {
     //no access to voting here, we have one voting and no time: don't constrain to votingId
-    const cachedResult = cache.get('all')
-    if(cachedResult) {
-      return cachedResult
-    }
 
     const allCountriesWithPostalCodesAndCityVotingOptions = await pgdb.query(`
       SELECT
@@ -433,9 +411,7 @@ module.exports = {
         options: reduceOptions( [].concat.apply([], d.values.map( c => c.options) ) )
       }))
 
-    const result = countStatsCounts(chSlt2012)
-    cache.set('all', result)
-    return result
+    return countStatsCounts(chSlt2012)
   },
   */
 }
