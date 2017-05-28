@@ -4,7 +4,7 @@ const getBFSNr = require('../../../lib/geo/chPostalCode').getBFSNr
 const getSlt = require('../../../lib/geo/chSlt').getSlt
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
-const util = require('util')
+//const util = require('util')
 
 
 const reduceOptions = (entries) =>
