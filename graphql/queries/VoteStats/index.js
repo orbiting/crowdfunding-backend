@@ -329,9 +329,9 @@ module.exports = {
       .map( d => {
         const baseData = postalCodeData('CH', d.key)
         return {
-          key: baseData
-               ? baseData.stateAbbr
-               : 'others',
+          key: baseData && baseData.stateAbbr.length > 0
+            ? baseData.stateAbbr
+            : 'others',
           options: reduceOptions(d.values)
         }
       })
