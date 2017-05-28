@@ -5,19 +5,27 @@
 //   optional: message
 //   optional: winner's votingOption.name (in case of final vote)
 //   optional: video: hls, mp4, youtube, subtitles (if given, hls and mp4 are required)
+//   optional: no-freeze: don't freeze turnout and stats into result
 //
 // usage
-// cf_server  node script/countVoting.js --name NAME [--message MESSAGE] [--winner WINNER] [--hls url] [--mp4 url] [--youtube url] [--subtitles url]
+// cf_server  node script/countVoting.js --name NAME [--message MESSAGE] [--winner WINNER] [--hls url] [--mp4 url] [--youtube url] [--subtitles url] [--no-freeze]
 //
 
 
-const PgDb = require('../lib/pgdb')
 require('dotenv').config()
+const PgDb = require('../lib/pgdb')
+const Voting = require('../graphql/queries/Voting/index')
+const VoteStats = require('../graphql/queries/VoteStats/index')
+const util = require('util')
 
 PgDb.connect().then( async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
 
   const {name, message, winner: winnerName} = argv
+  const freeze = argv.freeze === false
+    ? false
+    : true
+
   if(!name)
     throw new Error('name must be provided')
 
@@ -99,6 +107,17 @@ PgDb.connect().then( async (pgdb) => {
       winner = counts[0]
     }
 
+    const turnout = freeze
+      ? await Voting.turnout(voting, null, {pgdb})
+      : null
+    const stats = freeze
+      ? {
+          ages: await VoteStats.ages(null, null, {pgdb}),
+          countries: await VoteStats.countries(null, null, {pgdb}),
+          chCantons: await VoteStats.chCantons(null, null, {pgdb})
+        }
+      : null
+
     const newVoting = await pgdb.public.votings.updateAndGetOne({
       id: voting.id
     }, {
@@ -109,11 +128,13 @@ PgDb.connect().then( async (pgdb) => {
         updatedAt: new Date(),
         createdAt: voting.result ? voting.result.createdAt : new Date(),
         message, //ignored by postgres if null
-        video
+        video,
+        turnout,
+        stats
       }
     })
     console.log("finished! The result is:")
-    console.log(newVoting.result)
+    console.log(util.inspect(newVoting.result, {depth: 3}))
     console.log("🎉🎉🎉🎉🎉🎉")
   } catch(e) {
     await transaction.transactionRollback()

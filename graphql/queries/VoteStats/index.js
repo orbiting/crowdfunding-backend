@@ -66,7 +66,11 @@ const countStatsCounts = (statsCounts, sort = true) => {
 }
 
 module.exports = {
-  ages: async (_, args, {pgdb}) => {
+  ages: async (stats, args, {pgdb}) => {
+    if(stats && stats.ages) { //cached by countVoting
+      return stats.ages
+    }
+
     //no access to voting here, we have one voting and no time: don't constrain to votingId
 
     //others (no birthday)
@@ -178,7 +182,11 @@ module.exports = {
     return countStatsCounts(ageStatsCount.concat([nullStatsCount]), false)
   },
 
-  countries: async (_, args, {pgdb}) => {
+  countries: async (stats, args, {pgdb}) => {
+    if(stats && stats.countries) { //cached by countVoting
+      return stats.countries
+    }
+
     //no access to voting here, we have one voting and no time: don't constrain to votingId
 
     const allCountriesVotingOptions = await pgdb.query(`
@@ -258,7 +266,11 @@ module.exports = {
     return countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
   },
 
-  chCantons: async (_, args, {pgdb}) => {
+  chCantons: async (stats, args, {pgdb}) => {
+    if(stats && stats.chCantons) { //cached by countVoting
+      return stats.chCantons
+    }
+
     //no access to voting here, we have one voting and no time: don't constrain to votingId
 
     const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`

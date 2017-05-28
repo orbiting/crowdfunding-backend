@@ -3,6 +3,9 @@ module.exports = {
     return pgdb.public.votingOptions.find({votingId: voting.id})
   },
   async turnout(voting, args, {pgdb}) {
+    if(voting.result && voting.result.turnout) { //cached by countVoting
+      return voting.result.turnout
+    }
     return {
       eligitable: await pgdb.queryOneField(`SELECT count(distinct("userId")) FROM memberships`),
       submitted: await pgdb.public.ballots.count({votingId: voting.id})
