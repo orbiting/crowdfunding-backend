@@ -20,11 +20,31 @@ OpticsAgent.configureAgent({
 })
 OpticsAgent.instrumentSchema(executableSchema)
 
-//no args, thus max 1
-const membershipStatsCountriesCache = LRU({
-  max: 1,
-  maxAge: (MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS || 30 ) * 1000
-})
+const caches = {
+  //no args, thus max 1
+  membershipStatsCountries: LRU({
+    max: 1,
+    maxAge: (MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS || 30 ) * 1000
+  }),
+  votingStatsAges: LRU({
+    max: 1,
+    maxAge: 10*60*1000
+  }),
+  votingStatsCountries: LRU({
+    max: 1,
+    maxAge: 10*60*1000
+  }),
+  votingStatsCHCantons: LRU({
+    max: 1,
+    maxAge: 10*60*1000
+  }),
+  /* check chSlt2012 in graphql/query/VoteStats/index.js
+  votingStatsCHSlt2012: LRU({
+    max: 1,
+    maxAge: 10*60*1000
+  }),
+  */
+}
 
 module.exports = (server, pgdb, t) => {
   server.use(OpticsAgent.middleware())
@@ -45,7 +65,7 @@ module.exports = (server, pgdb, t) => {
           user: req.user,
           req,
           t,
-          membershipStatsCountriesCache
+          caches
         }
       }
     })

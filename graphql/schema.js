@@ -312,6 +312,7 @@ type Video {
   mp4: String!
   youtube: String
   subtitles: String
+  poster: String
 }
 
 
@@ -464,9 +465,21 @@ type VoteOptionResult {
 }
 type VoteResult {
   options: [VoteOptionResult!]!
+  stats: VoteStats!
   message: String
+  video: Video
   createdAt: DateTime
   updatedAt: DateTime
+}
+type VoteStats {
+  ages: [VoteStatsCount!]!
+  countries: [VoteStatsCount!]!
+  chCantons: [VoteStatsCount!]!
+}
+type VoteStatsCount {
+  key: String!
+  count: Int!
+  options: [VoteOptionResult!]!
 }
 
 `

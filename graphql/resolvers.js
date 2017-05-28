@@ -3,6 +3,7 @@ const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
 const queries = require('./queries/index')
+const VoteStats = require('./queries/VoteStats/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
@@ -317,8 +318,8 @@ const resolveFunctions = {
         ORDER BY 1
       `)
     },
-    async countries(_, args, {pgdb, membershipStatsCountriesCache}) {
-      const result = membershipStatsCountriesCache.get('all')
+    async countries(_, args, {pgdb, caches: {membershipStatsCountries: cache}}) {
+      const result = cache.get('all')
       if(result) {
         return result
       }
@@ -434,7 +435,7 @@ const resolveFunctions = {
           collator.compare(a.name, b.name)
         ))
 
-      membershipStatsCountriesCache.set('all', countriesWithPostalCodes)
+      cache.set('all', countriesWithPostalCodes)
 
       return countriesWithPostalCodes
     }
@@ -604,6 +605,12 @@ const resolveFunctions = {
       }))
     },
   },
+  VoteResult: {
+    async stats(result, args, {pgdb}) {
+      return {}
+    }
+  },
+  VoteStats,
 
   RootMutation: mutations
 }
