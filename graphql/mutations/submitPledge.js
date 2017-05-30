@@ -38,8 +38,8 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     })
 
     //check if crowdfunding is still open
-    const package = await pgdb.public.packages.findOne({id: packageId})
-    const crowdfunding = await pgdb.public.crowdfundings.findOne({id: package.crowdfundingId})
+    const pkg = await pgdb.public.packages.findOne({id: packageId})
+    const crowdfunding = await pgdb.public.crowdfundings.findOne({id: pkg.crowdfundingId})
     const now = new Date()
     const gracefullEnd = new Date(crowdfunding.endDate)
     gracefullEnd.setMinutes( now.getMinutes() + 10 )
