@@ -1,7 +1,8 @@
 //
 // This script freezes the crowdfunding status into crowdfunding.result
 // params
-//   crowdfunding name
+//   name: crowdfunding name
+//   optional: video: hls, mp4, youtube, subtitles (if given, hls and mp4 are required)
 //
 // usage
 // cf_server  node script/freezeCrowdfunding.js --name NAME
@@ -16,9 +17,22 @@ PgDb.connect().then( async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
 
   const {name} = argv
-
   if(!name)
     throw new Error('name must be provided')
+
+  let video
+  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
+    if(!argv.hls || !argv.mp4) {
+      throw new Error('hls and mp4 are required for video')
+    }
+    video = {
+      hls: argv.hls,
+      mp4: argv.mp4,
+      youtube: argv.youtube,
+      subtitles: argv.subtitles,
+      poster: argv.poster
+    }
+  }
 
   const transaction = await pgdb.transactionBegin()
   try {
@@ -33,7 +47,8 @@ PgDb.connect().then( async (pgdb) => {
       id: crowdfunding.id
     }, {
       result: {
-        status
+        status,
+        endVideo: video
       }
     })
     console.log("finished! The result is:")
