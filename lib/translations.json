@@ -1,5 +1,5 @@
 {
-  "updated": "2017-05-30T13:50:38.218Z",
+  "updated": "2017-05-30T14:55:51.570Z",
   "title": "live",
   "data": [
     {
@@ -1477,6 +1477,10 @@
     {
       "key": "api/crowdfunding/tooLate",
       "value": "Es tut uns sehr leid, das Crowdfunding ist bereits beendet."
+    },
+    {
+      "key": "api/testimonial/notFound",
+      "value": "Es konnte kein Testimonial gefunden werden."
     },
     {
       "key": "vote/END_GOAL/title",
