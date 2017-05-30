@@ -224,14 +224,14 @@ const resolveFunctions = {
           users u
           ON t."userId" = u.id
         WHERE
-          t."sequenceNumber" ${orderBy === 'ASC'
-            ? '> '+sequenceNumber
-            : '< '+sequenceNumber
-        }
-        ORDER BY
-          t."sequenceNumber" ${orderBy}
+          t."sequenceNumber" ${orderBy === 'ASC' ? '> ' : '< '} :sequenceNumber
+
+        ORDER BY :orderBy
         LIMIT 1
-      `)
+      `, {
+        orderBy: 't."sequenceNumber" '+orderBy,
+        sequenceNumber: sequenceNumber
+      })
       if(testimonial[0]) {
         return testimonial[0]
       }
