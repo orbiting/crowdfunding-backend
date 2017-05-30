@@ -3,6 +3,7 @@ const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
 const queries = require('./queries/index')
+const Crowdfunding = require('./queries/Crowdfunding/index')
 const Voting = require('./queries/Voting/index')
 const VoteStats = require('./queries/VoteStats/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
@@ -208,21 +209,7 @@ const resolveFunctions = {
       return image
     }
   },
-  Crowdfunding: {
-    async packages(crowdfunding, args, {pgdb}) {
-      return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
-    },
-    async goals(crowdfunding, args, {pgdb}) {
-      return pgdb.public.crowdfundingGoals.find({crowdfundingId: crowdfunding.id}, {
-        orderBy: ['people asc', 'money asc']
-      })
-    },
-    async status(crowdfunding, args, {pgdb}) {
-      const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`) || 0
-      const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`) || 0
-      return {money, people}
-    }
-  },
+  Crowdfunding,
   Package: {
     async options(package_, args, {pgdb}) {
       return pgdb.public.packageOptions.find( {packageId: package_.id} )
