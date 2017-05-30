@@ -214,6 +214,7 @@ const resolveFunctions = {
     },
     async nextTestimonial(_, args, {pgdb, t}) {
       const {sequenceNumber, orderBy} = args
+      const isAsc = orderBy === 'ASC'
       const testimonial = await pgdb.query(`
         SELECT
           t.*,
@@ -224,12 +225,10 @@ const resolveFunctions = {
           users u
           ON t."userId" = u.id
         WHERE
-          t."sequenceNumber" ${orderBy === 'ASC' ? '> ' : '< '} :sequenceNumber
-
-        ORDER BY :orderBy
+          t."sequenceNumber" ${isAsc ? '>' : '<'} :sequenceNumber
+        ORDER BY t."sequenceNumber" ${isAsc ? 'ASC' : 'DESC'}
         LIMIT 1
       `, {
-        orderBy: 't."sequenceNumber" '+orderBy,
         sequenceNumber: sequenceNumber
       })
       if(testimonial[0]) {
