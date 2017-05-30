@@ -94,6 +94,8 @@ type Crowdfunding {
   name: String!
   beginDate: DateTime!
   endDate: DateTime!
+  endVideo: Video
+  hasEnded: Boolean!
   goals: [CrowdfundingGoal!]!
   status: CrowdfundingStatus!
   packages: [Package!]!

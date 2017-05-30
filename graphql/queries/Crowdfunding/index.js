@@ -1,4 +1,8 @@
 module.exports = {
+  hasEnded(crowdfunding) {
+    const now = new Date()
+    return now > new Date(crowdfunding.endDate)
+  },
   async packages(crowdfunding, args, {pgdb}) {
     return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
   },
