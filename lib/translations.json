@@ -1,5 +1,5 @@
 {
-  "updated": "2017-05-27T16:58:16.663Z",
+  "updated": "2017-05-30T13:50:38.218Z",
   "title": "live",
   "data": [
     {
@@ -867,6 +867,10 @@
       "value": "Crew"
     },
     {
+      "key": "footer/events",
+      "value": "Veranstaltungen"
+    },
+    {
       "key": "footer/about/projecR",
       "value": "Project R"
     },
@@ -1471,8 +1475,12 @@
       "value": "Die Abstimmung ist bereits geschlossen."
     },
     {
+      "key": "api/crowdfunding/tooLate",
+      "value": "Es tut uns sehr leid, das Crowdfunding ist bereits beendet."
+    },
+    {
       "key": "vote/END_GOAL/title",
-      "value": "Abstimmung zum letzten Ziel des Crowdfundings"
+      "value": "Demokratie in der Republik – das Abstimmungsresultat"
     },
     {
       "key": "vote/END_GOAL/lead",
@@ -1728,7 +1736,7 @@
     },
     {
       "key": "vote/options/moreInfo",
-      "value": "<a href=\"/updates/abstimmung\">Mehr Informationen</a>"
+      "value": "Demokratie in der Republik – <a href=\"/updates/abstimmung\">mehr Informationen</a>."
     },
     {
       "key": "vote/result/title",
@@ -1761,6 +1769,14 @@
     {
       "key": "vote/result/votes/1",
       "value": "Eine Stimme"
+    },
+    {
+      "key": "vote/result/ofVotes/other",
+      "value": "{formattedN} von {formattedCount} Stimmen"
+    },
+    {
+      "key": "vote/result/ofVotes/1",
+      "value": "{formattedN} von einer Stimme"
     },
     {
       "key": "vote/result/labels/null",
