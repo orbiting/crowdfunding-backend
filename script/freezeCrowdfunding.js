@@ -1,5 +1,5 @@
 //
-// This script counts the ballots of a vote and upserts vote.result
+// This script freezes the crowdfunding status into crowdfunding.result
 // params
 //   crowdfunding name
 //
