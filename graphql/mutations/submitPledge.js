@@ -37,6 +37,17 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       }
     })
 
+    //check if crowdfunding is still open
+    const pkg = await pgdb.public.packages.findOne({id: packageId})
+    const crowdfunding = await pgdb.public.crowdfundings.findOne({id: pkg.crowdfundingId})
+    const now = new Date()
+    const gracefullEnd = new Date(crowdfunding.endDate)
+    gracefullEnd.setMinutes( now.getMinutes() + 20 )
+    if(gracefullEnd < now) {
+      logger.error('crowdfunding already closed', { req: req._log(), args })
+      throw new Error(t('api/crowdfunding/tooLate'))
+    }
+
     //check total
     const minTotal = Math.max(pledgeOptions.reduce(
       (amount, plo) => {

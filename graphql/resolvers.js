@@ -3,6 +3,7 @@ const { Kind } = require('graphql/language')
 const logger = require('../lib/logger')
 const mutations = require('./mutations/index')
 const queries = require('./queries/index')
+const Crowdfunding = require('./queries/Crowdfunding/index')
 const Voting = require('./queries/Voting/index')
 const VoteStats = require('./queries/VoteStats/index')
 const {utcTimeFormat, utcTimeParse} = require('../lib/formats')
@@ -173,6 +174,49 @@ const resolveFunctions = {
     async voting(_, args, {pgdb}) {
       return pgdb.public.votings.findOne( args )
     },
+    async lastTestimonial(_, args, {pgdb}) {
+      const testimonial = await pgdb.query(`
+        SELECT
+          t.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) as name
+        FROM
+          testimonials t
+        JOIN
+          users u
+          ON t."userId" = u.id
+        ORDER BY
+          t."createdAt" DESC
+        LIMIT 1
+      `)
+      if(testimonial[0]) {
+        return testimonial[0]
+      }
+      throw new Error(t('api/testimonial/notFound'))
+    },
+    async nextTestimonial(_, args, {pgdb, t}) {
+      const {sequenceNumber, orderBy} = args
+      const isAsc = orderBy === 'ASC'
+      const testimonial = await pgdb.query(`
+        SELECT
+          t.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) as name
+        FROM
+          testimonials t
+        JOIN
+          users u
+          ON t."userId" = u.id
+        WHERE
+          t."sequenceNumber" ${isAsc ? '>' : '<'} :sequenceNumber
+        ORDER BY t."sequenceNumber" ${isAsc ? 'ASC' : 'DESC'}
+        LIMIT 1
+      `, {
+        sequenceNumber: sequenceNumber
+      })
+      if(testimonial[0]) {
+        return testimonial[0]
+      }
+      throw new Error(t('api/testimonial/notFound'))
+    }
   }),
 
   User: {
@@ -208,21 +252,7 @@ const resolveFunctions = {
       return image
     }
   },
-  Crowdfunding: {
-    async packages(crowdfunding, args, {pgdb}) {
-      return pgdb.public.packages.find( {crowdfundingId: crowdfunding.id} )
-    },
-    async goals(crowdfunding, args, {pgdb}) {
-      return pgdb.public.crowdfundingGoals.find({crowdfundingId: crowdfunding.id}, {
-        orderBy: ['people asc', 'money asc']
-      })
-    },
-    async status(crowdfunding, args, {pgdb}) {
-      const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`) || 0
-      const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`) || 0
-      return {money, people}
-    }
-  },
+  Crowdfunding,
   Package: {
     async options(package_, args, {pgdb}) {
       return pgdb.public.packageOptions.find( {packageId: package_.id} )

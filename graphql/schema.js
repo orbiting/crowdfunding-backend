@@ -22,6 +22,8 @@ type RootQuery {
   events: [Event!]!
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
+  lastTestimonial: Testimonial!
+  nextTestimonial(sequenceNumber: Int!, orderBy: OrderBy!): Testimonial!
 
   membershipStats: MembershipStats!
   testimonialStats: TestimonialStats!
@@ -382,6 +384,10 @@ enum OrderType {
   HOT
   NEW
   TOP
+}
+enum OrderBy {
+  ASC
+  DESC
 }
 
 type Feed {
