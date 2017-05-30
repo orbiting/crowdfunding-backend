@@ -174,6 +174,69 @@ const resolveFunctions = {
     async voting(_, args, {pgdb}) {
       return pgdb.public.votings.findOne( args )
     },
+    async lastTestimonial(_, args, {pgdb}) {
+      const testimonial = await pgdb.query(`
+        SELECT
+          t.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) as name
+        FROM
+          testimonials t
+        JOIN
+          users u
+          ON t."userId" = u.id
+        ORDER BY
+          t."createdAt" DESC
+        LIMIT 1
+      `)
+      if(testimonial[0]) {
+        return testimonial[0]
+      }
+      return
+    },
+    async lastTestimonial(_, args, {pgdb}) {
+      const testimonial = await pgdb.query(`
+        SELECT
+          t.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) as name
+        FROM
+          testimonials t
+        JOIN
+          users u
+          ON t."userId" = u.id
+        ORDER BY
+          t."createdAt" DESC
+        LIMIT 1
+      `)
+      if(testimonial[0]) {
+        return testimonial[0]
+      }
+      throw new Error(t('api/testimonial/notFound'))
+    },
+    async nextTestimonial(_, args, {pgdb, t}) {
+      const {sequenceNumber, orderBy} = args
+      const testimonial = await pgdb.query(`
+        SELECT
+          t.*,
+          concat_ws(' ', u."firstName"::text, u."lastName"::text) as name
+        FROM
+          testimonials t
+        JOIN
+          users u
+          ON t."userId" = u.id
+        WHERE
+          t."sequenceNumber" ${orderBy === 'ASC'
+            ? '> '+sequenceNumber
+            : '< '+sequenceNumber
+        }
+        ORDER BY
+          t."sequenceNumber" ${orderBy}
+        LIMIT 1
+      `)
+      if(testimonial[0]) {
+        return testimonial[0]
+      }
+      throw new Error(t('api/testimonial/notFound'))
+    }
   }),
 
   User: {
