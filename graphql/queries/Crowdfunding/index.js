@@ -15,5 +15,15 @@ module.exports = {
     const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`) || 0
     const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`) || 0
     return {money, people}
+  },
+  hasEnded(crowdfunding) {
+    const now = new Date()
+    return now > new Date(crowdfunding.endDate)
+  },
+  endVideo(crowdfunding) {
+    if(crowdfunding.result) {
+      return crowdfunding.result.endVideo
+    }
+    return
   }
 }
