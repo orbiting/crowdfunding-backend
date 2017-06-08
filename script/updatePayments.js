@@ -17,8 +17,6 @@ PgDb.connect().then( async (pgdb) => {
   const inputFile = rw.readFileSync('/dev/stdin', 'utf8')
   const input = csvParse(inputFile)
 
-  console.log(input)
-
   const transaction = await pgdb.transactionBegin()
   try {
 
