@@ -56,8 +56,6 @@
     "migrate:down": "db-migrate down",
     "db:reset": "db-migrate reset && db-migrate up && knex seed:run && cat script/data/feeds.json | node script/importFeeds.js && cat script/data/votings.json | node script/importVotings.js",
     "seed": "knex seed:run",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage",
     "translations": "gsheets --key=1OHoiENwJH-tqf9yXfXHOevAn17daO_CvB21Rym-oiqk --title=live --pretty --out lib/translations.json",
     "import": "cat script/local/members.csv | node script/importMembers.js && node script/importTestimonials.js && node script/generateSMImages.js",
     "sync:testimonials": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/ script/local/testimonials/",
@@ -71,19 +69,8 @@
     "d3-dsv": "^1.0.5",
     "gsheets": "^2.0.0",
     "http-proxy": "^1.16.2",
-    "jest": "^20.0.3",
-    "jest-cli": "^20.0.3",
     "node-inspector": "^1.1.1",
     "nodemon": "^1.11.0",
     "rw": "^1.3.3"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "/node_modules/"
-    ],
-    "coverageReporters": [ "lcov", "html" ],
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true
   }
 }
