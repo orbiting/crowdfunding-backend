@@ -1,9 +1,13 @@
 {
-  "updated": "2017-05-30T14:55:51.570Z",
+  "updated": "2017-06-28T09:16:33.071Z",
   "title": "live",
   "data": [
     {
       "key": "menu/",
+      "value": "Danke"
+    },
+    {
+      "key": "menu/crowdfunding",
       "value": "Crowdfunding"
     },
     {
@@ -575,10 +579,6 @@
       "value": "bis Deadline"
     },
     {
-      "key": "status/time/ended",
-      "value": "Vorbei"
-    },
-    {
       "key": "status/time/days/1",
       "value": "1 Tag"
     },
@@ -719,7 +719,7 @@
       "value": "E-Mail ungültig"
     },
     {
-      "key": "api/unauthorized",
+      "key": "api/signIn",
       "value": "Sie müssen sich zuerst einloggen."
     },
     {
@@ -832,15 +832,15 @@
     },
     {
       "key": "api/newsletter/invalidRequest",
-      "value": "Ungültige Anfrage"
+      "value": "Ungültige Anfrage."
     },
     {
       "key": "api/newsletter/alreadySubscribed",
-      "value": "Sie sind bereits eingetragen"
+      "value": "Sie sind bereits eingetragen."
     },
     {
       "key": "api/newsletter/subscriptionFailed",
-      "value": "Anmeldung fehlgeschlagen"
+      "value": "Anmeldung fehlgeschlagen."
     },
     {
       "key": "footer/contact/title",
@@ -1180,7 +1180,7 @@
     },
     {
       "key": "faq/before/support/text",
-      "value": "Bei allen technischen Problemen beim Crowdfunding helfen wir Ihnen gerne so schnell wie möglich per Mail: <a href=\"mailto:kontakt@republik.ch\">kontakt@republik.ch</a>"
+      "value": "Bei allen technischen Problemen helfen wir Ihnen gerne so schnell wie möglich per Mail: <a href=\"mailto:kontakt@republik.ch\">kontakt@republik.ch</a>"
     },
     {
       "key": "faq/form/title",
@@ -1251,10 +1251,6 @@
       "value": "Sie müssen ein Foto hochladen"
     },
     {
-      "key": "testimonial/list/before",
-      "value": "Noch nicht Mitglied? Jetzt <a href=\"/pledge\">mitmachen</a> und Mitglied werden!"
-    },
-    {
       "key": "testimonial/search/label",
       "value": "Suchen"
     },
@@ -1272,11 +1268,7 @@
     },
     {
       "key": "testimonial/infinite/end",
-      "value": "Sie haben gerade {count} Statements angeschaut. Sind Sie selber schon dabei? {pledgeLink}"
-    },
-    {
-      "key": "testimonial/infinite/end/pledgeLink",
-      "value": "Sonst jetzt Mitmachen!"
+      "value": "Sie haben gerade {count} Statements angeschaut."
     },
     {
       "key": "testimonial/detail/share/emailSubject",
@@ -1866,6 +1858,42 @@
     {
       "key": "vote/waiting/hasSubmitted",
       "value": "Sie haben abgestimmt. Vielen Dank für Ihre Stimme!"
+    },
+    {
+      "key": "merci/pledges/title/0",
+      "value": "Sie haben nicht mitgemacht."
+    },
+    {
+      "key": "ended/pledge/lead",
+      "value": "<a href=\"/\">Das Crowdfunding ist vorbei.</a>"
+    },
+    {
+      "key": "ended/crowdfunding/description",
+      "value": "Das war unser Crowdfunding."
+    },
+    {
+      "key": "status/time/ended",
+      "value": "Das Crowdfunding ist vorbei."
+    },
+    {
+      "key": "ended/waitingList/title",
+      "value": "Interesse an Republik-Mitgliedschaft"
+    },
+    {
+      "key": "ended/waitingList/defaultMessage",
+      "value": "Wir werden auf Sie zukommen."
+    },
+    {
+      "key": "status/time/seconds/1",
+      "value": "1 Sekunde"
+    },
+    {
+      "key": "status/time/seconds/other",
+      "value": "{count} Sekunden"
+    },
+    {
+      "key": "api/unauthorized",
+      "value": "Nicht genehmigt. Sie müssen die Rolle «{role}» besitzen um die gwünschte Aktion auszuführen."
     }
   ]
 }
