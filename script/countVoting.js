@@ -14,8 +14,8 @@
 
 require('dotenv').config()
 const PgDb = require('../lib/pgdb')
-const Voting = require('../graphql/queries/Voting/index')
-const VoteStats = require('../graphql/queries/VoteStats/index')
+const Voting = require('../graphql/resolvers/Voting')
+const VoteStats = require('../graphql/resolvers/VoteStats')
 const util = require('util')
 
 PgDb.connect().then( async (pgdb) => {

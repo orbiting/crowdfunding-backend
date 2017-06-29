@@ -7,7 +7,7 @@ const LRU = require("lru-cache")
 const {MSTATS_COUNTRIES_CACHE_TIMEOUT_SECS} = process.env
 
 const Schema = require('./schema')
-const Resolvers = require('./resolvers')
+const Resolvers = require('./resolvers/index')
 
 const executableSchema = makeExecutableSchema({
   typeDefs: Schema,

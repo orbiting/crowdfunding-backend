@@ -11,7 +11,7 @@
 
 require('dotenv').config()
 const PgDb = require('../lib/pgdb')
-const Crowdfunding = require('../graphql/queries/Crowdfunding/index')
+const Crowdfunding = require('../graphql/resolvers/Crowdfunding')
 
 PgDb.connect().then( async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
