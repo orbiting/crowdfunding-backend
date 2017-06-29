@@ -27,6 +27,7 @@ module.exports = {
     //  "error",
     //  "never"
     //],
+    "no-console": 0,
     "func-style": [
       "error",
       "declaration", { "allowArrowFunctions": true }
