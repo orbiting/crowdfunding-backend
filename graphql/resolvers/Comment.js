@@ -12,7 +12,7 @@ module.exports = {
     const userId = user ? user.id : null
     return comment.userId === userId
   },
-  score(comment, args) {
+  score(comment) {
     return comment.upVotes - comment.downVotes
   },
   async authorImage(comment, {size}, {pgdb}) {

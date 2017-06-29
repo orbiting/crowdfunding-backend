@@ -28,9 +28,7 @@
 // cf_server  node assets/geography/countries/augmentCountriesWithNames.js
 // this can take some time (3min on 3.2 GHz) enjoy a coffee...
 
-const fetch = require('isomorphic-unfetch')
 const fs = require('fs')
-const stream = require('stream')
 const es = require('event-stream')
 
 Promise.resolve().then( async () => {
@@ -45,7 +43,7 @@ Promise.resolve().then( async () => {
       name: 'Südkorea' },
   ]
 
-  await new Promise( (resolve, reject) => {
+  await new Promise( (resolve) => {
     const s = fs.createReadStream(__dirname+'/alternateNames.txt')
       .pipe(es.split())
       .pipe(es.mapSync(function(line){

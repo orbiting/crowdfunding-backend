@@ -1,8 +1,7 @@
-const uuid = require('uuid/v4')
 const ensureSignedIn = require('../../../lib/ensureSignedIn')
 const logger = require('../../../lib/logger')
 
-module.exports = async (_, args, {pgdb, user, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
 
   const testimonial = await pgdb.public.testimonials.findOne({userId: req.user.id})

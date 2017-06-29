@@ -23,7 +23,7 @@ const normalize = (data) => data.map( d => {
 })
 
 module.exports = (pgdb, logger) =>
-  server.get('/gsheets/:key', async function(req, res, next) {
+  server.get('/gsheets/:key', async function(req, res) {
     const {key} = req.params
     const name = mapping[key]
     if(!key || !name) {

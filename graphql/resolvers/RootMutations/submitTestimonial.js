@@ -13,13 +13,13 @@ const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 const MAX_QUOTE_LENGTH = 140
 const MAX_ROLE_LENGTH = 60
 
-module.exports = async (_, args, {pgdb, user, req, t}) => {
+module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
 
   //check if user has pledged, or was vouchered a memberships
   const hasPledges = !!(await pgdb.public.pledges.findFirst({userId: req.user.id}))
   if(!hasPledges && !(await pgdb.public.memberships.findFirst({userId: req.user.id}))) {
-    logger.error('not allowed submitTestimonial', { req: req._log(), args, pledge })
+    logger.error('not allowed submitTestimonial', { req: req._log(), args })
     throw new Error(t('api/testimonial/pledge/required'))
   }
 

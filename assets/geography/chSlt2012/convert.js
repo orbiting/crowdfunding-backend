@@ -5,7 +5,6 @@
 // cf_server  node assets/geography/chPostalCodes/convert.js
 
 const rw = require('rw')
-const nest = require('d3-collection').nest
 
 const input = rw.readFileSync(
   __dirname + '/data.csv',

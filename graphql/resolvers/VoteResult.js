@@ -1,5 +1,5 @@
 module.exports = {
-  async stats(result, args, {pgdb}) {
+  async stats(result) {
     if(result && result.stats) {
       return result.stats
     }

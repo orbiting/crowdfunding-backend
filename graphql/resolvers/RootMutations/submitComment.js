@@ -101,6 +101,4 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
     logger.error('error in transaction', { req: req._log(), args, error: e })
     throw e
   }
-
-  return true
 }

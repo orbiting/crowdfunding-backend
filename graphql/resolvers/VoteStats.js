@@ -1,9 +1,10 @@
 const {postalCodeData, postalCodeParsers} = require('../../lib/geo/postalCode')
 const countryNameNormalizer = require('../../lib/geo/country').nameNormalizer
-const getBFSNr = require('../../lib/geo/chPostalCode').getBFSNr
-const getSlt = require('../../lib/geo/chSlt').getSlt
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
+// see commented code below for chSlt2012
+//const getBFSNr = require('../../lib/geo/chPostalCode').getBFSNr
+//const getSlt = require('../../lib/geo/chSlt').getSlt
 //const util = require('util')
 
 

@@ -29,7 +29,7 @@ Promise.resolve().then( async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        key: process.env.MANDRILL_API_KEY,
+        key: MANDRILL_API_KEY,
         id: message._id
       })
     })).json()

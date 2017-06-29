@@ -1,8 +1,5 @@
 'use strict';
 
-var dbm;
-var type;
-var seed;
 var fs = require('fs');
 var path = require('path');
 var Promise;
@@ -11,10 +8,7 @@ var Promise;
   * We receive the dbmigrate dependency from dbmigrate initially.
   * This enables us to not have to rely on NODE_PATH.
   */
-exports.setup = function(options, seedLink) {
-  dbm = options.dbmigrate;
-  type = dbm.dataType;
-  seed = seedLink;
+exports.setup = function(options) {
   Promise = options.Promise;
 };
 

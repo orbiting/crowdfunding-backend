@@ -2,7 +2,7 @@ const sendMail = require('../../../lib/sendMail')
 const sendMailTemplate = require('../../../lib/sendMailTemplate')
 const ensureSignedIn = require('../../../lib/ensureSignedIn')
 
-module.exports = async (_, args, {pgdb, user, req, t}) => {
+module.exports = async (_, args, {user, req, t}) => {
   ensureSignedIn(req, t)
 
   const { question } = args

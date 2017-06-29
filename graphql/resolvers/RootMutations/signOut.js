@@ -1,6 +1,6 @@
 const logger = require('../../../lib/logger')
 
-module.exports = async (_, args, {pgdb, user, req}) => {
+module.exports = async (_, args, {req}) => {
   if(!req.session)
     return
   req.session.destroy(function(error) {

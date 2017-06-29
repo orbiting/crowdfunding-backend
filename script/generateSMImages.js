@@ -8,7 +8,6 @@
 require('dotenv').config()
 
 const PgDb = require('../lib/pgdb')
-const fetch = require('isomorphic-unfetch')
 const uploadExoscale = require('../lib/uploadExoscale')
 const keyCDN = require('../lib/keyCDN')
 const renderUrl = require('../lib/renderUrl')

@@ -1,6 +1,5 @@
 require('dotenv').config()
 const fetch = require('isomorphic-unfetch')
-const sendMail = require('../lib/sendMail')
 
 const {MANDRILL_API_KEY} = process.env
 
@@ -16,7 +15,7 @@ Promise.resolve().then( async () => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      key: process.env.MANDRILL_API_KEY,
+      key: MANDRILL_API_KEY,
       subject: 'Danke für Ihre Frage',
       senders: [
         "faq@republik.ch"

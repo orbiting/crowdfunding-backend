@@ -8,7 +8,6 @@
 require('dotenv').config()
 
 const PgDb = require('../lib/pgdb')
-const fetch = require('isomorphic-unfetch')
 const gsheets = require('gsheets')
 const uploadExoscale = require('../lib/uploadExoscale')
 const keyCDN = require('../lib/keyCDN')
@@ -27,7 +26,7 @@ const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 function randomString(len) {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for( var i=0; i < 10; i++ )
+  for( var i=0; i < len; i++ )
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   return text;
 }

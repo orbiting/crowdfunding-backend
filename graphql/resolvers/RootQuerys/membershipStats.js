@@ -1,3 +1,3 @@
-module.exports = (_, args) => {
+module.exports = () => {
   return {} //see detail resolvers
 }

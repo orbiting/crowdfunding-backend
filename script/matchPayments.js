@@ -20,12 +20,11 @@ const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(';').parse
-const csvFormat = dsvFormat(';').format
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 const generateMemberships = require('../lib/generateMemberships')
 const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
-const sendMail = require('../lib/sendMail')
+//const sendMail = require('../lib/sendMail')
 
 const t = getFormatter(MESSAGES)
 
@@ -159,7 +158,7 @@ const insertPayments = async (paymentsInput, tableName, pgdb) => {
   await Promise.all(
     paymentsInput.map( payment => {
       return pgdb.public[tableName].insert(payment)
-        .then( v => { return {payment, status: "resolved"} })
+        .then( () => { return {payment, status: "resolved"} })
         .catch( e => { numFailed+=1; return {payment, e, status: "rejected"} })
     })
   ).then( results => {

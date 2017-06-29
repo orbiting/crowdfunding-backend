@@ -3,7 +3,6 @@ const querystring = require('querystring')
 const crypto = require('crypto')
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const logger = require('../../../lib/logger')
-const sendMailTemplate = require('../../../lib/sendMailTemplate')
 const sendPendingPledgeConfirmations = require('../../../lib/sendPendingPledgeConfirmations')
 const generateMemberships = require('../../../lib/generateMemberships')
 const fetch = require('isomorphic-unfetch')
@@ -239,13 +238,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
           case 'Processed':
           case 'Pending':
             throw new Error(t('api/paypal/contactUs', {id: pledge.id}))
-            break
           case 'Denied':
           case 'Expired':
           case 'Failed':
           case 'Voided':
             throw new Error(t('api/paypal/deny', {id: pledge.id}))
-            break
         }
         throw new Error(t('api/paypal/deny', {id: pledge.id}))
       }

@@ -32,10 +32,10 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
     }
 
     //ensure user has not voted yet
-    if(!!(await transaction.public.ballots.findFirst({
+    if(await transaction.public.ballots.findFirst({
       userId: user.id,
       votingId: votingOption.votingId
-    }))) {
+    })) {
       logger.error('voted already', { req: req._log(), args })
       throw new Error(t('api/voting/alreadyVoted'))
     }

@@ -15,7 +15,6 @@ const ABO_PRICE = 24000
 
 PgDb.connect().then( async (pgdb) => {
   //gather data
-  const cf = await pgdb.public.crowdfundings.findOne({name: 'REPUBLIK'})
   const package = await pgdb.public.packages.findOne({name: 'ABO'})
   const packageOption = await pgdb.public.packageOptions.findOne({packageId: package.id})
   const membershipType = await pgdb.public.membershipTypes.findOne({name: 'ABO'})
@@ -46,14 +45,14 @@ PgDb.connect().then( async (pgdb) => {
         donation: 0,
         sendConfirmMail: false
       })
-      const pledgeOption = await pgdb.public.pledgeOptions.insertAndGet({
+      await pgdb.public.pledgeOptions.insert({
         templateId: packageOption.id,
         pledgeId: pledge.id,
         amount: 1,
         price: ABO_PRICE
       })
 
-      const membership = await pgdb.public.memberships.insertAndGet({
+      await pgdb.public.memberships.insert({
         userId: user.id,
         pledgeId: pledge.id,
         membershipTypeId: membershipType.id,

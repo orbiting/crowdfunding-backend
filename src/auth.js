@@ -17,12 +17,6 @@ exports.configure = ({
   // NB: With 'rolling: true' passed to session() the session expiry time will
   // be reset every time a user visits the site again before it expires.
   maxAge = 60000 * 60 * 24 * 7 * 4,
-  // How often the client should revalidate the session in ms (default 60s)
-  // Does not impact the session life on the server, but causes the client to
-  // always refetch session info after N seconds has elapsed since last
-  // checked. Sensible values are between 0 (always check the server) and a
-  // few minutes.
-  clientMaxAge = 60000,
   // is the server running in development
   dev = false
 } = {}) => {
@@ -124,7 +118,7 @@ exports.configure = ({
     } catch(e) {
       logger.error('auth: exception', { req: req._log(), emailFromQuery, context, e })
       return res.redirect(FRONTEND_BASE_URL+'/notifications/unavailable?'
-        + querystring.stringify({email, context}))
+        + querystring.stringify({emailFromQuery, context}))
     }
   })
 

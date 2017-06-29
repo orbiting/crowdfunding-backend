@@ -60,7 +60,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     ), 100)
 
     if(pledge.total < minTotal) {
-      logger.error(`pledge.total (${pledge.total}) must be >= (${total})`, { req: req._log(), args, minTotal })
+      logger.error(`pledge.total (${pledge.total}) must be >= (${minTotal})`, { req: req._log(), args, minTotal })
       throw new Error(t('api/unexpected'))
     }
 

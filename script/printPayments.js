@@ -21,7 +21,7 @@ const dateTimeFormat = timeFormat('%x %H:%M') //%x - the locale’s date
 
 require('dotenv').config()
 
-formatPrice = (price) => price/100
+const formatPrice = (price) => price/100
 
 PgDb.connect().then( async (pgdb) => {
   //console.log('starting export...')
