@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!--[if gte mso 15]>
+    <xml>
+      <o:officedocumentsettings>
+        <o:allowpng />
+        <o:pixelsperinch>96</o:pixelsperinch>
+      </o:officedocumentsettings>
+    </xml>
+    <![endif]-->
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #fff;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody>
+        <tr>
+          <td align="center" valign="top">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:640px;color:#444;font-size:18px;font-family:Times, 'Times New Roman', serif;">
+              <tbody>
+                <tr>
+                  <td style="padding:20px;">
+                    <p>*|NAME|*, willkommen an Bord!</p>
+                    <p>Wir freuen uns, Sie bei uns begrüssen zu dürfen. Hier die wichtigsten Informationen über Ihre Teilnahme an der Republik.</p>
+                    
+                    *|IF:NOT_PAYMENTSLIP|*
+                    <p>Ihre Zahlung ist erfolgreich bei uns angekommen, herzlichen Dank!</p>
+                    *|IF:ASK_PERSONAL_INFO|*
+                    <p>Gratulation: Sie werden damit automatisch Mitglied der Project R Genossenschaft. Und ein wenig Verleger oder Verlegerin der Republik.</p>
+                    <p>Aus juristischen Gründen brauchen wir noch zwei Angaben von Ihnen: Adresse und Geburtsdatum. Falls Sie das sofort erledigen wollen, danke für Ihre vorbildliche Disziplin! Klicken Sie auf folgenden Link: <a href="https://www.republik.ch/merci">republik.ch/merci</a>
+                  </p>
+                  *|END:IF|*
+                  *|END:IF|*
+                  *|IF:PAYMENTSLIP|*
+                  *|IF:PAPER_INVOICE|*
+                  <p>Wir schicken Ihnen einen Einzahlungsschein an folgende Adresse:</p>
+                  <p>*|HTML:ADDRESS|*</p>
+                  <p>Sollte der Brief verloren gehen, hier noch einmal alle Zahlungsinformationen auf einen Blick:</p>
+                  *|END:IF|*
+                  *|IF:NOT_PAPER_INVOICE|*
+                  <p>Sie haben einen Einzahlungsschein zwecks Zahlung gewählt.</p>
+                  *|END:IF|*
+                  <p>Bitte überweisen Sie *|TOTAL|* Franken an:</p>
+                  <p>
+                  PC 61-11760-6<br>
+                  IBAN: CH50 0900 0000 6101 1760 6<br>
+                  lautend auf:<br>
+                  Project R Genossenschaft<br>
+                  Sihlhallenstrasse 1<br>
+                  8004 Zürich
+                </p>
+                <p>Bis spätesten *|DUE_DATE|*.</p>
+                <p>Und hier das Wichtigste: Vergessen Sie nicht, folgende Botschaft in das Feld «Betreff» des Einzahlungsscheins zu schreiben: *|HRID|* (sonst funktioniert die Zuordnung nicht)</p>
+                *|IF:WAITING_FOR_PAYMENT|*
+                <p>Danke für Ihre Grosszügigkeit. Ihre Mitgliedschaft läuft ab dem Datum Ihrer Einzahlung.</p>
+                *|END:IF|*
+                *|IF:ASK_PERSONAL_INFO|*
+                <p>Gratulation: Sie werden damit automatisch Mitglied der Project R Genossenschaft. Und damit ein wenig Verleger oder Verlegerin der Republik.</p>
+                <p>Dazu brauchen wir noch eine einzige, letzte Angabe von Ihnen: Ihr Geburtsdatum. Falls Sie das sofort erledigen wollen, danke für Ihre vorbildliche Disziplin! Klicken Sie auf folgenden Link: <a href="https://www.republik.ch/merci">republik.ch/merci</a>
+              </p>
+              *|END:IF|*
+              *|END:IF|*
+              *|IF:VOUCHER_CODES|*
+              <p>Gratulation für Ihre Grossherzigkeit: Sie verschenken die Republik. Sie erhalten pro Geschenk-Abonnement einen Sechs-Zeichen-Code. Hier:</p>
+              <p>*|VOUCHER_CODES|*</p>
+              <p>Sie können diesen der Person Ihrer Wahl mit einem Mittel Ihrer Wahl überreichen: sofort per Mail oder mit Whats App, traditionell per Briefpost, originell als Schrift auf einem Kuchen oder mit einem Spezialflugzeug an den Himmel geschrieben.</p>
+              *|IF:NOTEBOOK|*
+              <p>Wie der Zufall spielt, eignet sich auch das Republik-Notizbuch perfekt für die Code-Übergabe. Sie werden dieses per Post zugeschickt bekommen.</p>
+              *|END:IF|*
+              <p>Um das Geschenk einzulösen, muss der neue Besitzer, die neue Besitzerin des Codes auf die Seite <a href="https://www.republik.ch/claim">republik.ch/claim</a> gehen. Und die sechs Zeichen dort eintippen.</p>
+              *|END:IF|*
+              <p>Und wenn Sie noch ein oder zwei Minuten freihaben: Posten Sie doch ein Foto auf unserer Republik-Unterstützungs-Seite. Dort werden Sie sich in guter Gesellschaft befinden. Die durch Sie noch einen Hauch besser werden wird. Hier lang: <a href="https://www.republik.ch/merci">republik.ch/merci</a>
+            </p>
+            <p>Vielen Dank!</p>
+            <p>Die Crew von Project R und der Republik</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px;">
+            <p>
+            <img height="79" src="https://gallery.mailchimp.com/650c1ec9003c7d8567eef4c5e/images/feb6bdde-83da-4211-bcf8-b09d3d3d012a.png" style="border: 0px  ; width: 180px !important; height: 79px !important; margin: 0px;" width="180" alt="feb6bdde-83da-4211-bcf8-b09d3d3d012a.png">
+            <br>
+            Republik<br>
+            c/o Project R Genossenschaft<br>
+            Sihlhallenstrasse 1<br>
+            8004 Zürich<br>
+            Schweiz<br><a href="mailto:kontakt@republik.ch">kontakt@republik.ch</a>
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
