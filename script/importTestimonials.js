@@ -70,7 +70,7 @@ PgDb.connect().then(async (pgdb) => {
       const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
 
       const image = fs.readFileSync(path.join(__dirname, '/local/photos/', filename), 'binary')
-      const inputBuffer = new Buffer(image, 'binary')
+      const inputBuffer = Buffer.from(image, 'binary')
 
       await Promise.all([
         convertImage.toJPEG(inputBuffer)

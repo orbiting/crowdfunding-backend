@@ -69,7 +69,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       sequenceNumber: testimonial.sequenceNumber || seqNumber
     }, {skipUndefined: true})
   } else { // new image
-    const inputBuffer = new Buffer(image, 'base64')
+    const inputBuffer = Buffer.from(image, 'base64')
     const id = testimonial ? testimonial.id : uuid()
 
     const pathOriginal = `/${FOLDER}/${id}_original.jpeg`
