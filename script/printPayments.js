@@ -147,35 +147,37 @@ PgDb.connect().then(async (pgdb) => {
 
     const user = users.find(u => u.id === pledge.userId)
 
+    /*eslint-disable */
     return {
-      'exportedAlready': payment.exported ? 'x' : '',
-      'DatumTimestamp': dateTimeFormat(payment.createdAt),
-      'Payment ID': payment.id.substring(0, 13),
-      'HRID': payment.hrid,
-      'UserId': user.id.substring(0, 13),
-      'Vorname': user.firstName,
-      'Nachname': user.lastName,
-      'email': user.email,
-      'verified': user.verified,
-      'Tel': user.phoneNumber,
-      'Anschrift': user.address.name,
-      'Adresse1': user.address.line1,
-      'Adresse2': user.address.line2,
-      'PLZ': user.address.postalCode,
-      'Ort': user.address.city,
-      'Land': user.address.country,
-      'Abo#': sequenceNumbers,
-      'BetragTotal': formatPrice(payment.total),
-      'Produkt1Anzahl': produkte[0].anzahl,
+      'exportedAlready':   payment.exported ? 'x' : '',
+      'DatumTimestamp':    dateTimeFormat(payment.createdAt),
+      'Payment ID':        payment.id.substring(0, 13),
+      'HRID':              payment.hrid,
+      'UserId':            user.id.substring(0, 13),
+      'Vorname':           user.firstName,
+      'Nachname':          user.lastName,
+      'email':             user.email,
+      'verified':          user.verified,
+      'Tel':               user.phoneNumber,
+      'Anschrift':         user.address.name,
+      'Adresse1':          user.address.line1,
+      'Adresse2':          user.address.line2,
+      'PLZ':               user.address.postalCode,
+      'Ort':               user.address.city,
+      'Land':              user.address.country,
+      'Abo#':              sequenceNumbers,
+      'BetragTotal':       formatPrice(payment.total),
+      'Produkt1Anzahl':    produkte[0].anzahl,
       'Produkt1Beschrieb': produkte[0].beschrieb,
-      'Produkt1Preis': produkte[0].preis,
-      'Produkt2Anzahl': produkte[1].anzahl,
+      'Produkt1Preis':     produkte[0].preis,
+      'Produkt2Anzahl':    produkte[1].anzahl,
       'Produkt2Beschrieb': produkte[1].beschrieb,
-      'Produkt2Preis': produkte[1].preis,
-      'Produkt3Anzahl': produkte[2].anzahl,
+      'Produkt2Preis':     produkte[1].preis,
+      'Produkt3Anzahl':    produkte[2].anzahl,
       'Produkt3Beschrieb': produkte[2].beschrieb,
-      'Produkt3Preis': produkte[2].preis
+      'Produkt3Preis':     produkte[2].preis
     }
+    /*eslint-disable */
   })
 
   if (!DRY_MODE) {

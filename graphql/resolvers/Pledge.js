@@ -34,7 +34,7 @@ module.exports = {
     // augment memberships with claimer's names
     const users = await pgdb.public.users.find({id: memberships.map(m => m.userId)})
     return memberships.map(membership => {
-      if (membership.userId != pledge.userId) { // membership was vouchered to somebody else
+      if (membership.userId !== pledge.userId) { // membership was vouchered to somebody else
         const user = users.find(u => u.id === membership.userId)
         return Object.assign({}, membership, {
           claimerName: user.firstName + ' ' + user.lastName
