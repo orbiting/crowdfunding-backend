@@ -71,7 +71,7 @@ module.exports = {
       return stats.ages
     }
 
-    // no access to voting here, we have one voting and no time: don't constrain to votingId
+    const {voting} = stats
 
     // others (no birthday)
     const nullOptions = await pgdb.query(`
@@ -88,12 +88,15 @@ module.exports = {
         users u
         ON b."userId"=u.id
       WHERE
-        u.birthday is null
+        u.birthday is null AND
+        vo."votingId" = :votingId
       GROUP BY
         1, 2
       ORDER BY
         3 DESC
-    `)
+    `, {
+      votingId: voting.id
+    })
 
     const nullStatsCount = {
       key: 'null',
@@ -138,12 +141,16 @@ module.exports = {
             u.birthday is not null AND
             extract(year from age(u.birthday)) >= e1.min AND
             ((e1.max IS NULL) OR extract(year from age(u.birthday)) <= e1.max)
+        WHERE
+          vo."votingId" = :votingId
         GROUP BY
           1, 2
         ORDER BY
           3 DESC
       ) e2 ON true;
-    `)
+    `, {
+      votingId: voting.id
+    })
 
     const allOptions = await pgdb.query(`
       SELECT
@@ -152,7 +159,11 @@ module.exports = {
         0 AS count
       FROM
         "votingOptions" vo
-    `)
+      WHERE
+        vo."votingId" = :votingId
+    `, {
+      votingId: voting.id
+    })
     const ageStatsCount = nest()
       .key(d => d.max ? `${d.min}-${d.max}` : `${d.min}+`)
       .entries(flatAgeOptions)
@@ -187,7 +198,7 @@ module.exports = {
       return stats.countries
     }
 
-    // no access to voting here, we have one voting and no time: don't constrain to votingId
+    const {voting} = stats
 
     const allCountriesVotingOptions = await pgdb.query(`
       SELECT
@@ -207,6 +218,8 @@ module.exports = {
         LEFT JOIN
           addresses a
           ON u."addressId" = a.id
+        WHERE
+          b."votingId" = :votingId
         GROUP BY
           1
         ORDER BY
@@ -228,7 +241,9 @@ module.exports = {
         ORDER BY
           3 DESC
       ) e2 ON true;
-    `)
+    `, {
+      votingId: voting.id
+    })
 
     const nullCountryOptions = {
       key: 'null',
@@ -270,7 +285,7 @@ module.exports = {
       return stats.chCantons
     }
 
-    // no access to voting here, we have one voting and no time: don't constrain to votingId
+    const {voting} = stats
 
     const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`
       SELECT
@@ -292,6 +307,8 @@ module.exports = {
           LEFT JOIN
             addresses a
             ON u."addressId" = a.id
+          WHERE
+            b."votingId" = :votingId
           GROUP BY
             1, 2
           ORDER BY
@@ -313,7 +330,9 @@ module.exports = {
           ORDER BY
             3 DESC
       ) e2 ON true;
-    `)
+    `, {
+      votingId: voting.id
+    })
 
     const pcParser = postalCodeParsers['CH']
 
@@ -348,7 +367,8 @@ module.exports = {
 
   /* addresses -> bfsNr matching needs refinement. check lib/geo/chPostalCode.js
   chSlt2012: async (_, args, {pgdb}) => {
-    //no access to voting here, we have one voting and no time: don't constrain to votingId
+
+    const {voting} = stats
 
     const allCountriesWithPostalCodesAndCityVotingOptions = await pgdb.query(`
       SELECT
@@ -372,6 +392,8 @@ module.exports = {
           LEFT JOIN
             addresses a
             ON u."addressId" = a.id
+          WHERE
+            b."votingId" = :votingId
           GROUP BY
             1, 2, 3
           ORDER BY
@@ -393,7 +415,9 @@ module.exports = {
           ORDER BY
             3 DESC
       ) e2 ON true;
-    `)
+    `, {
+      votingId: voting.id
+    })
 
     const pcParser = postalCodeParsers['CH']
 
