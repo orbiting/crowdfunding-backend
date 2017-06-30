@@ -1,7 +1,7 @@
 module.exports = async (_, args, {pgdb}) => {
   const data = await pgdb.public.gsheets.findOneFieldOnly({name: 'updates'}, 'data')
   if (!data) {
-  	return []
+    return []
   }
   const now = new Date()
   return data

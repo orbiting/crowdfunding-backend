@@ -1,23 +1,23 @@
 /*
  100399
- #	The nouns in this file are taken from the dictionary file of the
- #	de_DE Hunspell dictionary derived from the igerman98 dictionary
+ #  The nouns in this file are taken from the dictionary file of the
+ #  de_DE Hunspell dictionary derived from the igerman98 dictionary
  #
  #      Censored some explicit words for Project R - Republik.
  #      Removed words containing ß
  #
- #	Version: 20151222+frami20151222
+ #  Version: 20151222+frami20151222
  #
- #	Copyright (C) 1998-2015
+ #  Copyright (C) 1998-2015
  #   Bjoern Jacke <bjoern@j3e.de>,
  #   for the addon Franz Michael Baumann <fm.baumann@uni-muenster.de>
  #
- #	License: GPLv2, GPLv3
- #	There should be a copy of all of this licenses included with every distribution
- #	of this dictionary. Modified versions using the GPL may only include the
- #	GPL. This dictionary is compiled from igerman98. For the purpose of the
- #	GPL modifications of this dictionary should be made public as a patch
- #	for igerman98 allowing to regenerate the modified dictionary.
+ #  License: GPLv2, GPLv3
+ #  There should be a copy of all of this licenses included with every distribution
+ #  of this dictionary. Modified versions using the GPL may only include the
+ #  GPL. This dictionary is compiled from igerman98. For the purpose of the
+ #  GPL modifications of this dictionary should be made public as a patch
+ #  for igerman98 allowing to regenerate the modified dictionary.
  */
 module.exports = [
   'Äbte',
