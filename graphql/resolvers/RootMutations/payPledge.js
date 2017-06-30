@@ -31,7 +31,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     // check/charge payment
     let pledgeStatus
     let payment
-    if (pledgePayment.method == 'PAYMENTSLIP') {
+    if (pledgePayment.method === 'PAYMENTSLIP') {
       if (!pledgePayment.address) {
         logger.error('PAYMENTSLIP payments must include an address', { req: req._log(), args, pledge, pledgeStatus, payment })
         throw new Error(t('api/unexpected'))
@@ -56,7 +56,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         paperInvoice: pledgePayment.paperInvoice || false,
         dueDate: new Date(now).setDate(now.getDate() + PAYMENT_DEADLINE_DAYS)
       })
-    } else if (pledgePayment.method == 'STRIPE') {
+    } else if (pledgePayment.method === 'STRIPE') {
       if (!pledgePayment.sourceId) {
         logger.error('sourceId required', { req: req._log(), args, pledge, pledgeStatus, payment })
         throw new Error(t('api/unexpected'))
@@ -100,7 +100,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         pspId: charge.source.id,
         pspPayload: charge.source
       })
-    } else if (pledgePayment.method == 'POSTFINANCECARD') {
+    } else if (pledgePayment.method === 'POSTFINANCECARD') {
       let parsedPspPayload = null
       try {
         parsedPspPayload = JSON.parse(pledgePayment.pspPayload)
@@ -186,7 +186,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
           pspId: pspPayload.ALIAS
         })
       }
-    } else if (pledgePayment.method == 'PAYPAL') {
+    } else if (pledgePayment.method === 'PAYPAL') {
       let parsedPspPayload = null
       try {
         parsedPspPayload = JSON.parse(pledgePayment.pspPayload)

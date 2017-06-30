@@ -6,7 +6,7 @@ module.exports = {
     const pledgeOptionTemplateIds = pledgeOptions.map((plo) => plo.templateId)
     const packageOptions = await pgdb.public.packageOptions.find({id: pledgeOptionTemplateIds})
     return pledgeOptions.map((plo) => {
-      const pko = packageOptions.find((pko) => plo.templateId == pko.id)
+      const pko = packageOptions.find((pko) => plo.templateId === pko.id)
       pko.id = plo.pledgeId + '-' + plo.templateId // combinded primary key
       pko.amount = plo.amount
       pko.templateId = plo.templateId
