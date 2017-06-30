@@ -21,7 +21,7 @@ PgDb.connect().then(async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
   try {
     for (let voting of input.votings) {
-      const {name, beginDate, endDate, options} = voting
+      const {name, beginDate, endDate, options} = voting
 
       const existingVoting = await transaction.public.votings.findOne({name})
       let newVoting

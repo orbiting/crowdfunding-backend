@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4')
-const ensureSignedIn = require('../../../lib/ensureSignedIn')
+const ensureSignedIn = require('../../../lib/ensureSignedIn')
 const keyCDN = require('../../../lib/keyCDN')
 const convertImage = require('../../../lib/convertImage')
 const uploadExoscale = require('../../../lib/uploadExoscale')
@@ -8,7 +8,7 @@ const renderUrl = require('../../../lib/renderUrl')
 const sendMailTemplate = require('../../../lib/sendMailTemplate')
 // const rw = require('rw')
 
-const FOLDER = 'testimonials'
+const FOLDER = 'testimonials'
 const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 const MAX_QUOTE_LENGTH = 140
 const MAX_ROLE_LENGTH = 60
@@ -166,7 +166,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
   }
 
   // augement with name
-  testimonial.name = `${req.user.firstName} ${req.user.lastName}`
+  testimonial.name = `${req.user.firstName} ${req.user.lastName}`
 
   return testimonial
 }

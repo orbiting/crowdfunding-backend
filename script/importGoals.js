@@ -10,7 +10,7 @@ const rw = require('rw')
 
 require('dotenv').config()
 
-const CF_NAME = 'REPUBLIK'
+const CF_NAME = 'REPUBLIK'
 
 PgDb.connect().then(async (pgdb) => {
   const input = JSON.parse(rw.readFileSync('/dev/stdin', 'utf8'))
@@ -22,10 +22,10 @@ PgDb.connect().then(async (pgdb) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-    const crowdfundingId = await transaction.public.crowdfundings.findOneFieldOnly({name: CF_NAME}, 'id')
+    const crowdfundingId = await transaction.public.crowdfundings.findOneFieldOnly({name: CF_NAME}, 'id')
 
     for (let goal of input.goals) {
-      const {name, people, money, description} = goal
+      const {name, people, money, description} = goal
 
       const existingGoal = await transaction.public.crowdfundingGoals.findOne({name})
 

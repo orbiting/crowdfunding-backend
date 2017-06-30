@@ -38,7 +38,7 @@ const countStatsCounts = (statsCounts, sort = true) => {
   }
   const countedStatsCounts = statsCounts
     .map(c => {
-      const optionCountMax = c.options.map(o => o.count).reduce(
+      const optionCountMax = c.options.map(o => o.count).reduce(
         (prev, current) => prev > current ? prev : current,
         0
       )

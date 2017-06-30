@@ -264,7 +264,7 @@ PgDb.connect().then(async (pgdb) => {
         if (payment.total >= pledge.total) { newStatus = 'SUCCESSFUL' } else { newStatus = 'PAID_INVESTIGATE' }
 
         if (pledge.status !== newStatus) {
-          if (newStatus === 'SUCCESSFUL') {
+          if (newStatus === 'SUCCESSFUL') {
             await generateMemberships(pledge.id, transaction, t)
           }
           await transaction.public.pledges.update({id: pledge.id}, {

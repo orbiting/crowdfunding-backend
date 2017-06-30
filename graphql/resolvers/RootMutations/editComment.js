@@ -1,11 +1,11 @@
-const ensureSignedIn = require('../../../lib/ensureSignedIn')
-const logger = require('../../../lib/logger')
-const slack = require('../../../lib/slack')
+const ensureSignedIn = require('../../../lib/ensureSignedIn')
+const logger = require('../../../lib/logger')
+const slack = require('../../../lib/slack')
 const uuid = require('uuid/v4')
 const renderUrl = require('../../../lib/renderUrl')
 const uploadExoscale = require('../../../lib/uploadExoscale')
 
-const FOLDER = 'comments'
+const FOLDER = 'comments'
 const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {

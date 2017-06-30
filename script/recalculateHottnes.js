@@ -15,7 +15,7 @@ const {descending} = require('d3-array')
 PgDb.connect().then(async (pgdb) => {
   const DRY_MODE = process.argv[2] === 'dry'
   if (DRY_MODE) {
-    console.log('RUN IN DRY MODE!!!')
+    console.log('RUN IN DRY MODE!!!')
   }
 
   console.log('recalculating hottnes...')

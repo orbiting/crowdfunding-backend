@@ -20,14 +20,14 @@ const dateTimeFormat = timeFormat('%x %H:%M') // %x - the locale’s date
 
 require('dotenv').config()
 
-const formatPrice = (price) => price / 100
+const formatPrice = (price) => price / 100
 
 PgDb.connect().then(async (pgdb) => {
   // console.log('starting export...')
 
   const DRY_MODE = process.argv[2] === 'dry'
   if (DRY_MODE) {
-    console.log('RUN IN DRY MODE!!!')
+    console.log('RUN IN DRY MODE!!!')
   }
 
   // console.log('reading data...')

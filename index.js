@@ -11,7 +11,7 @@ if (DEV) {
   require('dotenv').config()
 }
 
-process.env.PORT = process.env.PORT || 3001
+process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')

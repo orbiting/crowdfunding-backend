@@ -10,7 +10,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
     // load original of chosen packageOptions
     const pledgeOptionsTemplateIds = pledgeOptions.map((plo) => plo.templateId)
-    const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
+    const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptionsTemplateIds})
 
     // check if all templateIds are valid
     if (packageOptions.length < pledgeOptions.length) {
@@ -136,7 +136,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         const pledgeOptions = await transaction.public.pledgeOptions.find({pledgeId: pledges.map(p => p.id)})
         if (pledgeOptions.length) {
           const packageOptions = await transaction.public.packageOptions.find({id: pledgeOptions.map(p => p.templateId)})
-          const rewards = await pgdb.public.rewards.find({id: packageOptions.map(p => p.rewardId)})
+          const rewards = await pgdb.public.rewards.find({id: packageOptions.map(p => p.rewardId)})
           if (rewards.length) {
             logger.info('user tried to buy a reduced membership and already pledged before', { req: req._log(), args })
             throw new Error(t('api/membership/reduced/alreadyHas'))

@@ -11,9 +11,9 @@ const hottnes = require('../lib/hottnes')
 const uuid = require('uuid/v4')
 const renderUrl = require('../lib/renderUrl')
 const uploadExoscale = require('../lib/uploadExoscale')
-const logger = require('../lib/logger')
+const logger = require('../lib/logger')
 
-const FOLDER = 'comments'
+const FOLDER = 'comments'
 const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 
 require('dotenv').config()
@@ -35,7 +35,7 @@ PgDb.connect().then(async (pgdb) => {
     }
 
     for (let comment of input.comments) {
-      const {email, content, tags} = comment
+      const {email, content, tags} = comment
 
       const user = await pgdb.public.users.findOne({email})
       if (!user) {

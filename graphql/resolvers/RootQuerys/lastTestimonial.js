@@ -1,5 +1,5 @@
 module.exports = async (_, args, {pgdb, t}) => {
-  const testimonial = await pgdb.query(`
+  const testimonial = await pgdb.query(`
     SELECT
       t.*,
       concat_ws(' ', u."firstName"::text, u."lastName"::text) as name

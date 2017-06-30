@@ -21,7 +21,7 @@ PgDb.connect().then(async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
   try {
     for (let feed of input.feeds) {
-      const {name, commentMaxLength, commentInterval} = feed
+      const {name, commentMaxLength, commentInterval} = feed
 
       const existingFeed = await transaction.public.feeds.findOne({name})
 

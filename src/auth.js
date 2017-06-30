@@ -65,8 +65,8 @@ exports.configure = ({
   // authenticate a token sent by email
   server.get('/auth/email/signin/:token?', async (req, res) => {
     const {FRONTEND_BASE_URL} = process.env
-    const {context} = req.query
-    const emailFromQuery = req.query.email
+    const {context} = req.query
+    const emailFromQuery = req.query.email
     // old links may still contain the token as param
     const token = req.query.token || req.params.token
 

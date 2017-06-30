@@ -43,13 +43,13 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
       // only count PAYMENTSLIP payments up to CHF 1000.- immediately
       if (pledge.total > 100000) {
-        pledgeStatus = 'WAITING_FOR_PAYMENT'
+        pledgeStatus = 'WAITING_FOR_PAYMENT'
       } else {
-        pledgeStatus = 'SUCCESSFUL'
+        pledgeStatus = 'SUCCESSFUL'
       }
       const now = new Date()
       payment = await transaction.public.payments.insertAndGet({
-        type: 'PLEDGE',
+        type: 'PLEDGE',
         method: 'PAYMENTSLIP',
         total: pledge.total,
         status: 'WAITING',
@@ -85,14 +85,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       }
       // save payment ( outside of transaction to never loose it again)
       payment = await pgdb.public.payments.insertAndGet({
-        type: 'PLEDGE',
+        type: 'PLEDGE',
         method: 'STRIPE',
         total: charge.amount,
         status: 'PAID',
         pspId: charge.id,
         pspPayload: charge
       })
-      pledgeStatus = 'SUCCESSFUL'
+      pledgeStatus = 'SUCCESSFUL'
       // save sourceId to user
       await transaction.public.paymentSources.insert({
         method: 'STRIPE',
@@ -145,14 +145,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       // save payment no matter what
       // PF amount is suddendly in franken
       payment = await pgdb.public.payments.insertAndGet({
-        type: 'PLEDGE',
+        type: 'PLEDGE',
         method: 'POSTFINANCECARD',
         total: pspPayload.amount * 100,
         status: 'PAID',
         pspId: PAYID,
         pspPayload: pspPayload
       })
-      pledgeStatus = 'SUCCESSFUL'
+      pledgeStatus = 'SUCCESSFUL'
 
       if (pspPayload.ALIAS) {
         const paymentSourceExists = await transaction.public.paymentSources.count({
@@ -249,14 +249,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
       // save payment no matter what
       payment = await pgdb.public.payments.insertAndGet({
-        type: 'PLEDGE',
+        type: 'PLEDGE',
         method: 'PAYPAL',
         total: amount,
         status: 'PAID',
         pspId: pspPayload.tx,
         pspPayload: responseDict
       })
-      pledgeStatus = 'SUCCESSFUL'
+      pledgeStatus = 'SUCCESSFUL'
 
       // check if amount is correct
       if (amount !== pledge.total) {

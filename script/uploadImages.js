@@ -4,7 +4,7 @@ const uploadExoscale = require('../lib/uploadExoscale')
 const convertImage = require('../lib/convertImage')
 const slugify = require('../lib/slugify')
 
-const FOLDER = 'images'
+const FOLDER = 'images'
 const IMAGES_DIR = __dirname + '/data/images/'
 const IMAGES_WIDTH = 1200
 
@@ -20,7 +20,7 @@ Promise.resolve().then(async () => {
       const image = fs.readFileSync(IMAGES_DIR + filename, 'binary')
       const inputBuffer = new Buffer(image, 'binary')
 
-      const slug = slugify(filename.substr(0, filename.lastIndexOf('.')))
+      const slug = slugify(filename.substr(0, filename.lastIndexOf('.')))
       const path = `/${FOLDER}/${slug}.jpeg`
       urls.push(ASSETS_BASE_URL + path)
       console.log('uploading: ' + filename)

@@ -17,7 +17,7 @@ const convertImage = require('../lib/convertImage')
 
 const GKEY = '1IoNowWMs6dK3OAK_uyWaZMQKrWU0H6LCTYedLcbHPXk'
 
-const FOLDER = 'testimonials'
+const FOLDER = 'testimonials'
 const { ASSETS_BASE_URL } = process.env
 const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 
@@ -102,7 +102,7 @@ PgDb.connect().then(async (pgdb) => {
       ])
 
       if (!user) {
-        user = await pgdb.public.users.insertAndGet({
+        user = await pgdb.public.users.insertAndGet({
           firstName,
           lastName,
           email: email || `${randomString(10)}@anonymous.project-r.construction`,

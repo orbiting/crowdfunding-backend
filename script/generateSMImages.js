@@ -13,13 +13,13 @@ const keyCDN = require('../lib/keyCDN')
 const renderUrl = require('../lib/renderUrl')
 const slugify = require('../lib/slugify')
 
-const FOLDER = 'testimonials'
+const FOLDER = 'testimonials'
 const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 const WITH_USER_NAME = false
 
 PgDb.connect().then(async (pgdb) => {
   let counter = 0
-  const testimonials = await pgdb.public.testimonials.find({})
+  const testimonials = await pgdb.public.testimonials.find({})
 
   for (let testimonial of testimonials) {
     let smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`

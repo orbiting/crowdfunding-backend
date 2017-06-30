@@ -36,7 +36,7 @@ Promise.resolve().then(async () => {
     if (content.subject === 'Danke für Ihre Frage') {
       const questionRegex = /Herzlichen Dank für die folgende Frage:(.*?)Eine Antwort finden Sie/g
       const question = questionRegex.exec(content.text.replace(/(?:\r\n|\r|\n)/g, ' '))[1].trim()
-      const text = `${content.to.email} hat folgende Frage gestellt:\n\n${question}`
+      const text = `${content.to.email} hat folgende Frage gestellt:\n\n${question}`
       await sendMail({
         to: 'faq@republik.ch',
         fromEmail: 'faq@republik.ch',

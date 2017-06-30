@@ -1,6 +1,6 @@
-const ensureSignedIn = require('../../../lib/ensureSignedIn')
-const logger = require('../../../lib/logger')
-const slack = require('../../../lib/slack')
+const ensureSignedIn = require('../../../lib/ensureSignedIn')
+const logger = require('../../../lib/logger')
+const slack = require('../../../lib/slack')
 
 module.exports = async (_, args, {pgdb, user, req, t}) => {
   ensureSignedIn(req, t)
