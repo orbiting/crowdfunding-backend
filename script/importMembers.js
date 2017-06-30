@@ -13,10 +13,10 @@ const rw = require('rw')
 
 const ABO_PRICE = 24000
 
-PgDb.connect().then( async (pgdb) => {
-  //gather data
-  const package = await pgdb.public.packages.findOne({name: 'ABO'})
-  const packageOption = await pgdb.public.packageOptions.findOne({packageId: package.id})
+PgDb.connect().then(async (pgdb) => {
+  // gather data
+  const pkg = await pgdb.public.packages.findOne({name: 'ABO'})
+  const pkgOption = await pgdb.public.packageOptions.findOne({packageId: pkg.id})
   const membershipType = await pgdb.public.membershipTypes.findOne({name: 'ABO'})
 
   const inputFile = rw.readFileSync("/dev/stdin", "utf8");
@@ -38,7 +38,7 @@ PgDb.connect().then( async (pgdb) => {
 
     if(!(await pgdb.public.pledges.count({userId: user.id}))) {
       const pledge = await pgdb.public.pledges.insertAndGet({
-        packageId: package.id,
+        packageId: pkg.id,
         userId: user.id,
         status: 'SUCCESSFUL',
         total: ABO_PRICE,
@@ -46,7 +46,7 @@ PgDb.connect().then( async (pgdb) => {
         sendConfirmMail: false
       })
       await pgdb.public.pledgeOptions.insert({
-        templateId: packageOption.id,
+        templateId: pkgOption.id,
         pledgeId: pledge.id,
         amount: 1,
         price: ABO_PRICE

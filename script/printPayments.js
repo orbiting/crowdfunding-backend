@@ -39,8 +39,8 @@ PgDb.connect().then(async (pgdb) => {
   const pledgePayments = await pgdb.public.pledgePayments.find({paymentId: payments.map(p => p.id)})
   const pledges = await pgdb.public.pledges.find({id: pledgePayments.map(p => p.pledgeId)})
   const pledgeOptions = await pgdb.public.pledgeOptions.find({pledgeId: pledges.map(p => p.id)})
-  let packageOptions = await pgdb.public.packageOptions.find({id: pledgeOptions.map(p => p.templateId)})
-  let rewards = await pgdb.public.rewards.find({id: packageOptions.map(p => p.rewardId)})
+  let pkgOptions = await pgdb.public.packageOptions.find({id: pledgeOptions.map(p => p.templateId)})
+  let rewards = await pgdb.public.rewards.find({id: pkgOptions.map(p => p.rewardId)})
   const goodies = await pgdb.public.goodies.find({rewardId: rewards.map(p => p.id)})
   const membershipTypes = await pgdb.public.membershipTypes.find({rewardId: rewards.map(p => p.id)})
 
@@ -66,9 +66,9 @@ PgDb.connect().then(async (pgdb) => {
       })
     }
   })
-  packageOptions = packageOptions.map(packageOption => {
-    const reward = rewards.find(r => r.id === packageOption.rewardId)
-    return Object.assign({}, packageOption, {
+  pkgOptions = pkgOptions.map(pkgOption => {
+    const reward = rewards.find(r => r.id === pkgOption.rewardId)
+    return Object.assign({}, pkgOption, {
       reward
     })
   })
@@ -83,9 +83,9 @@ PgDb.connect().then(async (pgdb) => {
     const pledgePayment = pledgePayments.find(p => p.paymentId === payment.id)
     const pledge = pledges.find(p => p.id === pledgePayment.pledgeId)
     const _pledgeOptions = pledgeOptions.filter(p => p.pledgeId === pledge.id).map(pledgeOption => {
-      const packageOption = packageOptions.find(p => pledgeOption.templateId === p.id)
+      const pkgOption = pkgOptions.find(p => pledgeOption.templateId === p.id)
       return Object.assign({}, pledgeOption, {
-        template: packageOption
+        template: pkgOption
       })
     })
     const sequenceNumbers = memberships

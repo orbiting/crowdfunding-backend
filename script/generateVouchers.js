@@ -17,9 +17,9 @@ PgDb.connect().then( async (pgdb) => {
     throw new Error("number if vouchers is required as first argument")
   }
 
-  //gather data
-  const package = await pgdb.public.packages.findOne({name: 'ABO'})
-  const packageOption = await pgdb.public.packageOptions.findOne({packageId: package.id})
+  // gather data
+  const pkg = await pgdb.public.packages.findOne({name: 'ABO'})
+  const pkgOption = await pgdb.public.packageOptions.findOne({packageId: pkg.id})
   const membershipType = await pgdb.public.membershipTypes.findOne({name: 'ABO'})
 
   const user = await pgdb.public.users.findOne({email: 'jefferson@project-r.construction'})
@@ -28,7 +28,7 @@ PgDb.connect().then( async (pgdb) => {
   }
 
   const pledge = await pgdb.public.pledges.insertAndGet({
-    packageId: package.id,
+    packageId: pkg.id,
     userId: user.id,
     status: 'SUCCESSFUL',
     total: ABO_PRICE*numVouchers,
@@ -36,7 +36,7 @@ PgDb.connect().then( async (pgdb) => {
     sendConfirmMail: false
   })
   await pgdb.public.pledgeOptions.insert({
-    templateId: packageOption.id,
+    templateId: pkgOption.id,
     pledgeId: pledge.id,
     amount: numVouchers,
     price: ABO_PRICE
