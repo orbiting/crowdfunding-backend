@@ -15,27 +15,27 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-    //ensure comment exists and belongs to user
+    // ensure comment exists and belongs to user
     const comment = await transaction.public.comments.findOne({id: commentId})
-    if(!comment) {
+    if (!comment) {
       logger.error('comment not found', { req: req._log(), commentId })
       throw new Error(t('api/comment/commentNotFound'))
     }
-    if(comment.userId !== user.id) {
+    if (comment.userId !== user.id) {
       logger.error('comment does not belong to user', { req: req._log(), args })
       throw new Error(t('api/comment/notYours'))
     }
 
     const feed = await transaction.public.feeds.findOne({id: comment.feedId})
 
-    //ensure comment length is within limit
-    if(content.length > feed.commentMaxLength) {
+    // ensure comment length is within limit
+    if (content.length > feed.commentMaxLength) {
       logger.error('content too long', { req: req._log(), args })
       throw new Error(t('api/comment/tooLong'), {commentMaxLength: feed.commentMaxLength})
     }
 
     const newComment = await transaction.public.comments.updateAndGetOne({
-      id: comment.id,
+      id: comment.id
     }, {
       content,
       updatedAt: new Date()
@@ -43,35 +43,34 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
     await transaction.transactionCommit()
 
-    //generate sm picture
+    // generate sm picture
     try {
       const smImagePath = `/${FOLDER}/sm/${uuid()}_sm.png`
       await renderUrl(`${FRONTEND_BASE_URL}/vote?share=${newComment.id}`, 1200, 628)
-        .then( async (data) => {
+        .then(async (data) => {
           return uploadExoscale({
             stream: data,
             path: smImagePath,
             mimeType: 'image/png',
             bucket: S3BUCKET
-          }).then( async () => {
+          }).then(async () => {
             return pgdb.public.comments.updateOne({id: newComment.id}, {
-              smImage: ASSETS_BASE_URL+smImagePath
+              smImage: ASSETS_BASE_URL + smImagePath
             })
           })
         })
-    } catch(e) {
+    } catch (e) {
       logger.error('sm image render failed', { req: req._log(), args, e })
     }
 
     try {
       await slack.publishCommentUpdate(user, newComment, comment)
-    } catch(e) {
+    } catch (e) {
       logger.error('publish commentUpdate on slack failed', { req: req._log(), args, e })
     }
 
     return newComment
-
-  } catch(e) {
+  } catch (e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
     throw e

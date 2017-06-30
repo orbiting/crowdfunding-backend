@@ -10,9 +10,9 @@ const rw = require('rw')
 
 require('dotenv').config()
 
-PgDb.connect().then( async (pgdb) => {
+PgDb.connect().then(async (pgdb) => {
   const input = JSON.parse(rw.readFileSync('/dev/stdin', 'utf8'))
-  if(!input || !input.feeds) {
+  if (!input || !input.feeds) {
     console.error('input.feeds required')
     process.exit(1)
   }
@@ -20,13 +20,12 @@ PgDb.connect().then( async (pgdb) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-
-    for(let feed of input.feeds) {
+    for (let feed of input.feeds) {
       const {name, commentMaxLength, commentInterval} = feed
 
       const existingFeed = await transaction.public.feeds.findOne({name})
 
-      if(existingFeed) { //update existing
+      if (existingFeed) { // update existing
         await transaction.public.feeds.updateOne({id: existingFeed.id}, {
           commentMaxLength,
           commentInterval,
@@ -45,13 +44,13 @@ PgDb.connect().then( async (pgdb) => {
 
     console.log('done! New feeds:')
     console.log(await pgdb.public.feeds.find({}, {orderBy: ['createdAt desc']}))
-  } catch(e) {
+  } catch (e) {
     console.log('error in transaction! rolledback!')
     console.log(e)
     await transaction.transactionRollback()
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.log(e)
 })

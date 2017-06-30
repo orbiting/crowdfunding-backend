@@ -13,7 +13,7 @@ const input = rw.readFileSync(
 )
 
 const chPostalCodes = require('d3-dsv')
-  .dsvFormat(";").parse(input)
+  .dsvFormat(';').parse(input)
   .map(d => ({
     ortschaft: d['﻿Ortschaftsname'],
     gemeinde: d.Gemeindename,
@@ -24,11 +24,10 @@ const chPostalCodes = require('d3-dsv')
     lon: d.E
   }))
 
-
 const result = nest()
-  .key( d => d.postalCode )
+  .key(d => d.postalCode)
   .entries(chPostalCodes)
-  .map( d => ({
+  .map(d => ({
     postalCode: d.key,
     values: d.values
   }))

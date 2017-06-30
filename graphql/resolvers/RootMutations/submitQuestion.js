@@ -21,7 +21,7 @@ module.exports = async (_, args, {user, req, t}) => {
       templateName: 'cf_faq',
       globalMergeVars: [
         { name: 'NAME',
-          content: user.firstName+' '+user.lastName
+          content: user.firstName + ' ' + user.lastName
         },
         { name: 'QUESTION',
           content: question

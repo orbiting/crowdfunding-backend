@@ -12,11 +12,10 @@ require('dotenv').config()
 const hottnes = require('../lib/hottnes')
 const {descending} = require('d3-array')
 
-PgDb.connect().then( async (pgdb) => {
-
+PgDb.connect().then(async (pgdb) => {
   const DRY_MODE = process.argv[2] === 'dry'
-  if(DRY_MODE) {
-    console.log("RUN IN DRY MODE!!!")
+  if (DRY_MODE) {
+    console.log('RUN IN DRY MODE!!!')
   }
 
   console.log('recalculating hottnes...')
@@ -24,9 +23,8 @@ PgDb.connect().then( async (pgdb) => {
   let counter = 0
   const transaction = await pgdb.transactionBegin()
   try {
-
     const comments = (await pgdb.public.comments.find())
-      .map( c => Object.assign({}, c, {
+      .map(c => Object.assign({}, c, {
         newHottnes: hottnes(c.upVotes, c.downVotes, c.createdAt.getTime())
       }))
 
@@ -38,11 +36,11 @@ PgDb.connect().then( async (pgdb) => {
       hottnes: c.hottnes,
       newHottnes: c.newHottnes,
       diff: c.hottnes - c.newHottnes
-    })).sort( (a, b) => descending(a.newHottnes, b.newHottnes) ) )
+    })).sort((a, b) => descending(a.newHottnes, b.newHottnes)))
 
-    if(!DRY_MODE) {
-      for(let comment of comments) {
-        if(comment.newHottnes !== comment.hottnes) {
+    if (!DRY_MODE) {
+      for (let comment of comments) {
+        if (comment.newHottnes !== comment.hottnes) {
           counter += 1
           await pgdb.public.comments.updateOne({
             id: comment.id
@@ -54,13 +52,13 @@ PgDb.connect().then( async (pgdb) => {
     }
 
     console.log(`finished updating ${counter} comments!`)
-  } catch(e) {
+  } catch (e) {
     await transaction.transactionRollback()
     throw e
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

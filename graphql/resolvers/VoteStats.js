@@ -3,15 +3,14 @@ const countryNameNormalizer = require('../../lib/geo/country').nameNormalizer
 const nest = require('d3-collection').nest
 const {descending} = require('d3-array')
 // see commented code below for chSlt2012
-//const getBFSNr = require('../../lib/geo/chPostalCode').getBFSNr
-//const getSlt = require('../../lib/geo/chSlt').getSlt
-//const util = require('util')
-
+// const getBFSNr = require('../../lib/geo/chPostalCode').getBFSNr
+// const getSlt = require('../../lib/geo/chSlt').getSlt
+// const util = require('util')
 
 const reduceOptions = (entries) =>
   nest()
-    .key( o => o.name )
-    .rollup( values => ({
+    .key(o => o.name)
+    .rollup(values => ({
       name: values[0].name,
       id: values[0].id,
       count: values.reduce(
@@ -20,7 +19,7 @@ const reduceOptions = (entries) =>
       )
     }))
     .entries(entries)
-    .map( o => ({
+    .map(o => ({
       name: o.value.name,
       id: o.value.id,
       count: o.value.count
@@ -38,7 +37,7 @@ const countStatsCounts = (statsCounts, sort = true) => {
     }
   }
   const countedStatsCounts = statsCounts
-    .map( c => {
+    .map(c => {
       const optionCountMax = c.options.map(o => o.count).reduce(
         (prev, current) => prev > current ? prev : current,
         0
@@ -49,13 +48,13 @@ const countStatsCounts = (statsCounts, sort = true) => {
           0
         ),
         options: c.options
-          .map( o => Object.assign({}, o, {
+          .map(o => Object.assign({}, o, {
             winner: o.count === optionCountMax
           }))
           .sort((a, b) => descending(a.count, b.count))
       })
     })
-  if(sort) {
+  if (sort) {
     return countedStatsCounts
       .sort((a, b) => (
         descending(keyOrder(a.key), keyOrder(b.key)) ||
@@ -68,13 +67,13 @@ const countStatsCounts = (statsCounts, sort = true) => {
 
 module.exports = {
   ages: async (stats, args, {pgdb}) => {
-    if(stats && stats.ages) { //cached by countVoting
+    if (stats && stats.ages) { // cached by countVoting
       return stats.ages
     }
 
-    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    // no access to voting here, we have one voting and no time: don't constrain to votingId
 
-    //others (no birthday)
+    // others (no birthday)
     const nullOptions = await pgdb.query(`
       SELECT
         vo.id AS id,
@@ -155,21 +154,21 @@ module.exports = {
         "votingOptions" vo
     `)
     const ageStatsCount = nest()
-      .key( d => d.max ? `${d.min}-${d.max}` : `${d.min}+` )
+      .key(d => d.max ? `${d.min}-${d.max}` : `${d.min}+`)
       .entries(flatAgeOptions)
-      .map( d => ({
+      .map(d => ({
         key: d.key,
-        options: d.values.map( o => ({
+        options: d.values.map(o => ({
           id: o.id,
           name: o.name,
           count: o.count
         }))
       }))
-      .map( d => {
-        if(d.options.length < 3) {
+      .map(d => {
+        if (d.options.length < 3) {
           let missingOptions = []
-          allOptions.forEach( option => {
-            if(!d.options.find( o => o.id === option.id )) {
+          allOptions.forEach(option => {
+            if (!d.options.find(o => o.id === option.id)) {
               missingOptions.push(option)
             }
           })
@@ -184,11 +183,11 @@ module.exports = {
   },
 
   countries: async (stats, args, {pgdb}) => {
-    if(stats && stats.countries) { //cached by countVoting
+    if (stats && stats.countries) { // cached by countVoting
       return stats.countries
     }
 
-    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    // no access to voting here, we have one voting and no time: don't constrain to votingId
 
     const allCountriesVotingOptions = await pgdb.query(`
       SELECT
@@ -233,46 +232,45 @@ module.exports = {
 
     const nullCountryOptions = {
       key: 'null',
-      options: allCountriesVotingOptions.filter( o => o.countryName === null )
+      options: allCountriesVotingOptions.filter(o => o.countryName === null)
     }
 
     const countryOptions = nest()
-      .key( d => countryNameNormalizer(d.countryName))
-      .entries(allCountriesVotingOptions.filter( d => d.countryName !== null))
-      .map( d => ({
+      .key(d => countryNameNormalizer(d.countryName))
+      .entries(allCountriesVotingOptions.filter(d => d.countryName !== null))
+      .map(d => ({
         key: d.key,
         options: reduceOptions(d.values)
       }))
 
     let designatedCountryOptions = []
     let otherCountryOptions = []
-    countryOptions.forEach( c => {
+    countryOptions.forEach(c => {
       const total = c.options.reduce(
         (sum, v) => sum + v.count,
         0
       )
-      if(total >= 7) {
+      if (total >= 7) {
         designatedCountryOptions.push(c)
-      }
-      else {
+      } else {
         otherCountryOptions.push(c)
       }
     })
 
     const combinedOtherCountryOptions = {
       key: 'others',
-      options: reduceOptions( [].concat.apply([], otherCountryOptions.map( d => d.options) ) )
+      options: reduceOptions([].concat.apply([], otherCountryOptions.map(d => d.options)))
     }
 
     return countStatsCounts([].concat(designatedCountryOptions, combinedOtherCountryOptions, nullCountryOptions))
   },
 
   chCantons: async (stats, args, {pgdb}) => {
-    if(stats && stats.chCantons) { //cached by countVoting
+    if (stats && stats.chCantons) { // cached by countVoting
       return stats.chCantons
     }
 
-    //no access to voting here, we have one voting and no time: don't constrain to votingId
+    // no access to voting here, we have one voting and no time: don't constrain to votingId
 
     const allCountriesWithPostalCodesVotingOptions = await pgdb.query(`
       SELECT
@@ -320,14 +318,14 @@ module.exports = {
     const pcParser = postalCodeParsers['CH']
 
     const switzerlandOptions = nest()
-      .key( d => countryNameNormalizer(d.countryName))
-      .entries(allCountriesWithPostalCodesVotingOptions.filter( d => d.countryName !== null))
-      .find( d => d.key === 'Schweiz')
+      .key(d => countryNameNormalizer(d.countryName))
+      .entries(allCountriesWithPostalCodesVotingOptions.filter(d => d.countryName !== null))
+      .find(d => d.key === 'Schweiz')
 
     const postalCodeOptions = nest()
-      .key( d => pcParser(d.postalCode))
+      .key(d => pcParser(d.postalCode))
       .entries(switzerlandOptions.values)
-      .map( d => {
+      .map(d => {
         const baseData = postalCodeData('CH', d.key)
         return {
           key: baseData && baseData.stateAbbr.length > 0
@@ -338,15 +336,15 @@ module.exports = {
       })
 
     const stateStatsCount = nest()
-      .key( c => c.key)
+      .key(c => c.key)
       .entries(postalCodeOptions)
-      .map( c => ({
+      .map(c => ({
         key: c.key,
-        options: reduceOptions( [].concat.apply([], c.values.map( d => d.options) ) )
+        options: reduceOptions([].concat.apply([], c.values.map(d => d.options)))
       }))
 
     return countStatsCounts(stateStatsCount)
-  },
+  }
 
   /* addresses -> bfsNr matching needs refinement. check lib/geo/chPostalCode.js
   chSlt2012: async (_, args, {pgdb}) => {

@@ -16,22 +16,22 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-    //ensure feed exists
+    // ensure feed exists
     const feed = await transaction.public.feeds.findOne({name: feedName})
-    if(!feed) {
+    if (!feed) {
       logger.error('feed not found', { req: req._log(), args })
       throw new Error(t('api/comment/feedNotFound'))
     }
 
-    //ensure user has membership
+    // ensure user has membership
     const membership = await transaction.public.memberships.findFirst({userId: user.id})
-    if(!membership) {
+    if (!membership) {
       logger.error('membership required', { req: req._log(), args })
       throw new Error(t('api/comment/membershipRequired'))
     }
 
-    //ensure user is within commentInterval
-    if(feed.commentInterval) {
+    // ensure user is within commentInterval
+    if (feed.commentInterval) {
       const now = new Date().getTime()
       const lastCommentByUser = await transaction.public.comments.findFirst({
         userId: user.id,
@@ -40,20 +40,17 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       }, {
         orderBy: ['createdAt desc']
       })
-      if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval) {
-        const waitForMinutes = (lastCommentByUser.createdAt.getTime()+feed.commentInterval-now)/1000/60
+      if (lastCommentByUser && lastCommentByUser.createdAt.getTime() > now - feed.commentInterval) {
+        const waitForMinutes = (lastCommentByUser.createdAt.getTime() + feed.commentInterval - now) / 1000 / 60
         let waitFor
-        if(waitForMinutes <= 60)
-          waitFor = Math.ceil(waitForMinutes)+'m'
-        else
-          waitFor = Math.ceil(waitForMinutes/60)+'h'
+        if (waitForMinutes <= 60) { waitFor = Math.ceil(waitForMinutes) + 'm' } else { waitFor = Math.ceil(waitForMinutes / 60) + 'h' }
         logger.error('too early', { req: req._log(), args })
-        throw new Error( t('api/comment/tooEarly', { waitFor }) )
+        throw new Error(t('api/comment/tooEarly', { waitFor }))
       }
     }
 
-    //ensure comment length is within limit
-    if(content.length > feed.commentMaxLength) {
+    // ensure comment length is within limit
+    if (content.length > feed.commentMaxLength) {
       logger.error('content too long', { req: req._log(), args })
       throw new Error(t('api/comment/tooLong', {commentMaxLength: feed.commentMaxLength}))
     }
@@ -62,41 +59,40 @@ module.exports = async (_, args, {pgdb, user, req, t}) => {
       feedId: feed.id,
       userId: user.id,
       content,
-      tags: tags ? tags : [],
+      tags: tags || [],
       hottnes: hottnes(0, 0, (new Date().getTime()))
     })
 
     await transaction.transactionCommit()
 
-    //generate sm picture
+    // generate sm picture
     try {
       const smImagePath = `/${FOLDER}/sm/${uuid()}_sm.png`
       await renderUrl(`${FRONTEND_BASE_URL}/vote?share=${comment.id}`, 1200, 628)
-        .then( async (data) => {
+        .then(async (data) => {
           return uploadExoscale({
             stream: data,
             path: smImagePath,
             mimeType: 'image/png',
             bucket: S3BUCKET
-          }).then( async () => {
+          }).then(async () => {
             return pgdb.public.comments.updateOne({id: comment.id}, {
-              smImage: ASSETS_BASE_URL+smImagePath
+              smImage: ASSETS_BASE_URL + smImagePath
             })
           })
         })
-    } catch(e) {
+    } catch (e) {
       logger.error('sm image render failed', { req: req._log(), args, e })
     }
 
     try {
       await slack.publishComment(user, comment)
-    } catch(e) {
+    } catch (e) {
       logger.error('publish comment on slack failed', { req: req._log(), args, e })
     }
 
     return comment
-
-  } catch(e) {
+  } catch (e) {
     await transaction.transactionRollback()
     logger.error('error in transaction', { req: req._log(), args, error: e })
     throw e

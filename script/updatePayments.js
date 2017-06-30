@@ -12,15 +12,13 @@ const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(',').parse
 
-PgDb.connect().then( async (pgdb) => {
-
+PgDb.connect().then(async (pgdb) => {
   const inputFile = rw.readFileSync('/dev/stdin', 'utf8')
   const input = csvParse(inputFile)
 
   const transaction = await pgdb.transactionBegin()
   try {
-
-    for(let update of input) {
+    for (let update of input) {
       await pgdb.public.postfinancePayments.updateOne({
         id: update.id
       }, {
@@ -29,15 +27,15 @@ PgDb.connect().then( async (pgdb) => {
     }
 
     await transaction.transactionCommit()
-  } catch(e) {
+  } catch (e) {
     console.log('error in transaction! rolledback!')
     console.log(e)
     await transaction.transactionRollback()
   }
 
   console.log('done')
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.log(e)
 })

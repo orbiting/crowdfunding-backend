@@ -17,7 +17,7 @@ module.exports = async (_, args, {pgdb, t}) => {
   `, {
     sequenceNumber: sequenceNumber
   })
-  if(testimonial[0]) {
+  if (testimonial[0]) {
     return testimonial[0]
   }
   throw new Error(t('api/testimonial/notFound'))

@@ -10,22 +10,20 @@ require('dotenv').config()
 const PgDb = require('../lib/pgdb')
 const util = require('util')
 
-
-PgDb.connect().then( async (pgdb) => {
+PgDb.connect().then(async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
   try {
-
     const emails = (await transaction.query(`
       SELECT LOWER(email) email, count(*)
       FROM users
       GROUP BY 1
       HAVING count(*) > 1;
-    `)).map( result => result.email )
+    `)).map(result => result.email)
     console.log(`cleaning up ${emails.length} users`)
 
-    for(let email of emails) {
+    for (let email of emails) {
       const users = await transaction.query(`SELECT * FROM users WHERE LOWER(email) = :email ORDER BY "createdAt" DESC`, {email: email.toLowerCase()})
-      const electedUser = users[users.length-1] //oldest user for createdAt
+      const electedUser = users[users.length - 1] // oldest user for createdAt
 
       console.log('electedUser:---------------------------------')
       console.log(electedUser)
@@ -33,18 +31,18 @@ PgDb.connect().then( async (pgdb) => {
       console.log(users)
 
       const newUser = await transaction.public.users.updateAndGetOne({id: electedUser.id}, {
-        firstName: users.map( u => u.firstName ).filter(Boolean)[0],
-        lastName:  users.map( u => u.lastName ).filter(Boolean)[0],
-        birthday: users.map( u => u.birthday ).filter(Boolean)[0],
-        addressId: users.map( u => u.addressId ).filter(Boolean)[0]
+        firstName: users.map(u => u.firstName).filter(Boolean)[0],
+        lastName: users.map(u => u.lastName).filter(Boolean)[0],
+        birthday: users.map(u => u.birthday).filter(Boolean)[0],
+        addressId: users.map(u => u.addressId).filter(Boolean)[0]
       }, {skipUndefined: true})
 
       console.log('updated infos:--------------------------------')
       console.log(newUser)
 
-      const userIds = users.filter( u => u.id !== newUser.id).map( u => u.id )
+      const userIds = users.filter(u => u.id !== newUser.id).map(u => u.id)
 
-      //transfer belongings
+      // transfer belongings
       const paymentSources = await transaction.public.paymentSources.updateAndGet({userId: userIds}, {
         userId: newUser.id
       })
@@ -59,9 +57,9 @@ PgDb.connect().then( async (pgdb) => {
       })
 
       let sessions = []
-      for(let userId of userIds) {
+      for (let userId of userIds) {
         let _sessions = await transaction.public.sessions.find({'sess @>': {passport: {user: userId}}})
-        for(let session of _sessions) {
+        for (let session of _sessions) {
           const sess = Object.assign({}, session.sess, {
             passport: {user: newUser.id}
           })
@@ -69,25 +67,24 @@ PgDb.connect().then( async (pgdb) => {
         }
       }
 
-
-      //remove addresses
-      const addressIds = users.filter( u => u.addressId && u.addressId !== newUser.addressId).map( u => u.addressId )
+      // remove addresses
+      const addressIds = users.filter(u => u.addressId && u.addressId !== newUser.addressId).map(u => u.addressId)
       let addresses = []
-      if(addressIds.length) {
+      if (addressIds.length) {
         addresses = await transaction.public.addresses.deleteAndGet({id: addressIds})
       }
 
-      //remove old users
+      // remove old users
       const oldUsers = await transaction.public.users.deleteAndGet({id: userIds})
 
-      //make sure email is lower case now
+      // make sure email is lower case now
       await transaction.public.users.updateOne({id: newUser.id}, {
         email: newUser.email.toLowerCase()
       })
 
-      console.log("old userIds")
+      console.log('old userIds')
       console.log(userIds)
-      console.log("old addressIds")
+      console.log('old addressIds')
       console.log(addressIds)
       console.log('paymentSources----------------------')
       console.log(paymentSources)
@@ -107,19 +104,17 @@ PgDb.connect().then( async (pgdb) => {
       console.log(oldUsers)
       console.log('----------------------------------------------------')
       console.log('----------------------------------------------------')
-
     }
 
     await transaction.transactionCommit()
-
-  } catch(e) {
+  } catch (e) {
     await transaction.transactionRollback()
     console.error('transaction rollback')
     throw e
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

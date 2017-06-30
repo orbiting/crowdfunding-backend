@@ -1,3 +1,3 @@
 module.exports = () => {
-  return {} //see detail resolvers
+  return {} // see detail resolvers
 }

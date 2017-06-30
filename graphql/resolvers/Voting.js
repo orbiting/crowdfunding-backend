@@ -1,9 +1,9 @@
 module.exports = {
-  async options(voting, args, {pgdb}) {
+  async options (voting, args, {pgdb}) {
     return pgdb.public.votingOptions.find({votingId: voting.id})
   },
-  async turnout(voting, args, {pgdb}) {
-    if(voting.result && voting.result.turnout) { //cached by countVoting
+  async turnout (voting, args, {pgdb}) {
+    if (voting.result && voting.result.turnout) { // cached by countVoting
       return voting.result.turnout
     }
     return {
@@ -11,17 +11,15 @@ module.exports = {
       submitted: await pgdb.public.ballots.count({votingId: voting.id})
     }
   },
-  async userIsEligitable(voting, args, {pgdb, user}) {
-    if(!user)
-      return false
+  async userIsEligitable (voting, args, {pgdb, user}) {
+    if (!user) { return false }
     return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
   },
-  async userHasSubmitted(voting, args, {pgdb, user}) {
-    if(!user)
-      return false
+  async userHasSubmitted (voting, args, {pgdb, user}) {
+    if (!user) { return false }
     return !!(await pgdb.public.ballots.findFirst({
       userId: user.id,
       votingId: voting.id
     }))
-  },
+  }
 }

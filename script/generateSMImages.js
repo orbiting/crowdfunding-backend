@@ -17,30 +17,28 @@ const FOLDER = 'testimonials'
 const { ASSETS_BASE_URL, FRONTEND_BASE_URL, S3BUCKET } = process.env
 const WITH_USER_NAME = false
 
-PgDb.connect().then( async (pgdb) => {
-
+PgDb.connect().then(async (pgdb) => {
   let counter = 0
   const testimonials = await pgdb.public.testimonials.find({})
 
-  for(let testimonial of testimonials) {
-
+  for (let testimonial of testimonials) {
     let smImagePath = `/${FOLDER}/sm/${testimonial.id}_sm.png`
 
-    if(WITH_USER_NAME) {
+    if (WITH_USER_NAME) {
       const user = await pgdb.public.users.findOne({id: testimonial.userId})
-      smImagePath = `/${FOLDER}/export/${slugify(user.firstName+'_'+user.lastName)}.png`
+      smImagePath = `/${FOLDER}/export/${slugify(user.firstName + '_' + user.lastName)}.png`
     }
 
-    const url = ASSETS_BASE_URL+smImagePath
+    const url = ASSETS_BASE_URL + smImagePath
 
     await renderUrl(`${FRONTEND_BASE_URL}/community?share=${testimonial.id}`, 1200, 628)
-      .then( async (data) => {
+      .then(async (data) => {
         await uploadExoscale({
           stream: data,
           path: smImagePath,
           mimeType: 'image/png',
           bucket: S3BUCKET
-        }).then( async () => {
+        }).then(async () => {
           await keyCDN.purgeUrls([smImagePath])
           await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
             smImage: url
@@ -50,13 +48,11 @@ PgDb.connect().then( async (pgdb) => {
     console.log(`magic done for: ${url}`)
 
     counter += 1
-
   }
   console.log(`${counter} images generated`)
-
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

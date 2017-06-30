@@ -7,12 +7,12 @@ module.exports = async (_, args, {t}) => {
 
   const token = subscribeToken(REMIND_ME_LIST_ID, email)
 
-  const subscribeLink = PUBLIC_URL
-    +'/newsletter/subscribe?'
-    +'list='+encodeURIComponent(REMIND_ME_LIST_ID)
-    +'&email='+encodeURIComponent(email)
-    +'&token='+encodeURIComponent(token)
-    +'&successMessage='+encodeURIComponent(t('api/remindeme/successMessage'))
+  const subscribeLink = PUBLIC_URL +
+    '/newsletter/subscribe?' +
+    'list=' + encodeURIComponent(REMIND_ME_LIST_ID) +
+    '&email=' + encodeURIComponent(email) +
+    '&token=' + encodeURIComponent(token) +
+    '&successMessage=' + encodeURIComponent(t('api/remindeme/successMessage'))
 
   await sendMailTemplate({
     to: email,

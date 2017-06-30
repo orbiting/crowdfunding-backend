@@ -7,7 +7,7 @@ const countryNameNormalizer = require('../../lib/geo/country').nameNormalizer
 const countryDetailsForName = require('../../lib/geo/country').detailsForName
 
 module.exports = {
-  async createdAts(_, {interval}, {pgdb}) {
+  async createdAts (_, {interval}, {pgdb}) {
     return pgdb.query(`
       SELECT
         date_trunc('${interval}', "createdAt") AS datetime,
@@ -17,7 +17,7 @@ module.exports = {
       ORDER BY 1 ASC
     `)
   },
-  async ages(_, args, {pgdb}) {
+  async ages (_, args, {pgdb}) {
     return pgdb.query(`
       SELECT
         extract(year from age(birthday)) AS age,
@@ -30,9 +30,9 @@ module.exports = {
       ORDER BY 1
     `)
   },
-  async countries(_, args, {pgdb, caches: {membershipStatsCountries: cache}}) {
+  async countries (_, args, {pgdb, caches: {membershipStatsCountries: cache}}) {
     const result = cache.get('all')
-    if(result) {
+    if (result) {
       return result
     }
 
@@ -116,7 +116,6 @@ module.exports = {
             count: unkownCount
           })
         }
-
 
         return {
           name: datum.key === 'null'

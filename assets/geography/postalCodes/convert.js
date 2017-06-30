@@ -10,7 +10,7 @@
 const rw = require('rw')
 const nest = require('d3-collection').nest
 
-//EU + CH
+// EU + CH
 const countriesOfInterest = [
   'BE', 'EL', 'LT', 'PT',
   'BG', 'ES', 'LU', 'RO',
@@ -29,7 +29,7 @@ const input = rw.readFileSync(
 
 const countries = require('d3-dsv')
   .tsvParse('country\tcode\tname\tstate\tstateAbbr\tname2\tcode2\tname3\tcode3\tlat\tlon\n' + input)
-  .filter( d => countriesOfInterest.indexOf(d.country) > -1 )
+  .filter(d => countriesOfInterest.indexOf(d.country) > -1)
   .map(d => ({
     country: d.country,
     code: d.code,
@@ -43,12 +43,12 @@ const countries = require('d3-dsv')
   }))
 
 const result = nest()
-  .key( d => d.country )
-  .key( d => d.code )
+  .key(d => d.country)
+  .key(d => d.code)
   .entries(countries)
-  .map( n => ({
+  .map(n => ({
     country: n.key,
-    postalCodes: n.values.map( d => ({
+    postalCodes: n.values.map(d => ({
       code: d.key,
       name: d.values
         .map(x => x.name)
@@ -57,14 +57,14 @@ const result = nest()
       state: d.values[0].state,
       stateAbbr: d.values[0].stateAbbr,
       lat: d.values[0].lat,
-      lon: d.values[0].lon,
-      //values: d.values.map( v => ({
+      lon: d.values[0].lon
+      // values: d.values.map( v => ({
       //  name: v.name,
       //  state: v.state,
       //  stateAbbr: v.stateAbbr,
       //  lat: v.lat,
       //  lon: v.lon
-      //}))
+      // }))
     }))
   }))
 

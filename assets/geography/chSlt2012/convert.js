@@ -14,7 +14,7 @@ const input = rw.readFileSync(
 const cleanedInput = input.slice(31, input.length).join('\n')
 
 const slts = require('d3-dsv')
-  .dsvFormat(",").parseRows(cleanedInput)
+  .dsvFormat(',').parseRows(cleanedInput)
   .map(d => ({
     bfs: d[0],
     slt: d[25]

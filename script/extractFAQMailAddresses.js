@@ -3,10 +3,9 @@ const fetch = require('isomorphic-unfetch')
 
 const {MANDRILL_API_KEY} = process.env
 
-Promise.resolve().then( async () => {
-
-  function onlyUnique(value, index, self) {
-    return self.indexOf(value) === index;
+Promise.resolve().then(async () => {
+  function onlyUnique (value, index, self) {
+    return self.indexOf(value) === index
   }
 
   const emails = (await (await fetch('https://mandrillapp.com/api/1.0/messages/search.json', {
@@ -18,22 +17,21 @@ Promise.resolve().then( async () => {
       key: MANDRILL_API_KEY,
       subject: 'Danke für Ihre Frage',
       senders: [
-        "faq@republik.ch"
+        'faq@republik.ch'
       ],
       limit: 10000
     })
   })).json())
-    .filter( message => message.email !== 'faq@republik.ch')
-    .map( message => message.email )
-    .filter( onlyUnique )
+    .filter(message => message.email !== 'faq@republik.ch')
+    .map(message => message.email)
+    .filter(onlyUnique)
 
-  for(let email of emails) {
+  for (let email of emails) {
     console.log(email)
   }
-
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

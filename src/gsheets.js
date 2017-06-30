@@ -3,7 +3,7 @@ const gsheets = require('gsheets')
 const {utcTimeParse, timeParse} = require('../lib/formats')
 const slugify = require('../lib/slugify')
 
-const dateParse = utcTimeParse('%x') //%x - the locale’s date
+const dateParse = utcTimeParse('%x') // %x - the locale’s date
 const dateTimeParse = timeParse('%x %H:%M')
 
 const mapping = {
@@ -12,7 +12,7 @@ const mapping = {
   '1rktqc3xhluZLH6OrdmY456LaiCOk0L2tMD5ZjwG89lo': 'events'
 }
 
-const normalize = (data) => data.map( d => {
+const normalize = (data) => data.map(d => {
   return Object.assign({}, d, {
     published: d.hasOwnProperty('published') ? !!d.published : undefined,
     date: d.hasOwnProperty('date') ? dateParse(d.date) : undefined,
@@ -23,10 +23,10 @@ const normalize = (data) => data.map( d => {
 })
 
 module.exports = (pgdb, logger) =>
-  server.get('/gsheets/:key', async function(req, res) {
+  server.get('/gsheets/:key', async function (req, res) {
     const {key} = req.params
     const name = mapping[key]
-    if(!key || !name) {
+    if (!key || !name) {
       logger.error('gsheets: no key', { req: req._log() })
       return res.status(400).end('invalid key')
     }
@@ -35,15 +35,15 @@ module.exports = (pgdb, logger) =>
     let sheet
     try {
       sheet = await gsheets.getWorksheet(key, 'live')
-    } catch(e) {
+    } catch (e) {
       logger.error('gsheets: could not get sheet', { e, key, req: req._log() })
       return res.status(400).end('could not get sheet')
     }
 
-    if(sheet) {
+    if (sheet) {
       const data = normalize(sheet.data)
       try {
-        if(await pgdb.public.gsheets.count({name})) {
+        if (await pgdb.public.gsheets.count({name})) {
           await pgdb.public.gsheets.update({name}, {
             data,
             updatedAt: new Date()
@@ -56,7 +56,7 @@ module.exports = (pgdb, logger) =>
             updatedAt: new Date()
           })
         }
-      } catch(e) {
+      } catch (e) {
         logger.error('gsheets: error while trying to save data', { e, req: req._log() })
         return res.status(400).end('failed while trying to save data')
       }

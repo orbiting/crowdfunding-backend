@@ -15,33 +15,28 @@ const fs = require('fs')
 const uuid = require('uuid/v4')
 const convertImage = require('../lib/convertImage')
 
-
 const GKEY = '1IoNowWMs6dK3OAK_uyWaZMQKrWU0H6LCTYedLcbHPXk'
 
 const FOLDER = 'testimonials'
 const { ASSETS_BASE_URL } = process.env
 const {IMAGE_SIZE_SMALL, IMAGE_SIZE_SHARE} = convertImage
 
-
-function randomString(len) {
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for( var i=0; i < len; i++ )
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  return text;
+function randomString (len) {
+  var text = ''
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (var i = 0; i < len; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
+  return text
 }
 
-
-PgDb.connect().then( async (pgdb) => {
-
+PgDb.connect().then(async (pgdb) => {
   const {S3BUCKET} = process.env
 
   let counter = 0
 
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
 
-  for(let person of sheet.data) {
-    if(person.Filename && fs.existsSync(__dirname+'/local/photos/'+person.Filename)) {
+  for (let person of sheet.data) {
+    if (person.Filename && fs.existsSync(__dirname + '/local/photos/' + person.Filename)) {
       const names = person.Name.split(' ')
 
       const filename = person.Filename
@@ -51,20 +46,20 @@ PgDb.connect().then( async (pgdb) => {
       const quote = person.Statement
       const role = person.Bezeichnung
       let video
-      if(person.hls && person.mp4) {
+      if (person.hls && person.mp4) {
         video = {
           hls: person.hls,
           mp4: person.mp4,
           subtitles: person.subtitles,
-          youtube: person.youtube,
+          youtube: person.youtube
         }
       }
 
-      console.log(firstName+' '+lastName)
+      console.log(firstName + ' ' + lastName)
 
       let user = await pgdb.public.users.findOne({email})
       let testimonial
-      if(user) {
+      if (user) {
         testimonial = await pgdb.public.testimonials.findOne({userId: user.id})
       }
 
@@ -73,12 +68,12 @@ PgDb.connect().then( async (pgdb) => {
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
       const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
 
-      const image = fs.readFileSync(__dirname+'/local/photos/'+filename, 'binary')
+      const image = fs.readFileSync(__dirname + '/local/photos/' + filename, 'binary')
       const inputBuffer = new Buffer(image, 'binary')
 
       await Promise.all([
         convertImage.toJPEG(inputBuffer)
-          .then( (data) => {
+          .then((data) => {
             return uploadExoscale({
               stream: data,
               path: pathOriginal,
@@ -87,7 +82,7 @@ PgDb.connect().then( async (pgdb) => {
             })
           }),
         convertImage.toSmallBW(inputBuffer)
-          .then( (data) => {
+          .then((data) => {
             return uploadExoscale({
               stream: data,
               path: pathSmall,
@@ -96,7 +91,7 @@ PgDb.connect().then( async (pgdb) => {
             })
           }),
         convertImage.toShare(inputBuffer)
-          .then( (data) => {
+          .then((data) => {
             return uploadExoscale({
               stream: data,
               path: pathShare,
@@ -106,7 +101,7 @@ PgDb.connect().then( async (pgdb) => {
           })
       ])
 
-      if(!user) {
+      if (!user) {
         user = await pgdb.public.users.insertAndGet({
           firstName,
           lastName,
@@ -114,21 +109,20 @@ PgDb.connect().then( async (pgdb) => {
           verified: true
         })
       }
-      //load existing memberships
+      // load existing memberships
       const firstMembership = await pgdb.public.memberships.findFirst({
         userId: user.id
       }, {orderBy: ['sequenceNumber asc']})
       let sequenceNumber
-      if(firstMembership)
-        sequenceNumber = firstMembership.sequenceNumber
+      if (firstMembership) { sequenceNumber = firstMembership.sequenceNumber }
 
-      if(!testimonial) {
+      if (!testimonial) {
         await pgdb.public.testimonials.insert({
           id,
           userId: user.id,
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall,
+          image: ASSETS_BASE_URL + pathSmall,
           video,
           sequenceNumber
         }, {skipUndefined: true})
@@ -137,23 +131,21 @@ PgDb.connect().then( async (pgdb) => {
         await pgdb.public.testimonials.updateAndGetOne({id: testimonial.id}, {
           role,
           quote,
-          image: ASSETS_BASE_URL+pathSmall,
+          image: ASSETS_BASE_URL + pathSmall,
           video,
           sequenceNumber
         }, {skipUndefined: true})
       }
       counter += 1
-      console.log('finished: '+firstName+' '+lastName)
-
+      console.log('finished: ' + firstName + ' ' + lastName)
     } else {
-      console.log("photo not found: "+person.Filename)
+      console.log('photo not found: ' + person.Filename)
     }
   }
   console.log(`${counter} people imported`)
-
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

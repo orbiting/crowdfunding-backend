@@ -1,4 +1,4 @@
-exports.seed = async function(knex) {
+exports.seed = async function (knex) {
   await knex('pledgeOptions').del()
   await knex('pledges').del()
   await knex('packageOptions').del()
@@ -9,9 +9,9 @@ exports.seed = async function(knex) {
   await knex('crowdfundings').del()
 
   let crowdfundingId = await knex('crowdfundings').insert({
-    name: "REPUBLIK",
-    beginDate: new Date("2017-04-26T06:00:00.000Z"),
-    endDate: new Date("2017-05-31T23:59:59.999Z"),
+    name: 'REPUBLIK',
+    beginDate: new Date('2017-04-26T06:00:00.000Z'),
+    endDate: new Date('2017-05-31T23:59:59.999Z'),
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
@@ -26,7 +26,7 @@ exports.seed = async function(knex) {
     updatedAt: new Date()
   })
 
-  ///////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////
 
   // let rewardPosterId = await knex('rewards').insert({
   //   type: "Goodie",
@@ -44,9 +44,8 @@ exports.seed = async function(knex) {
   // }).returning('id')
   // goodiePosterId = goodiePosterId[0]
 
-
   let rewardNoteBookId = await knex('rewards').insert({
-    type: "Goodie",
+    type: 'Goodie',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
@@ -54,15 +53,14 @@ exports.seed = async function(knex) {
 
   await knex('goodies').insert({
     rewardId: rewardNoteBookId,
-    rewardType: "Goodie",
-    name: "NOTEBOOK",
+    rewardType: 'Goodie',
+    name: 'NOTEBOOK',
     createdAt: new Date(),
     updatedAt: new Date()
   })
 
-
   let rewardMembershipRegularId = await knex('rewards').insert({
-    type: "MembershipType",
+    type: 'MembershipType',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
@@ -70,17 +68,16 @@ exports.seed = async function(knex) {
 
   await knex('membershipTypes').insert({
     rewardId: rewardMembershipRegularId,
-    rewardType: "MembershipType",
-    name: "ABO",
+    rewardType: 'MembershipType',
+    name: 'ABO',
     duration: 365 + 364 / 2,
     price: 24000,
     createdAt: new Date(),
     updatedAt: new Date()
   })
 
-
   let rewardMembershipBenefactorId = await knex('rewards').insert({
-    type: "MembershipType",
+    type: 'MembershipType',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
@@ -88,15 +85,15 @@ exports.seed = async function(knex) {
 
   await knex('membershipTypes').insert({
     rewardId: rewardMembershipBenefactorId,
-    rewardType: "MembershipType",
-    name: "BENEFACTOR_ABO",
+    rewardType: 'MembershipType',
+    name: 'BENEFACTOR_ABO',
     duration: 365 + 364 / 2,
     price: 24000,
     createdAt: new Date(),
     updatedAt: new Date()
   })
 
-  ///////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////
 
   // let packagePosterId = await knex('packages').insert({
   //   name: "POSTER",
@@ -119,9 +116,8 @@ exports.seed = async function(knex) {
   // }).returning('id')
   // packagePosterOptionId = packagePosterOptionId[0]
 
-
   let packageAboId = await knex('packages').insert({
-    name: "ABO",
+    name: 'ABO',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
@@ -140,9 +136,8 @@ exports.seed = async function(knex) {
     updatedAt: new Date()
   })
 
-
   let packageAboGiveId = await knex('packages').insert({
-    name: "ABO_GIVE",
+    name: 'ABO_GIVE',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
@@ -173,9 +168,8 @@ exports.seed = async function(knex) {
     updatedAt: new Date()
   })
 
-
   let packageBenefactorId = await knex('packages').insert({
-    name: "BENEFACTOR",
+    name: 'BENEFACTOR',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
@@ -194,9 +188,8 @@ exports.seed = async function(knex) {
     updatedAt: new Date()
   })
 
-
   let packageDonateId = await knex('packages').insert({
-    name: "DONATE",
+    name: 'DONATE',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()

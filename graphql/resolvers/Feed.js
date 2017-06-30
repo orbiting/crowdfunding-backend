@@ -1,14 +1,12 @@
 const {descending} = require('d3-array')
 
 module.exports = {
-  async userIsEligitable(feed, args, {pgdb, user}) {
-    if(!user)
-      return false
+  async userIsEligitable (feed, args, {pgdb, user}) {
+    if (!user) { return false }
     return !!(await pgdb.public.memberships.findFirst({userId: user.id}))
   },
-  async userWaitUntil(feed, args, {pgdb, user}) {
-    if(!user || !feed.commentInterval)
-      return
+  async userWaitUntil (feed, args, {pgdb, user}) {
+    if (!user || !feed.commentInterval) { return }
     const now = new Date().getTime()
     const lastCommentByUser = await pgdb.public.comments.findFirst({
       userId: user.id,
@@ -17,28 +15,23 @@ module.exports = {
     }, {
       orderBy: ['createdAt desc']
     })
-    if(lastCommentByUser && lastCommentByUser.createdAt.getTime() > now-feed.commentInterval)
-      return new Date((lastCommentByUser.createdAt.getTime()+feed.commentInterval))
-    return
+    if (lastCommentByUser && lastCommentByUser.createdAt.getTime() > now - feed.commentInterval) { return new Date((lastCommentByUser.createdAt.getTime() + feed.commentInterval)) }
   },
-  async comments(feed, args, {pgdb}) {
+  async comments (feed, args, {pgdb}) {
     const {offset, limit, firstId, tags, order} = args
 
     const firstComment = firstId
       ? await pgdb.public.comments.findOne({
-          id: firstId,
-          feedId: feed.id,
-          published: true,
-          adminUnpublished: false
-        })
+        id: firstId,
+        feedId: feed.id,
+        published: true,
+        adminUnpublished: false
+      })
       : null
 
-
     let orderBy = 'hottnes DESC'
-    if(order === 'NEW')
-      orderBy = '"createdAt" DESC'
-    if(order === 'TOP')
-      orderBy = '"upVotes" - "downVotes" DESC'
+    if (order === 'NEW') { orderBy = '"createdAt" DESC' }
+    if (order === 'TOP') { orderBy = '"upVotes" - "downVotes" DESC' }
 
     const comments = (await pgdb.public.comments.find({
       feedId: feed.id,
@@ -51,7 +44,7 @@ module.exports = {
       limit,
       orderBy: [orderBy],
       skipUndefined: true
-    })).map( c => Object.assign({}, c, {
+    })).map(c => Object.assign({}, c, {
       score: c.upVotes - c.downVotes
     }))
 
@@ -59,7 +52,7 @@ module.exports = {
       ? [firstComment].concat(comments.filter(c => c.id !== firstComment.id))
       : comments
   },
-  async stats(feed, args, {pgdb}) {
+  async stats (feed, args, {pgdb}) {
     return {
       count: pgdb.public.comments.count({
         feedId: feed.id,
@@ -82,7 +75,7 @@ module.exports = {
           `, {
             feedId: feed.id,
             published: true,
-            adminUnpublished: false,
+            adminUnpublished: false
           })
         }
       ]
@@ -101,7 +94,7 @@ module.exports = {
         `, {
           feedId: feed.id,
           published: true,
-          adminUnpublished: false,
+          adminUnpublished: false
         }))
         .sort((a, b) => descending(a.count, b.count))
     }
