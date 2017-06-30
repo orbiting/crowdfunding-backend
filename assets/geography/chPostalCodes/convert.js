@@ -5,10 +5,11 @@
 // cf_server  node assets/geography/chPostalCodes/convert.js
 
 const rw = require('rw')
+const path = require('path')
 const nest = require('d3-collection').nest
 
 const input = rw.readFileSync(
-  __dirname + '/PLZO_CSV_WGS84.csv',
+  path.join(__dirname, 'PLZO_CSV_WGS84.csv'),
   'utf8'
 )
 

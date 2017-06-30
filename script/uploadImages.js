@@ -1,11 +1,12 @@
 require('dotenv').config()
 const fs = require('mz/fs')
+const path = require('path')
 const uploadExoscale = require('../lib/uploadExoscale')
 const convertImage = require('../lib/convertImage')
 const slugify = require('../lib/slugify')
 
 const FOLDER = 'images'
-const IMAGES_DIR = __dirname + '/data/images/'
+const IMAGES_DIR = path.join(__dirname, '/data/images/')
 const IMAGES_WIDTH = 1200
 
 const {S3BUCKET, ASSETS_BASE_URL} = process.env

@@ -12,6 +12,7 @@ const gsheets = require('gsheets')
 const uploadExoscale = require('../lib/uploadExoscale')
 const keyCDN = require('../lib/keyCDN')
 const fs = require('fs')
+const path = require('path')
 const uuid = require('uuid/v4')
 const convertImage = require('../lib/convertImage')
 
@@ -36,7 +37,7 @@ PgDb.connect().then(async (pgdb) => {
   const sheet = await gsheets.getWorksheet(GKEY, 'live')
 
   for (let person of sheet.data) {
-    if (person.Filename && fs.existsSync(__dirname + '/local/photos/' + person.Filename)) {
+    if (person.Filename && fs.existsSync(path.join(__dirname, '/local/photos/', person.Filename))) {
       const names = person.Name.split(' ')
 
       const filename = person.Filename
@@ -68,7 +69,7 @@ PgDb.connect().then(async (pgdb) => {
       const pathSmall = `/${FOLDER}/${id}_${IMAGE_SIZE_SMALL}x${IMAGE_SIZE_SMALL}.jpeg`
       const pathShare = `/${FOLDER}/${id}_${IMAGE_SIZE_SHARE}x${IMAGE_SIZE_SHARE}.jpeg`
 
-      const image = fs.readFileSync(__dirname + '/local/photos/' + filename, 'binary')
+      const image = fs.readFileSync(path.join(__dirname, '/local/photos/', filename), 'binary')
       const inputBuffer = new Buffer(image, 'binary')
 
       await Promise.all([

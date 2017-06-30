@@ -8,6 +8,7 @@
 // this can take some time (7s on 3.2 GHz) enjoy an espresso...
 
 const rw = require('rw')
+const path = require('path')
 const nest = require('d3-collection').nest
 
 // EU + CH
@@ -23,7 +24,7 @@ const countriesOfInterest = [
 
 // source
 const input = rw.readFileSync(
-  __dirname + '/allCountries.txt',
+  path.join(__dirname, 'allCountries.txt'),
   'utf8'
 )
 

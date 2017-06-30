@@ -5,9 +5,10 @@
 // cf_server  node assets/geography/chPostalCodes/convert.js
 
 const rw = require('rw')
+const path = require('path')
 
 const input = rw.readFileSync(
-  __dirname + '/data.csv',
+  path.join(__dirname, 'data.csv'),
   'utf8'
 ).split('\n')
 
