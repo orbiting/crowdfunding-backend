@@ -18,7 +18,7 @@ PgDb.connect().then(async (pgdb) => {
   const membershipType = await pgdb.public.membershipTypes.findOne({name: 'ABO'})
 
   const user = await pgdb.public.users.findOne({email: 'jefferson@project-r.construction'})
-  if(!user) {
+  if (!user) {
     console.error('jefferson not found')
   }
 
@@ -33,13 +33,12 @@ PgDb.connect().then(async (pgdb) => {
   await pgdb.public.pledgeOptions.insert({
     templateId: pkgOption.id,
     pledgeId: pledge.id,
-    amount: 5780-5748, //32
+    amount: 5780 - 5748, // 32
     price: ABO_PRICE
   })
   let sequenceNumber
   for (sequenceNumber = 5748; sequenceNumber < 5780; sequenceNumber++) {
-    if(!(await pgdb.public.memberships.findFirst({sequenceNumber}))) {
-
+    if (!(await pgdb.public.memberships.findFirst({sequenceNumber}))) {
       await pgdb.public.memberships.insert({
         userId: user.id,
         pledgeId: pledge.id,
@@ -50,9 +49,9 @@ PgDb.connect().then(async (pgdb) => {
     }
   }
   console.log(`memberships: ${await pgdb.public.memberships.count()}`)
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

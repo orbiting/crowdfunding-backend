@@ -105,8 +105,9 @@ PgDb.connect().then(async (pgdb) => {
             preis: formatPrice(pledgeOption.price)
           }
         } else { // if(pledgeOption.template.reward.goodie) {
-          if (pledgeOption.amount === 0) // omit 0 Notizbuch
-            { return null }
+          if (pledgeOption.amount === 0) { // omit 0 Notizbuch
+            return null
+          }
           return {
             anzahl: pledgeOption.amount,
             beschrieb: t('option/NOTEBOOK/label/1'),

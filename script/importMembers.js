@@ -19,15 +19,15 @@ PgDb.connect().then(async (pgdb) => {
   const pkgOption = await pgdb.public.packageOptions.findOne({packageId: pkg.id})
   const membershipType = await pgdb.public.membershipTypes.findOne({name: 'ABO'})
 
-  const inputFile = rw.readFileSync("/dev/stdin", "utf8");
+  const inputFile = rw.readFileSync('/dev/stdin', 'utf8')
   const people = csvParse(inputFile)
-  for(let person of people) {
+  for (let person of people) {
     const {firstName, lastName, email} = person
 
-    console.log(firstName+' '+lastName)
+    console.log(firstName + ' ' + lastName)
 
     let user = await pgdb.public.users.findOne({email})
-    if(!user) {
+    if (!user) {
       user = await pgdb.public.users.insertAndGet({
         firstName,
         lastName,
@@ -36,7 +36,7 @@ PgDb.connect().then(async (pgdb) => {
       })
     }
 
-    if(!(await pgdb.public.pledges.count({userId: user.id}))) {
+    if (!(await pgdb.public.pledges.count({userId: user.id}))) {
       const pledge = await pgdb.public.pledges.insertAndGet({
         packageId: pkg.id,
         userId: user.id,
@@ -56,17 +56,16 @@ PgDb.connect().then(async (pgdb) => {
         userId: user.id,
         pledgeId: pledge.id,
         membershipTypeId: membershipType.id,
-        beginDate: new Date(),
+        beginDate: new Date()
       })
     }
   }
   console.log(`users: ${await pgdb.public.users.count()}`)
   console.log(`memberships: ${await pgdb.public.memberships.count()}`)
   console.log(`payments: ${await pgdb.public.payments.count()} (zero is ok)`)
-
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })
