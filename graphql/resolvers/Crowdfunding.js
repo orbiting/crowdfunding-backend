@@ -7,13 +7,47 @@ module.exports = {
       orderBy: ['people asc', 'money asc']
     })
   },
-  async status (crowdfunding, args, {pgdb}) {
-    const {forceUpdate} = args
+  async status (crowdfunding, {forceUpdate}, {pgdb}) {
     if (!forceUpdate && crowdfunding.result && crowdfunding.result.status) {
       return crowdfunding.result.status
     }
-    const money = await pgdb.public.queryOneField(`SELECT SUM(total) FROM pledges WHERE status = 'SUCCESSFUL'`) || 0
-    const people = await pgdb.public.queryOneField(`SELECT COUNT(id) FROM memberships`) || 0
+    const money = await pgdb.public.queryOneField(`
+      SELECT
+        SUM(pl.total)
+      FROM
+        pledges pl
+      JOIN
+        packages pa
+        ON pl."packageId" = pa.id
+      JOIN
+        crowdfundings cf
+        ON
+          pa."crowdfundingId" = cf.id AND
+          cf.id = crowdfundingId
+      WHERE
+        pl.status = 'SUCCESSFUL'
+    `, {
+      crowdfundingId: crowdfunding.id
+    }) || 0
+    const people = await pgdb.public.queryOneField(`
+      SELECT
+        COUNT(m.id)
+      FROM
+        memberships m
+      JOIN
+        pledges pl
+        ON m."pledgeId" = pl.id
+      JOIN
+        packages pa
+        ON pl."packageId" = pa.id
+      JOIN
+        crowdfundings cf
+        ON
+          pa."crowdfundingId" = cf.id AND
+          cf.id = crowdfundingId
+    `, {
+      crowdfundingId: crowdfunding.id
+    }) || 0
     return {money, people}
   },
   hasEnded (crowdfunding) {
