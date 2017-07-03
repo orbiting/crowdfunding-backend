@@ -19,7 +19,7 @@ SESSION_SECRET=replaceMe
 DATABASE_URL=postgres://postgres@localhost:5432/postgres
 ```
 
-Bootstrap the DB.
+Adapt the [seed file](seeds/republik.js) to your needs and bootstrap the DB.
 ```
 npm run db:reset
 ```
