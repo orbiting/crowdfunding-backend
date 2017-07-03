@@ -63,15 +63,11 @@
     "sync:smexport": "s3cmd sync --verbose --acl-public -c ./.s3cfg s3://republik/testimonials/export/ script/local/testimonials/export/",
     "upload:images": "node script/uploadImages.js",
     "download:1k": "s3cmd sync --verbose --exclude '*' --include '*_1000x1000.jpeg' -c ./.s3cfg s3://republik/testimonials/ script/local/1kx1k/",
-    "lint": "eslint ./",
-    "lint-graphql": "eslint ./graphql",
     "standardize": "standard --fix"
   },
   "devDependencies": {
     "concurrently": "^3.4.0",
     "d3-dsv": "^1.0.5",
-    "eslint": "^4.1.1",
-    "eslint-plugin-import": "^2.6.0",
     "gsheets": "^2.0.0",
     "http-proxy": "^1.16.2",
     "node-inspector": "^1.1.1",
