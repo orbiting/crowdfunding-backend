@@ -23,7 +23,7 @@ module.exports = {
         crowdfundings cf
         ON
           pa."crowdfundingId" = cf.id AND
-          cf.id = crowdfundingId
+          cf.id = :crowdfundingId
       WHERE
         pl.status = 'SUCCESSFUL'
     `, {
@@ -44,7 +44,7 @@ module.exports = {
         crowdfundings cf
         ON
           pa."crowdfundingId" = cf.id AND
-          cf.id = crowdfundingId
+          cf.id = :crowdfundingId
     `, {
       crowdfundingId: crowdfunding.id
     }) || 0
