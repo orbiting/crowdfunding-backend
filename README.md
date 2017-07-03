@@ -154,3 +154,6 @@ STRIPE_SECRET_KEY=
 ### Upload images
 Assets for public use are stored under `script/data/images`. Place a new image you want to upload there, then run `npm run upload:images`. The public URLs of the new images are then printed on the console. This script does not purge the cache of existing images.
 
+## Copyright and license
+Code and documentation copyright 2017 [Project R](https://project-r.construction).
+Code is licensed under GNU AGPLv3+.
