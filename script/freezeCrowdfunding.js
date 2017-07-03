@@ -49,6 +49,9 @@ PgDb.connect().then(async (pgdb) => {
         endVideo: video
       }
     })
+
+    await transaction.transactionCommit()
+
     console.log('finished! The result is:')
     console.log(newCrowdfunding.result)
   } catch (e) {
