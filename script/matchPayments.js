@@ -20,12 +20,11 @@ const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(';').parse
-const csvFormat = dsvFormat(';').format
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 const generateMemberships = require('../lib/generateMemberships')
 const sendPaymentSuccessful = require('../lib/sendPaymentSuccessful')
-const sendMail = require('../lib/sendMail')
+// const sendMail = require('../lib/sendMail')
 
 const t = getFormatter(MESSAGES)
 
@@ -34,43 +33,41 @@ const LOG_FAILED_INSERTS = false
 const parseCashExport = (path) => {
   const inputFile = rw.readFileSync(path, 'utf8')
   return csvParse(inputFile)
-    .filter( row => row.hrid )
+    .filter(row => row.hrid)
 }
 
 const parsePostfinanceExport = (path) => {
-  //sanitize input
-  //keys to lower case
-  //trash uninteresting columns
-  //parse columns
-  //extract mitteilung
+  // sanitize input
+  // keys to lower case
+  // trash uninteresting columns
+  // parse columns
+  // extract mitteilung
   const inputFile = rw.readFileSync(path, 'utf8')
   const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
   const parseDate = ['Buchungsdatum', 'Valuta']
   const parseAmount = ['Gutschrift']
-  return csvParse( inputFile )
-    .filter( row => row.Gutschrift ) //trash rows without gutschrift (such as lastschrift and footer)
-    .filter( row => !/^EINZAHLUNGSSCHEIN/g.exec(row.Avisierungstext) ) //trash useless EINZAHLUNGSSCHEIN
-    .filter( row => !/^GUTSCHRIFT E-PAYMENT TRANSAKTION POSTFINANCE CARD/g.exec(row.Avisierungstext) ) //trash PF CARD
-    .filter( row => !/^GUTSCHRIFT VON FREMDBANK (.*?) AUFTRAGGEBER: STRIPE/g.exec(row.Avisierungstext) ) //trash stripe payments
-    .map( row => {
+  return csvParse(inputFile)
+    .filter(row => row.Gutschrift) // trash rows without gutschrift (such as lastschrift and footer)
+    .filter(row => !/^EINZAHLUNGSSCHEIN/g.exec(row.Avisierungstext)) // trash useless EINZAHLUNGSSCHEIN
+    .filter(row => !/^GUTSCHRIFT E-PAYMENT TRANSAKTION POSTFINANCE CARD/g.exec(row.Avisierungstext)) // trash PF CARD
+    .filter(row => !/^GUTSCHRIFT VON FREMDBANK (.*?) AUFTRAGGEBER: STRIPE/g.exec(row.Avisierungstext)) // trash stripe payments
+    .map(row => {
       let newRow = {}
-      Object.keys(row).forEach( key => {
+      Object.keys(row).forEach(key => {
         const value = row[key]
-        if(includeColumns.indexOf(key) > -1) {
+        if (includeColumns.indexOf(key) > -1) {
           const newKey = key.toLowerCase()
-          if(parseDate.indexOf(key) > -1) {
+          if (parseDate.indexOf(key) > -1) {
             newRow[newKey] = new Date(value)
-          }
-          else if(parseAmount.indexOf(key) > -1) {
-            newRow[newKey] = parseInt( parseFloat(value)*100 )
-          }
-          else {
-            if(key==='Avisierungstext') {
+          } else if (parseAmount.indexOf(key) > -1) {
+            newRow[newKey] = parseInt(parseFloat(value) * 100)
+          } else {
+            if (key === 'Avisierungstext') {
               try {
                 newRow['mitteilung'] = /.*?MITTEILUNGEN:.*?\s([A-Za-z0-9]{6})(\s.*?|$)/g.exec(value)[1]
-              } catch(e) {
-                //console.log("Cloud not extract mitteilung from row:")
-                //console.log(row)
+              } catch (e) {
+                // console.log("Cloud not extract mitteilung from row:")
+                // console.log(row)
               }
             }
             newRow[newKey] = value
@@ -89,40 +86,40 @@ const writeReport = async (pgdb) => {
     'dueDate <': new Date(),
     status: 'WAITING'
   })
-  if(investigatePledges.length || overduePayments.length) {
+  if (investigatePledges.length || overduePayments.length) {
     let find = {}
-    const findPledgeIds = { pledgeId: investigatePledges.map( p => p.id ) }
-    const findPaymentIds = { paymentId: overduePayments.map( p => p.id ) }
-    if(investigatePledges.length && overduePayments.length) {
+    const findPledgeIds = { pledgeId: investigatePledges.map(p => p.id) }
+    const findPaymentIds = { paymentId: overduePayments.map(p => p.id) }
+    if (investigatePledges.length && overduePayments.length) {
       find = { or: [ findPledgeIds, findPaymentIds ] }
-    } else if(investigatePledges.length) {
+    } else if (investigatePledges.length) {
       find = findPledgeIds
     } else {
       find = findPaymentIds
     }
     const pledgePayments = await pgdb.public.pledgePayments.find(find)
 
-    const payments = await pgdb.public.payments.find({id: pledgePayments.map( p => p.paymentId )})
-    const pledges = await pgdb.public.pledges.find({id: pledgePayments.map( p => p.pledgeId )})
-    const users = await pgdb.public.users.find({id: pledges.map( p => p.userId )})
-    const addresses = await pgdb.public.addresses.find({id: users.map( p => p.addressId )})
-    users.forEach( user => {
-      user.address = addresses.find( a => user.addressId === a.id )
+    const payments = await pgdb.public.payments.find({id: pledgePayments.map(p => p.paymentId)})
+    const pledges = await pgdb.public.pledges.find({id: pledgePayments.map(p => p.pledgeId)})
+    const users = await pgdb.public.users.find({id: pledges.map(p => p.userId)})
+    const addresses = await pgdb.public.addresses.find({id: users.map(p => p.addressId)})
+    users.forEach(user => {
+      user.address = addresses.find(a => user.addressId === a.id)
     })
-    pledges.forEach( pledge => {
-      pledge.user = users.find( u => u.id === pledge.userId )
-      pledge.pledgePayments = pledgePayments.filter( p => p.pledgeId === pledge.id )
-      pledge.pledgePaymentsPaymentIds = pledge.pledgePayments.map( p => p.paymentId )
-      pledge.payments = payments.filter( p => pledge.pledgePaymentsPaymentIds.indexOf(p.id) > -1 )
+    pledges.forEach(pledge => {
+      pledge.user = users.find(u => u.id === pledge.userId)
+      pledge.pledgePayments = pledgePayments.filter(p => p.pledgeId === pledge.id)
+      pledge.pledgePaymentsPaymentIds = pledge.pledgePayments.map(p => p.paymentId)
+      pledge.payments = payments.filter(p => pledge.pledgePaymentsPaymentIds.indexOf(p.id) > -1)
       delete pledge.pledgePaymentsPaymentIds
       delete pledge.pledgePayments
     })
-    investigatePledges = investigatePledges.map( pledge => {
-      return pledges.find( p => p.id === pledge.id )
+    investigatePledges = investigatePledges.map(pledge => {
+      return pledges.find(p => p.id === pledge.id)
     })
-    overduePayments.forEach( payment => {
-      const pledgePayment = pledgePayments.find( p => p.paymentId === payment.id )
-      payment.pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
+    overduePayments.forEach(payment => {
+      const pledgePayment = pledgePayments.find(p => p.paymentId === payment.id)
+      payment.pledge = pledges.find(p => p.id === pledgePayment.pledgeId)
     })
   }
   /*
@@ -142,14 +139,14 @@ const writeReport = async (pgdb) => {
   const unmatchedPayments = await pgdb.public.postfinancePayments.find({
     matched: false
   })
-  console.log("-------------------")
-  console.log("investigatePledges")
+  console.log('-------------------')
+  console.log('investigatePledges')
   console.log(JSON.stringify(investigatePledges))
-  console.log("-------------------")
-  console.log("overduePayments")
+  console.log('-------------------')
+  console.log('overduePayments')
   console.log(JSON.stringify(overduePayments))
-  console.log("-------------------")
-  console.log("unmatchedPayments")
+  console.log('-------------------')
+  console.log('unmatchedPayments')
   console.log(JSON.stringify(unmatchedPayments))
 }
 
@@ -157,16 +154,16 @@ const insertPayments = async (paymentsInput, tableName, pgdb) => {
   const numPaymentsBefore = await pgdb.public[tableName].count()
   let numFailed = 0
   await Promise.all(
-    paymentsInput.map( payment => {
+    paymentsInput.map(payment => {
       return pgdb.public[tableName].insert(payment)
-        .then( v => { return {payment, status: "resolved"} })
-        .catch( e => { numFailed+=1; return {payment, e, status: "rejected"} })
+        .then(() => { return {payment, status: 'resolved'} })
+        .catch(e => { numFailed += 1; return {payment, e, status: 'rejected'} })
     })
-  ).then( results => {
-    if(LOG_FAILED_INSERTS) {
-      const rejected = results.filter(x => x.status === "rejected")
-      rejected.forEach( promise => {
-        console.log("could not insert row:")
+  ).then(results => {
+    if (LOG_FAILED_INSERTS) {
+      const rejected = results.filter(x => x.status === 'rejected')
+      rejected.forEach(promise => {
+        console.log('could not insert row:')
         console.log(promise.e.message)
         console.log(promise.payment)
         console.log('---------------------')
@@ -177,52 +174,46 @@ const insertPayments = async (paymentsInput, tableName, pgdb) => {
   return numPaymentsBefore
 }
 
-PgDb.connect().then( async (pgdb) => {
-
+PgDb.connect().then(async (pgdb) => {
   const MODE = process.argv[2]
-  if(!MODE || (MODE !== 'pf' && MODE !== 'cash')) {
+  if (!MODE || (MODE !== 'pf' && MODE !== 'cash')) {
     console.error('second parameter must be pf or cash')
     process.exit(1)
   }
   const PF = MODE === 'pf'
 
-
   let tName
-  if(PF) {
+  if (PF) {
     tName = 'postfinancePayments'
-  }
-  else {
+  } else {
     tName = 'cashPayments'
   }
   const tableName = tName
   console.log(`importing new ${tableName}...`)
 
-
-  if(process.argv[3] === 'no-input') {
+  if (process.argv[3] === 'no-input') {
     console.log('not reading from input!')
   } else {
     console.log('reading from /dev/stdin')
     let input
-    if(PF) {
+    if (PF) {
       input = parsePostfinanceExport('/dev/stdin')
-    }
-    else {
+    } else {
       input = parseCashExport('/dev/stdin')
     }
     const paymentsInput = input
 
-    //insert into db
-    //this is done outside of transaction because it's
-    //ment to throw on duplicate rows and doesn't change other records
+    // insert into db
+    // this is done outside of transaction because it's
+    // ment to throw on duplicate rows and doesn't change other records
     const numPaymentsBefore = await insertPayments(paymentsInput, tableName, pgdb)
     const numPaymentsAfter = await pgdb.public[tableName].count()
-    console.log(`${numPaymentsAfter-numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
+    console.log(`${numPaymentsAfter - numPaymentsBefore} new payment(s) imported (${numPaymentsAfter} total)`)
   }
-
 
   const transaction = await pgdb.transactionBegin()
   try {
-    //load
+    // load
     const unmatchedPayments = await transaction.public[tableName].find({
       matched: false
     })
@@ -231,20 +222,18 @@ PgDb.connect().then( async (pgdb) => {
       status: 'WAITING'
     })
 
-    //match and update payments
+    // match and update payments
     let matchedPaymentIds = []
-    const updatedPayments = payments.filter( payment => {
-      if(PF) {
-        const matchingPayment = unmatchedPayments.find( up => up.mitteilung === payment.hrid )
-        if(!matchingPayment)
-          return null
+    const updatedPayments = payments.filter(payment => {
+      if (PF) {
+        const matchingPayment = unmatchedPayments.find(up => up.mitteilung === payment.hrid)
+        if (!matchingPayment) { return null }
         matchedPaymentIds.push(matchingPayment.id)
         payment.total = matchingPayment.gutschrift
         payment.pspPayload = matchingPayment.avisierungstext
       } else {
-        const matchingPayment = unmatchedPayments.find( up => up.hrid === payment.hrid )
-        if(!matchingPayment)
-          return null
+        const matchingPayment = unmatchedPayments.find(up => up.hrid === payment.hrid)
+        if (!matchingPayment) { return null }
         matchedPaymentIds.push(matchingPayment.id)
         payment.pspPayload = 'CASH'
       }
@@ -254,31 +243,28 @@ PgDb.connect().then( async (pgdb) => {
     })
     console.log(`${updatedPayments.length} payment(s) matched`)
 
-    if(updatedPayments.length > 0) { //else we are done
-      //write updatedPayments and matchedPayments
-      await Promise.all(updatedPayments.map( payment => {
+    if (updatedPayments.length > 0) { // else we are done
+      // write updatedPayments and matchedPayments
+      await Promise.all(updatedPayments.map(payment => {
         return transaction.public.payments.update({id: payment.id}, payment)
       }))
       await transaction.public[tableName].update({id: matchedPaymentIds}, {matched: true})
 
-      //update pledges
+      // update pledges
       const pledgePayments = await transaction.public.pledgePayments.find({paymentId: updatedPayments.map(p => p.id)})
       const pledges = await transaction.public.pledges.find({id: pledgePayments.map(p => p.pledgeId)})
       let numUpdatedPledges = 0
       let numPaymentsSuccessful = 0
-      await Promise.all(updatedPayments.map( async (payment) => {
-        const pledgePayment = pledgePayments.find( p => p.paymentId === payment.id )
-        const pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
-        if(!pledgePayment || !pledge) { throw new Error('could not find pledge for payment')}
+      await Promise.all(updatedPayments.map(async (payment) => {
+        const pledgePayment = pledgePayments.find(p => p.paymentId === payment.id)
+        const pledge = pledges.find(p => p.id === pledgePayment.pledgeId)
+        if (!pledgePayment || !pledge) { throw new Error('could not find pledge for payment') }
 
         let newStatus
-        if(payment.total >= pledge.total)
-          newStatus = 'SUCCESSFUL'
-        else
-          newStatus = 'PAID_INVESTIGATE'
+        if (payment.total >= pledge.total) { newStatus = 'SUCCESSFUL' } else { newStatus = 'PAID_INVESTIGATE' }
 
-        if(pledge.status !== newStatus) {
-          if(newStatus === 'SUCCESSFUL') {
+        if (pledge.status !== newStatus) {
+          if (newStatus === 'SUCCESSFUL') {
             await generateMemberships(pledge.id, transaction, t)
           }
           await transaction.public.pledges.update({id: pledge.id}, {
@@ -287,18 +273,17 @@ PgDb.connect().then( async (pgdb) => {
           numUpdatedPledges += 1
         }
 
-        if(newStatus === 'SUCCESSFUL') {
+        if (newStatus === 'SUCCESSFUL') {
           await sendPaymentSuccessful(pledge.id, transaction, t)
           numPaymentsSuccessful += 1
         }
-
       }))
       console.log(`${numUpdatedPledges} pledge(s) updated`)
       console.log(`${numPaymentsSuccessful} payments SUCCESSFUL (confirmations sent)`)
     }
 
     await transaction.transactionCommit()
-  } catch(e) {
+  } catch (e) {
     console.log('error in transaction! rolledback!')
     console.log(e)
     await transaction.transactionRollback()
@@ -307,8 +292,8 @@ PgDb.connect().then( async (pgdb) => {
   console.log('writing reports...')
   await writeReport(pgdb)
   console.log('done')
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.log(e)
 })

@@ -5,15 +5,16 @@
 // cf_server  node assets/geography/chPostalCodes/convert.js
 
 const rw = require('rw')
+const path = require('path')
 const nest = require('d3-collection').nest
 
 const input = rw.readFileSync(
-  __dirname + '/PLZO_CSV_WGS84.csv',
+  path.join(__dirname, 'PLZO_CSV_WGS84.csv'),
   'utf8'
 )
 
 const chPostalCodes = require('d3-dsv')
-  .dsvFormat(";").parse(input)
+  .dsvFormat(';').parse(input)
   .map(d => ({
     ortschaft: d['﻿Ortschaftsname'],
     gemeinde: d.Gemeindename,
@@ -24,11 +25,10 @@ const chPostalCodes = require('d3-dsv')
     lon: d.E
   }))
 
-
 const result = nest()
-  .key( d => d.postalCode )
+  .key(d => d.postalCode)
   .entries(chPostalCodes)
-  .map( d => ({
+  .map(d => ({
     postalCode: d.key,
     values: d.values
   }))

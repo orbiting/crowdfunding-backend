@@ -8,21 +8,19 @@
 // cf_server  node script/freezeCrowdfunding.js --name NAME
 //
 
-
 require('dotenv').config()
 const PgDb = require('../lib/pgdb')
-const Crowdfunding = require('../graphql/queries/Crowdfunding/index')
+const Crowdfunding = require('../graphql/resolvers/Crowdfunding')
 
-PgDb.connect().then( async (pgdb) => {
+PgDb.connect().then(async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
 
   const {name} = argv
-  if(!name)
-    throw new Error('name must be provided')
+  if (!name) { throw new Error('name must be provided') }
 
   let video
-  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
-    if(!argv.hls || !argv.mp4) {
+  if (argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
+    if (!argv.hls || !argv.mp4) {
       throw new Error('hls and mp4 are required for video')
     }
     video = {
@@ -37,7 +35,7 @@ PgDb.connect().then( async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
   try {
     const crowdfunding = await pgdb.public.crowdfundings.findOne({ name })
-    if(!crowdfunding) {
+    if (!crowdfunding) {
       throw new Error(`a crowdfunding with the name '${name}' could not be found!`)
     }
 
@@ -51,15 +49,15 @@ PgDb.connect().then( async (pgdb) => {
         endVideo: video
       }
     })
-    console.log("finished! The result is:")
+    console.log('finished! The result is:')
     console.log(newCrowdfunding.result)
-  } catch(e) {
+  } catch (e) {
     await transaction.transactionRollback()
     throw e
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

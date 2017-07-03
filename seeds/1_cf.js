@@ -1,4 +1,4 @@
-exports.seed = async function(knex, Promise) {
+exports.seed = async function (knex) {
   await knex('pledgeOptions').del()
   await knex('pledges').del()
   await knex('packageOptions').del()
@@ -9,25 +9,24 @@ exports.seed = async function(knex, Promise) {
   await knex('crowdfundings').del()
 
   let crowdfundingId = await knex('crowdfundings').insert({
-    name: "REPUBLIK",
-    beginDate: new Date("2017-04-26T06:00:00.000Z"),
-    endDate: new Date("2017-05-31T23:59:59.999Z"),
+    name: 'REPUBLIK',
+    beginDate: new Date('2017-04-26T06:00:00.000Z'),
+    endDate: new Date('2017-05-31T23:59:59.999Z'),
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   crowdfundingId = crowdfundingId[0]
 
-  let crowdfundingGoal0Id = await knex('crowdfundingGoals').insert({
+  await knex('crowdfundingGoals').insert({
     crowdfundingId: crowdfundingId,
     name: 'ONLY_THE_BEGINNING',
     people: 3000,
     money: 75000000,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  crowdfundingGoal0Id = crowdfundingGoal0Id[0]
+  })
 
-  ///////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////
 
   // let rewardPosterId = await knex('rewards').insert({
   //   type: "Goodie",
@@ -45,62 +44,56 @@ exports.seed = async function(knex, Promise) {
   // }).returning('id')
   // goodiePosterId = goodiePosterId[0]
 
-
   let rewardNoteBookId = await knex('rewards').insert({
-    type: "Goodie",
+    type: 'Goodie',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   rewardNoteBookId = rewardNoteBookId[0]
 
-  let goodieNoteBookId = await knex('goodies').insert({
+  await knex('goodies').insert({
     rewardId: rewardNoteBookId,
-    rewardType: "Goodie",
-    name: "NOTEBOOK",
+    rewardType: 'Goodie',
+    name: 'NOTEBOOK',
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  goodieNoteBookId = goodieNoteBookId[0]
-
+  })
 
   let rewardMembershipRegularId = await knex('rewards').insert({
-    type: "MembershipType",
+    type: 'MembershipType',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   rewardMembershipRegularId = rewardMembershipRegularId[0]
 
-  let membershipTypeRegularId = await knex('membershipTypes').insert({
+  await knex('membershipTypes').insert({
     rewardId: rewardMembershipRegularId,
-    rewardType: "MembershipType",
-    name: "ABO",
+    rewardType: 'MembershipType',
+    name: 'ABO',
     duration: 365 + 364 / 2,
     price: 24000,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  membershipTypeRegularId = membershipTypeRegularId[0]
-
+  })
 
   let rewardMembershipBenefactorId = await knex('rewards').insert({
-    type: "MembershipType",
+    type: 'MembershipType',
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   rewardMembershipBenefactorId = rewardMembershipBenefactorId[0]
 
-  let membershipTypeBenefactorId = await knex('membershipTypes').insert({
+  await knex('membershipTypes').insert({
     rewardId: rewardMembershipBenefactorId,
-    rewardType: "MembershipType",
-    name: "BENEFACTOR_ABO",
+    rewardType: 'MembershipType',
+    name: 'BENEFACTOR_ABO',
     duration: 365 + 364 / 2,
     price: 24000,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  membershipTypeBenefactorId = membershipTypeBenefactorId[0]
+  })
 
-  ///////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////
 
   // let packagePosterId = await knex('packages').insert({
   //   name: "POSTER",
@@ -123,16 +116,15 @@ exports.seed = async function(knex, Promise) {
   // }).returning('id')
   // packagePosterOptionId = packagePosterOptionId[0]
 
-
   let packageAboId = await knex('packages').insert({
-    name: "ABO",
+    name: 'ABO',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   packageAboId = packageAboId[0]
 
-  let packageAboOptionAboId = await knex('packageOptions').insert({
+  await knex('packageOptions').insert({
     packageId: packageAboId,
     rewardId: rewardMembershipRegularId,
     minAmount: 1,
@@ -142,19 +134,17 @@ exports.seed = async function(knex, Promise) {
     userPrice: true,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  packageAboOptionAboId = packageAboOptionAboId[0]
-
+  })
 
   let packageAboGiveId = await knex('packages').insert({
-    name: "ABO_GIVE",
+    name: 'ABO_GIVE',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   packageAboGiveId = packageAboGiveId[0]
 
-  let packageAboGiveOptionAboId = await knex('packageOptions').insert({
+  await knex('packageOptions').insert({
     packageId: packageAboGiveId,
     rewardId: rewardMembershipRegularId,
     minAmount: 1,
@@ -164,10 +154,9 @@ exports.seed = async function(knex, Promise) {
     userPrice: false,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  packageAboGiveOptionAboId = packageAboGiveOptionAboId[0]
+  })
 
-  let packageAboGiveOptionNoteBookId = await knex('packageOptions').insert({
+  await knex('packageOptions').insert({
     packageId: packageAboGiveId,
     rewardId: rewardNoteBookId,
     minAmount: 0,
@@ -177,19 +166,17 @@ exports.seed = async function(knex, Promise) {
     userPrice: false,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  packageAboGiveOptionNoteBookId = packageAboGiveOptionNoteBookId[0]
-
+  })
 
   let packageBenefactorId = await knex('packages').insert({
-    name: "BENEFACTOR",
+    name: 'BENEFACTOR',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   packageBenefactorId = packageBenefactorId[0]
 
-  let packageBenefactorOptionBenefactorAboId = await knex('packageOptions').insert({
+  await knex('packageOptions').insert({
     packageId: packageBenefactorId,
     rewardId: rewardMembershipBenefactorId,
     minAmount: 1,
@@ -199,19 +186,17 @@ exports.seed = async function(knex, Promise) {
     userPrice: false,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  packageBenefactorOptionBenefactorAboId = packageBenefactorOptionBenefactorAboId[0]
-
+  })
 
   let packageDonateId = await knex('packages').insert({
-    name: "DONATE",
+    name: 'DONATE',
     crowdfundingId: crowdfundingId,
     createdAt: new Date(),
     updatedAt: new Date()
   }).returning('id')
   packageDonateId = packageDonateId[0]
 
-  let packageDonateOptionId = await knex('packageOptions').insert({
+  await knex('packageOptions').insert({
     packageId: packageDonateId,
     minAmount: 1,
     maxAmount: 1,
@@ -220,7 +205,5 @@ exports.seed = async function(knex, Promise) {
     userPrice: true,
     createdAt: new Date(),
     updatedAt: new Date()
-  }).returning('id')
-  packageDonateOptionId = packageDonateOptionId[0]
-
+  })
 }

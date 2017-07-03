@@ -11,7 +11,7 @@ if (DEV) {
   require('dotenv').config()
 }
 
-process.env.PORT = process.env.PORT || 3001
+process.env.PORT = process.env.PORT || 3001
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')
@@ -22,30 +22,28 @@ const paymentsLog = require('./src/paymentsLog')
 
 const t = getFormatter(MESSAGES)
 
-
-//crash on unhandled promise rejections
+// crash on unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('unhandled promise rejection', { promise: util.inspect(promise) })
   throw new Error(t('api/unexpected'))
 })
 
-
-PgDb.connect().then( (pgdb) => {
+PgDb.connect().then((pgdb) => {
   const server = express()
 
-  //redirect to https
+  // redirect to https
   if (!DEV) {
     server.enable('trust proxy')
     server.use((req, res, next) => {
-      if(!req.secure) {
+      if (!req.secure) {
         res.redirect('https://' + req.hostname + req.url)
       }
       return next()
     })
   }
 
-  //fetch needs explicit CORS headers otherwise, cookies are not sent
-  if(process.env.CORS_WHITELIST_URL) {
+  // fetch needs explicit CORS headers otherwise, cookies are not sent
+  if (process.env.CORS_WHITELIST_URL) {
     const corsOptions = {
       origin: process.env.CORS_WHITELIST_URL.split(','),
       credentials: true,
@@ -54,7 +52,7 @@ PgDb.connect().then( (pgdb) => {
     server.use('*', cors(corsOptions))
   }
 
-  //middleware
+  // middleware
   server.use(requestLog)
   server.use(newsletter(t))
   server.use(gsheets(pgdb, logger))
@@ -83,6 +81,6 @@ PgDb.connect().then( (pgdb) => {
 
   // start the server
   server.listen(process.env.PORT, () => {
-    logger.info('server is running on http://localhost:'+process.env.PORT)
+    logger.info('server is running on http://localhost:' + process.env.PORT)
   })
 })

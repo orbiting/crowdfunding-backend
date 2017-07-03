@@ -11,27 +11,23 @@
 // cf_server  node script/countVoting.js --name NAME [--message MESSAGE] [--winner WINNER] [--hls url] [--mp4 url] [--youtube url] [--subtitles url] [--no-freeze]
 //
 
-
 require('dotenv').config()
 const PgDb = require('../lib/pgdb')
-const Voting = require('../graphql/queries/Voting/index')
-const VoteStats = require('../graphql/queries/VoteStats/index')
+const Voting = require('../graphql/resolvers/Voting')
+const VoteStats = require('../graphql/resolvers/VoteStats')
 const util = require('util')
 
-PgDb.connect().then( async (pgdb) => {
+PgDb.connect().then(async (pgdb) => {
   const argv = require('minimist')(process.argv.slice(2))
 
   const {name, message, winner: winnerName} = argv
-  const freeze = argv.freeze === false
-    ? false
-    : true
+  const freeze = argv.freeze !== false
 
-  if(!name)
-    throw new Error('name must be provided')
+  if (!name) { throw new Error('name must be provided') }
 
   let video
-  if(argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
-    if(!argv.hls || !argv.mp4) {
+  if (argv.hls || argv.mp4 || argv.youtube || argv.subtitles || argv.poster) {
+    if (!argv.hls || !argv.mp4) {
       throw new Error('hls and mp4 are required for video')
     }
     video = {
@@ -48,7 +44,7 @@ PgDb.connect().then( async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
   try {
     const voting = await pgdb.public.votings.findOne({ name })
-    if(!voting) {
+    if (!voting) {
       throw new Error(`a voting with the name '${name}' could not be found!`)
     }
 
@@ -95,12 +91,12 @@ PgDb.connect().then( async (pgdb) => {
     })
 
     let winner
-    if(counts[0].count === counts[1].count) { //undecided
-      if(!winnerName) {
+    if (counts[0].count === counts[1].count) { // undecided
+      if (!winnerName) {
         throw new Error(`voting is undecided, you must provide the winners votingOption name as a parameter!`)
       }
-      winner = counts.find( c => c.name === winnerName )
-      if(!winner) {
+      winner = counts.find(c => c.name === winnerName)
+      if (!winner) {
         throw new Error(`voting is undecided but a votingOption with the name '${winnerName}' could not be found!`)
       }
     } else {
@@ -112,37 +108,37 @@ PgDb.connect().then( async (pgdb) => {
       : null
     const stats = freeze
       ? {
-          ages: await VoteStats.ages(null, null, {pgdb}),
-          countries: await VoteStats.countries(null, null, {pgdb}),
-          chCantons: await VoteStats.chCantons(null, null, {pgdb})
-        }
+        ages: await VoteStats.ages(null, null, {pgdb}),
+        countries: await VoteStats.countries(null, null, {pgdb}),
+        chCantons: await VoteStats.chCantons(null, null, {pgdb})
+      }
       : null
 
     const newVoting = await pgdb.public.votings.updateAndGetOne({
       id: voting.id
     }, {
       result: {
-        options: counts.map( c => Object.assign({}, c, {
+        options: counts.map(c => Object.assign({}, c, {
           winner: (c.id === winner.id)
         })),
         updatedAt: new Date(),
         createdAt: voting.result ? voting.result.createdAt : new Date(),
-        message, //ignored by postgres if null
+        message, // ignored by postgres if null
         video,
         turnout,
         stats
       }
     })
-    console.log("finished! The result is:")
+    console.log('finished! The result is:')
     console.log(util.inspect(newVoting.result, {depth: 3}))
-    console.log("🎉🎉🎉🎉🎉🎉")
-  } catch(e) {
+    console.log('🎉🎉🎉🎉🎉🎉')
+  } catch (e) {
     await transaction.transactionRollback()
     throw e
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

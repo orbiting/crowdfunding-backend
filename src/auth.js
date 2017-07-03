@@ -17,12 +17,6 @@ exports.configure = ({
   // NB: With 'rolling: true' passed to session() the session expiry time will
   // be reset every time a user visits the site again before it expires.
   maxAge = 60000 * 60 * 24 * 7 * 4,
-  // How often the client should revalidate the session in ms (default 60s)
-  // Does not impact the session life on the server, but causes the client to
-  // always refetch session info after N seconds has elapsed since last
-  // checked. Sensible values are between 0 (always check the server) and a
-  // few minutes.
-  clientMaxAge = 60000,
   // is the server running in development
   dev = false
 } = {}) => {
@@ -64,22 +58,22 @@ exports.configure = ({
   }))
 
   // trust first proxy
-  if(!dev) {
+  if (!dev) {
     server.set('trust proxy', 1)
   }
 
   // authenticate a token sent by email
   server.get('/auth/email/signin/:token?', async (req, res) => {
     const {FRONTEND_BASE_URL} = process.env
-    const {context} = req.query
-    const emailFromQuery = req.query.email
-    //old links may still contain the token as param
+    const {context} = req.query
+    const emailFromQuery = req.query.email
+    // old links may still contain the token as param
     const token = req.query.token || req.params.token
 
-    if(!token) {
+    if (!token) {
       logger.error('auth: no token', { req: req._log(), emailFromQuery, context })
-      return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
-        + querystring.stringify({email: emailFromQuery, context}))
+      return res.redirect(FRONTEND_BASE_URL + '/notifications/invalid-token?' +
+        querystring.stringify({email: emailFromQuery, context}))
     }
 
     try {
@@ -87,47 +81,45 @@ exports.configure = ({
       const session = await Sessions.findOne({'sess @>': {token}})
       if (!session) {
         logger.error('auth: no session', { req: req._log(), token, emailFromQuery, context })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
-          + querystring.stringify({email: emailFromQuery, context}))
+        return res.redirect(FRONTEND_BASE_URL + '/notifications/invalid-token?' +
+          querystring.stringify({email: emailFromQuery, context}))
       }
 
       const email = session.sess.email
-      if(emailFromQuery && email !== emailFromQuery) { //emailFromQuery might be null for old links
+      if (emailFromQuery && email !== emailFromQuery) { // emailFromQuery might be null for old links
         logger.error('auth: session.email and query email dont match', { req: req._log(), email, emailFromQuery, context })
-        return res.redirect(FRONTEND_BASE_URL+'/notifications/invalid-token?'
-          + querystring.stringify({email, context}))
+        return res.redirect(FRONTEND_BASE_URL + '/notifications/invalid-token?' +
+          querystring.stringify({email, context}))
       }
 
       // verify and/or create the user
       let user = await Users.findOne({email})
       if (user) {
-        if(!user.verified) {
+        if (!user.verified) {
           await Users.updateOne({id: user.id}, {verified: true})
         }
       } else {
         user = await Users.insertAndGet({email, verified: true})
       }
 
-      //log in the session and delete token
+      // log in the session and delete token
       const sess = Object.assign({}, session.sess, {
         passport: {user: user.id},
         token: null
       })
       await Sessions.updateOne({sid: session.sid}, {sess})
 
-      //singin hooks
+      // singin hooks
       await sendPendingPledgeConfirmations(user.id, pgdb, t)
 
-      return res.redirect(FRONTEND_BASE_URL+'/notifications/email-confirmed?'
-        + querystring.stringify({email, context}))
-
-    } catch(e) {
+      return res.redirect(FRONTEND_BASE_URL + '/notifications/email-confirmed?' +
+        querystring.stringify({email, context}))
+    } catch (e) {
       logger.error('auth: exception', { req: req._log(), emailFromQuery, context, e })
-      return res.redirect(FRONTEND_BASE_URL+'/notifications/unavailable?'
-        + querystring.stringify({email, context}))
+      return res.redirect(FRONTEND_BASE_URL + '/notifications/unavailable?' +
+        querystring.stringify({emailFromQuery, context}))
     }
   })
-
 
   // Tell Passport how to seralize/deseralize user accounts
   passport.serializeUser(function (user, next) {
@@ -145,5 +137,4 @@ exports.configure = ({
   // Initialise Passport
   server.use(passport.initialize())
   server.use(passport.session())
-
 }

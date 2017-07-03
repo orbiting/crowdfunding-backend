@@ -5,17 +5,17 @@
 // cf_server  node assets/geography/chPostalCodes/convert.js
 
 const rw = require('rw')
-const nest = require('d3-collection').nest
+const path = require('path')
 
 const input = rw.readFileSync(
-  __dirname + '/data.csv',
+  path.join(__dirname, 'data.csv'),
   'utf8'
 ).split('\n')
 
 const cleanedInput = input.slice(31, input.length).join('\n')
 
 const slts = require('d3-dsv')
-  .dsvFormat(",").parseRows(cleanedInput)
+  .dsvFormat(',').parseRows(cleanedInput)
   .map(d => ({
     bfs: d[0],
     slt: d[25]

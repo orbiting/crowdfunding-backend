@@ -1,6 +1,5 @@
 const server = require('express').Router()
 const bodyParser = require('body-parser')
-const fetch = require('isomorphic-unfetch')
 const subscribeToken = require('../lib/subscribeToken')
 const subscribeEmail = require('../lib/subscribeEmail')
 

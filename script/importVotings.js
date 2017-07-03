@@ -10,9 +10,9 @@ const rw = require('rw')
 
 require('dotenv').config()
 
-PgDb.connect().then( async (pgdb) => {
+PgDb.connect().then(async (pgdb) => {
   const input = JSON.parse(rw.readFileSync('/dev/stdin', 'utf8'))
-  if(!input || !input.votings) {
+  if (!input || !input.votings) {
     console.error('input.votings required')
     process.exit(1)
   }
@@ -20,14 +20,13 @@ PgDb.connect().then( async (pgdb) => {
 
   const transaction = await pgdb.transactionBegin()
   try {
-
-    for(let voting of input.votings) {
-      const {name, beginDate, endDate, options} = voting
+    for (let voting of input.votings) {
+      const {name, beginDate, endDate, options} = voting
 
       const existingVoting = await transaction.public.votings.findOne({name})
       let newVoting
 
-      if(existingVoting) { //update existing
+      if (existingVoting) { // update existing
         newVoting = await transaction.public.votings.updateAndGetOne({id: existingVoting.id}, {
           beginDate: beginDate ? new Date(beginDate) : undefined,
           endDate: endDate ? new Date(endDate) : undefined,
@@ -37,16 +36,16 @@ PgDb.connect().then( async (pgdb) => {
         newVoting = await transaction.public.votings.insertAndGet({
           name,
           beginDate: beginDate ? new Date(beginDate) : undefined,
-          endDate: endDate ? new Date(endDate) : undefined,
+          endDate: endDate ? new Date(endDate) : undefined
         }, {skipUndefined: true})
       }
 
-      for(let option of options) {
+      for (let option of options) {
         const existingOption = await transaction.public.votingOptions.findOne({
           votingId: newVoting.id,
           name: option.name
         })
-        if(!existingOption) {
+        if (!existingOption) {
           await transaction.public.votingOptions.insert({
             votingId: newVoting.id,
             name: option.name
@@ -59,13 +58,13 @@ PgDb.connect().then( async (pgdb) => {
 
     console.log('done! New votings:')
     console.log(await pgdb.public.votings.find({}, {orderBy: ['createdAt desc']}))
-  } catch(e) {
+  } catch (e) {
     console.log('error in transaction! rolledback!')
     console.log(e)
     await transaction.transactionRollback()
   }
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.log(e)
 })

@@ -1108,7 +1108,7 @@
     },
     {
       "key": "events/metaDescription",
-      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
+      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "events/upcoming",
@@ -1148,7 +1148,7 @@
     },
     {
       "key": "updates/metaDescription",
-      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
+      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "updates/404",
@@ -1360,7 +1360,7 @@
     },
     {
       "key": "crew/description",
-      "value": "Die Crew stellt sich vor — jetzt unser Crowdfunding unterstützen."
+      "value": "Die Crew stellt sich vor — jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "crew/lead",
@@ -1740,7 +1740,7 @@
     },
     {
       "key": "vote/result/winner",
-      "value": "Gewonnen hat {winner} mit {count} Stimmen, {percentage} Prozent."
+      "value": "Gewonnen hat {winner} mit {count} Stimmen, {percentage} Prozent."
     },
     {
       "key": "vote/result/total",
@@ -1768,11 +1768,11 @@
     },
     {
       "key": "vote/result/ofVotes/other",
-      "value": "{formattedN} von {formattedCount} Stimmen"
+      "value": "{formattedN} von {formattedCount} Stimmen"
     },
     {
       "key": "vote/result/ofVotes/1",
-      "value": "{formattedN} von einer Stimme"
+      "value": "{formattedN} von einer Stimme"
     },
     {
       "key": "vote/result/labels/null",

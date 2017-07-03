@@ -6,7 +6,6 @@
 // cf_server  node script/printPayments.js > script/exports/printPayments.csv [dry]
 //
 
-
 const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
@@ -17,45 +16,45 @@ const MESSAGES = require('../lib/translations.json').data
 
 const t = getFormatter(MESSAGES)
 
-const dateTimeFormat = timeFormat('%x %H:%M') //%x - the locale’s date
+const dateTimeFormat = timeFormat('%x %H:%M') // %x - the locale’s date
 
 require('dotenv').config()
 
-formatPrice = (price) => price/100
+const formatPrice = (price) => price / 100
 
-PgDb.connect().then( async (pgdb) => {
-  //console.log('starting export...')
+PgDb.connect().then(async (pgdb) => {
+  // console.log('starting export...')
 
   const DRY_MODE = process.argv[2] === 'dry'
-  if(DRY_MODE) {
-    console.log("RUN IN DRY MODE!!!")
+  if (DRY_MODE) {
+    console.log('RUN IN DRY MODE!!!')
   }
 
-  //console.log('reading data...')
+  // console.log('reading data...')
   const payments = await pgdb.public.payments.find({
     paperInvoice: 'true',
     method: 'PAYMENTSLIP',
     status: 'WAITING'
   })
-  const pledgePayments = await pgdb.public.pledgePayments.find({paymentId: payments.map( p => p.id )})
-  const pledges = await pgdb.public.pledges.find({id: pledgePayments.map( p => p.pledgeId )})
-  const pledgeOptions = await pgdb.public.pledgeOptions.find({pledgeId: pledges.map( p => p.id )})
-  let packageOptions = await pgdb.public.packageOptions.find({id: pledgeOptions.map( p => p.templateId )})
-  let rewards = await pgdb.public.rewards.find({id: packageOptions.map( p => p.rewardId )})
-  const goodies = await pgdb.public.goodies.find({rewardId: rewards.map( p => p.id )})
-  const membershipTypes = await pgdb.public.membershipTypes.find({rewardId: rewards.map( p => p.id )})
+  const pledgePayments = await pgdb.public.pledgePayments.find({paymentId: payments.map(p => p.id)})
+  const pledges = await pgdb.public.pledges.find({id: pledgePayments.map(p => p.pledgeId)})
+  const pledgeOptions = await pgdb.public.pledgeOptions.find({pledgeId: pledges.map(p => p.id)})
+  let pkgOptions = await pgdb.public.packageOptions.find({id: pledgeOptions.map(p => p.templateId)})
+  let rewards = await pgdb.public.rewards.find({id: pkgOptions.map(p => p.rewardId)})
+  const goodies = await pgdb.public.goodies.find({rewardId: rewards.map(p => p.id)})
+  const membershipTypes = await pgdb.public.membershipTypes.find({rewardId: rewards.map(p => p.id)})
 
-  let users = await pgdb.public.users.find({id: pledges.map( p => p.userId )})
-  const addresses = await pgdb.public.addresses.find({id: users.map( p => p.addressId )})
+  let users = await pgdb.public.users.find({id: pledges.map(p => p.userId)})
+  const addresses = await pgdb.public.addresses.find({id: users.map(p => p.addressId)})
 
-  const memberships = await pgdb.public.memberships.find({pledgeId: pledges.map( p => p.id )})
-  //console.log('data ready. assembling...')
+  const memberships = await pgdb.public.memberships.find({pledgeId: pledges.map(p => p.id)})
+  // console.log('data ready. assembling...')
 
-  //assemble tree
-  rewards = rewards.map( reward => {
-    const goodie = goodies.find( g => g.rewardId === reward.id )
-    const membershipType = membershipTypes.find( m => m.rewardId === reward.id )
-    if(goodie) {
+  // assemble tree
+  rewards = rewards.map(reward => {
+    const goodie = goodies.find(g => g.rewardId === reward.id)
+    const membershipType = membershipTypes.find(m => m.rewardId === reward.id)
+    if (goodie) {
       return Object.assign({}, reward, {
         goodie,
         name: goodie.name
@@ -67,55 +66,55 @@ PgDb.connect().then( async (pgdb) => {
       })
     }
   })
-  packageOptions = packageOptions.map( packageOption => {
-    const reward = rewards.find( r => r.id === packageOption.rewardId )
-    return Object.assign({}, packageOption, {
+  pkgOptions = pkgOptions.map(pkgOption => {
+    const reward = rewards.find(r => r.id === pkgOption.rewardId)
+    return Object.assign({}, pkgOption, {
       reward
     })
   })
 
-  users = users.map( user => {
+  users = users.map(user => {
     return Object.assign({}, user, {
-      address: addresses.find( a => user.addressId === a.id )
+      address: addresses.find(a => user.addressId === a.id)
     })
   })
 
-  const exportData = payments.map( payment => {
-    const pledgePayment = pledgePayments.find( p => p.paymentId === payment.id )
-    const pledge = pledges.find( p => p.id === pledgePayment.pledgeId )
-    const _pledgeOptions = pledgeOptions.filter( p => p.pledgeId === pledge.id ).map( pledgeOption => {
-      const packageOption = packageOptions.find( p => pledgeOption.templateId === p.id )
+  const exportData = payments.map(payment => {
+    const pledgePayment = pledgePayments.find(p => p.paymentId === payment.id)
+    const pledge = pledges.find(p => p.id === pledgePayment.pledgeId)
+    const _pledgeOptions = pledgeOptions.filter(p => p.pledgeId === pledge.id).map(pledgeOption => {
+      const pkgOption = pkgOptions.find(p => pledgeOption.templateId === p.id)
       return Object.assign({}, pledgeOption, {
-        template: packageOption
+        template: pkgOption
       })
     })
     const sequenceNumbers = memberships
-      .filter( m => m.pledgeId === pledge.id )
-      .map( m => m.sequenceNumber)
+      .filter(m => m.pledgeId === pledge.id)
+      .map(m => m.sequenceNumber)
       .join(' ')
 
     let spendeCountedAsPledgeOption = false
-    const produkte = _pledgeOptions.map( pledgeOption => {
-      if(pledgeOption.template.reward) {
-        if(pledgeOption.template.reward.membershipType) {
-          //memberships/type/ABO
-          //memberships/type/BENEFACTOR_ABO
+    const produkte = _pledgeOptions.map(pledgeOption => {
+      if (pledgeOption.template.reward) {
+        if (pledgeOption.template.reward.membershipType) {
+          // memberships/type/ABO
+          // memberships/type/BENEFACTOR_ABO
           return {
             anzahl: pledgeOption.amount,
-            beschrieb: t('memberships/type/'+pledgeOption.template.reward.name),
+            beschrieb: t('memberships/type/' + pledgeOption.template.reward.name),
             preis: formatPrice(pledgeOption.price)
           }
-        } else {// if(pledgeOption.template.reward.goodie) {
-          if(pledgeOption.amount === 0) //omit 0 Notizbuch
+        } else { // if(pledgeOption.template.reward.goodie) {
+          if (pledgeOption.amount === 0) { // omit 0 Notizbuch
             return null
+          }
           return {
             anzahl: pledgeOption.amount,
             beschrieb: t('option/NOTEBOOK/label/1'),
             preis: formatPrice(pledgeOption.price)
           }
         }
-      }
-      else { //donation only pledge
+      } else { // donation only pledge
         spendeCountedAsPledgeOption = true
         return {
           anzahl: 1,
@@ -123,22 +122,22 @@ PgDb.connect().then( async (pgdb) => {
           preis: formatPrice(pledge.total)
         }
       }
-    }).filter( p => p !== null ) //filter emptys
-    if(pledge.donation > 0 && !spendeCountedAsPledgeOption) {
+    }).filter(p => p !== null) // filter emptys
+    if (pledge.donation > 0 && !spendeCountedAsPledgeOption) {
       produkte.push({
         anzahl: '1',
         beschrieb: t('package/DONATE/title/short'),
         preis: formatPrice(pledge.donation)
       })
     }
-    if(pledge.donation < 0) {
+    if (pledge.donation < 0) {
       produkte.push({
         anzahl: '1',
         beschrieb: t('print/paymentslip/reduction'),
         preis: formatPrice(-pledge.donation)
       })
     }
-    let step;
+    let step
     for (step = produkte.length; step < 3; step++) {
       produkte.push({
         anzahl: '',
@@ -147,8 +146,9 @@ PgDb.connect().then( async (pgdb) => {
       })
     }
 
-    const user = users.find( u => u.id === pledge.userId )
+    const user = users.find(u => u.id === pledge.userId)
 
+    /*eslint-disable */
     return {
       'exportedAlready':   payment.exported ? 'x' : '',
       'DatumTimestamp':    dateTimeFormat(payment.createdAt),
@@ -178,19 +178,20 @@ PgDb.connect().then( async (pgdb) => {
       'Produkt3Beschrieb': produkte[2].beschrieb,
       'Produkt3Preis':     produkte[2].preis
     }
+    /*eslint-disable */
   })
 
-  if(!DRY_MODE) {
-    await pgdb.public.payments.update({id: payments.map( p => p.id )}, {
+  if (!DRY_MODE) {
+    await pgdb.public.payments.update({id: payments.map(p => p.id)}, {
       exported: true
     })
   }
 
-  //console.log('writing file...')
+  // console.log('writing file...')
   rw.writeFileSync('/dev/stdout', csvFormat(exportData), 'utf8')
-}).then( () => {
+}).then(() => {
   process.exit()
-}).catch( e => {
+}).catch(e => {
   console.error(e)
   process.exit(1)
 })

@@ -3,11 +3,11 @@ scalar Date
 scalar DateTime
 
 schema {
-  query: RootQuery
-  mutation: RootMutation
+  query: RootQuerys
+  mutation: RootMutations
 }
 
-type RootQuery {
+type RootQuerys {
   me: User
 
   crowdfundings: [Crowdfunding]
@@ -36,7 +36,7 @@ type RootQuery {
   voting(name: String!): Voting!
 }
 
-type RootMutation {
+type RootMutations {
   signIn(email: String!, context: String): SignInResponse!
   signOut: Boolean!
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
