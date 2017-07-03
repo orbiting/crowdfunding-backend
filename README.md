@@ -49,7 +49,7 @@ Check out the API: [http://localhost:3001/graphiql](http://localhost:3001/graphi
 ## Behind the scenes
 Please read the source and don't be affraid to open an issue or drop us an [email](admin@project-r.construction) if you have a question.
 
-### Third party services.
+### Third party services
 We make use of many third party services.
 
 **Emails** are sent via [Mandrill](https://mandrillapp.com) see [lib/sendMail.js](lib/sendMail.js). We make extensive use of mandrill templates to send custom styled HTML emails and also to convert them to text-only emails, see this [README](seeds/email_templates/README.md). You can find all our templates inside the [seeds/email_templates](seeds/email_templates/) folder.
@@ -154,4 +154,4 @@ Checkout the [script folder](script/), each script comes with a header explainin
 
 ## Copyright and license
 Code and documentation copyright 2017 [Project R](https://project-r.construction).
-Code is licensed under GNU AGPLv3+.
+Code is licensed under [GNU AGPLv3](LICENSE.txt)+.
