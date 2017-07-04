@@ -366,6 +366,7 @@ type PostalCodeCount {
 
 type TestimonialStats {
   count: Int!
+  eligitable: Int!
 }
 
 
