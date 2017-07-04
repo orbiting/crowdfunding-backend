@@ -22,7 +22,10 @@ This [NodeJS](https://nodejs.org) server provides an [GraphQL](http://graphql.or
 
 Check out the (production) API: [https://api.republik.ch/graphiql](https://api.republik.ch/graphiql)
 
-## Quick start
+
+## Usage
+
+### Quick start
 You need to have postgres running somewhere.
 
 Boostrap your .env file.
@@ -45,8 +48,12 @@ npm run dev
 ```
 Check out the API: [http://localhost:3001/graphiql](http://localhost:3001/graphiql)
 
+### First steps
+* You want to change [translations.js](/lib/translations.json) and adapt it to your wording. See the [comment](#static-texts) about static texts about how to conveniently do that with spreadsheets.
+* Adapt the [environment variables](#environment) to e.g. integrate billing or enable image uploading to S3.
 
-## Behind the scenes
+
+## Development / Behind the scenes
 Please read the source (a good starting are the [resolvers](graphql/resolvers/)) and open an issue if you have a question.
 
 ### Third party services
@@ -56,7 +63,7 @@ We make use of many third party services.
 
 We integrated 3 **payment services**: [Stripe](https://stripe.com), [PayPal](https://www.paypal.com) and [Postfinance](https://www.postfinance.ch/de/unternehmen/produkte/debitorenloesungen/e-payment-psp.html). On top of that we manually handle swiss payment slips. All the payment "magic" happens in [payPledge.js](graphql/resolvers/RootMutations/payPledge.js).
 
-We use [Google Spreadsheets](https://docs.google.com/spreadsheets) to manage user-facing messages (**"static texts"**) this API emits, see [lib/translations.js](lib/translations.js). Refresh this file with `npm run translations`. Gsheets also act as a **small CMS** for FAQs, updates and events. To accomplish that we wrote a small [macro](seeds/gsheets/macro.gs) which sends a GET request via a menu-item inside the spreadsheet to this API. [src/gsheets.js](src/gsheets.js) receives the message and refreshes the cached gsheet inside the DB. Don't use the content of this file without adapting it to your needs.
+We use [Google Spreadsheets](https://docs.google.com/spreadsheets) to manage user-facing messages (<a name="static-texts"></a>**"static texts"**</a>) this API emits, see [lib/translations.js](lib/translations.js). Refresh this file with `npm run translations`. Gsheets also act as a **small CMS** for FAQs, updates and events. To accomplish that we wrote a small [macro](seeds/gsheets/macro.gs) which sends a GET request via a menu-item inside the spreadsheet to this API. [src/gsheets.js](src/gsheets.js) receives the message and refreshes the cached gsheet inside the DB. Don't use the content of this file without adapting it to your needs.
 
 We store our **assets** inside [Exoscale's Object Store](https://www.exoscale.ch/object-storage/). It provides a S3 v3 compatible API, which we talk to via [lib/uploadExoscale.js](lib/uploadExoscale.js)
 
@@ -66,8 +73,6 @@ We store our **assets** inside [Exoscale's Object Store](https://www.exoscale.ch
 
 We use [Phantomjscloud](https://phantomjscloud.com/) to **render** social-media images via the front-end.
 
-
-## Development
 
 ### Environment
 There are many knobs which can be turned to, check the following extensive list. Provided values are just an example.
