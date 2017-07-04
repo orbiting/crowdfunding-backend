@@ -108,9 +108,9 @@ PgDb.connect().then(async (pgdb) => {
       : null
     const stats = freeze
       ? {
-        ages: await VoteStats.ages(null, null, {pgdb}),
-        countries: await VoteStats.countries(null, null, {pgdb}),
-        chCantons: await VoteStats.chCantons(null, null, {pgdb})
+        ages: await VoteStats.ages({voting}, null, {pgdb}),
+        countries: await VoteStats.countries({voting}, null, {pgdb}),
+        chCantons: await VoteStats.chCantons({voting}, null, {pgdb})
       }
       : null
 
