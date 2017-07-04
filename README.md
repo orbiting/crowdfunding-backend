@@ -160,6 +160,6 @@ Checkout the [script folder](script/), each script comes with a header explainin
 ## Licensing
 The source code and it's documentation is licensed under [GNU AGPLv3](LICENSE.txt)+.
 
-The content of [translations.js](/lib/translations.json) is property of Project R and may not be reproduced without permission.
+The content of [translations.js](/lib/translations.json) is property of [Project R](https://project-r.construction) and may not be reproduced without permission.
 
 Check the READMEs in [/assets/geography/*/](/assets/geography/) for licensing details of used geo data.
