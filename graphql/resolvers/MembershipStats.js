@@ -7,6 +7,9 @@ const countryNameNormalizer = require('../../lib/geo/country').nameNormalizer
 const countryDetailsForName = require('../../lib/geo/country').detailsForName
 
 module.exports = {
+  async count (_, {interval}, {pgdb}) {
+    return pgdb.public.memberships.count()
+  },
   async createdAts (_, {interval}, {pgdb}) {
     return pgdb.query(`
       SELECT

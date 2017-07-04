@@ -321,6 +321,7 @@ type Video {
 
 
 type MembershipStats {
+  count: Int!
   createdAts(interval: TimeInterval!): [TimeCount!]!
   ages: [AgeCount!]!
   countries: [CountryCount!]!
