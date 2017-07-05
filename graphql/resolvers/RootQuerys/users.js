@@ -1,3 +1,5 @@
+const Roles = require('../../../lib/Roles')
+
 const deserializeOrderBy = str => {
   const [key, direction] = str.split(':')
   return {
@@ -8,8 +10,9 @@ const deserializeOrderBy = str => {
 module.exports = async (
   _,
   { limit, offset, orderBy },
-  { pgdb }
+  { pgdb, user }
 ) => {
+  Roles.ensureUserHasRole(user, 'supporter')
   const items = await pgdb.public.users.findAll({
     limit,
     offset,
