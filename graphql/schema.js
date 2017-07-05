@@ -9,6 +9,7 @@ schema {
 
 type RootQuerys {
   me: User
+  users(limit: Int!, offset: Int, orderBy: String): Users!
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
@@ -88,6 +89,10 @@ type User {
   testimonial: Testimonial
 }
 
+type Users {
+  items: [User]
+  count: Int!
+}
 
 type Crowdfunding {
   id: ID!
