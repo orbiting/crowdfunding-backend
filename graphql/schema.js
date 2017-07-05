@@ -327,6 +327,7 @@ type Video {
 
 
 type MembershipStats {
+  count: Int!
   createdAts(interval: TimeInterval!): [TimeCount!]!
   ages: [AgeCount!]!
   countries: [CountryCount!]!
@@ -371,6 +372,7 @@ type PostalCodeCount {
 
 type TestimonialStats {
   count: Int!
+  eligitable: Int!
 }
 
 
