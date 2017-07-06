@@ -9,7 +9,7 @@ schema {
 
 type RootQuerys {
   me: User
-  users(limit: Int!, offset: Int, orderBy: String): Users!
+  users(limit: Int!, offset: Int, orderBy: String, search: String): Users!
   user(id: String): User
 
   crowdfundings: [Crowdfunding]
