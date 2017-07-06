@@ -21,9 +21,29 @@ module.exports = async (
         createdAt: 'asc'
       }
     })
-   : await pgdb.query(`
+    : await pgdb.query(`
        SELECT
-         u.*
+         u.*,
+         concat_ws(' ',
+           u."firstName"::text,
+           u."lastName"::text,
+           u.email::text,
+           a.name::text,
+           a.line1::text,
+           a.line2::text,
+           a.city::text,
+           a.country::text
+         ) <->> :search AS word_sim,
+         concat_ws(' ',
+           u."firstName"::text,
+           u."lastName"::text,
+           u.email::text,
+           a.name::text,
+           a.line1::text,
+           a.line2::text,
+           a.city::text,
+           a.country::text
+         ) <-> :search AS dist
        FROM
          users u
        LEFT JOIN
@@ -32,27 +52,14 @@ module.exports = async (
        LEFT JOIN
          memberships m
          ON m."userId" = u.id
-       WHERE
-         u."firstName" % :search OR
-         u."lastName" % :search OR
-         u.email % :search OR
-         a.name ILIKE :searchLike OR
-         a.line1 ILIKE :searchLike OR
-         a.line2 ILIKE :searchLike OR
-         a.city ILIKE :searchLike OR
-         a.country ILIKE :searchLike OR
-         m."sequenceNumber"::text ILIKE :searchLike
-       ORDER BY :orderBy
+       ORDER BY
+         dist
        OFFSET :offset
-       LIMIT :limit;
+       LIMIT :limit
      `, {
-       search,
-       searchLike: search + '%',
+       search: search.trim(),
        limit,
-       offset,
-       orderBy: (orderBy && deserializeOrderBy(orderBy)) || {
-         createdAt: 'asc'
-       }
+       offset
      })
   const count = await pgdb.public.users.count()
   return { items, count }
