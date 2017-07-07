@@ -1,5 +1,5 @@
 {
-  "updated": "2017-07-05T08:11:50.145Z",
+  "updated": "2017-07-07T09:57:01.294Z",
   "title": "live",
   "data": [
     {
@@ -45,6 +45,10 @@
     {
       "key": "menu/vote",
       "value": "Abstimmung"
+    },
+    {
+      "key": "menu/join",
+      "value": "Mitglied werden"
     },
     {
       "key": "header/button",
@@ -865,6 +869,10 @@
     {
       "key": "footer/events",
       "value": "Veranstaltungen"
+    },
+    {
+      "key": "footer/updates",
+      "value": "Crowdfunding News"
     },
     {
       "key": "footer/about/projecR",
@@ -1922,6 +1930,10 @@
     {
       "key": "package/PRESALE/BENEFACTOR/description",
       "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen besonderen Anstecker und ein signiertes Manual für Journalismus im 21. Jahrhundert."
+    },
+    {
+      "key": "api/users/404",
+      "value": "Der User konnte nicht gefunden werden."
     }
   ]
 }
