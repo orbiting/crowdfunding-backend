@@ -91,6 +91,8 @@ type User {
   pledges: [Pledge!]!
   memberships: [Membership!]!
   testimonial: Testimonial
+
+  roles: [String!]
 }
 
 type Users {
