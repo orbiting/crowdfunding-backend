@@ -9,5 +9,5 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     logger.error('user not found', { req: req._log() })
     throw new Error(t('api/users/404'))
   }
-  return Roles.addRoleToUser(role, userId, pgdb)
+  return Roles.removeUserFromRoll(user.id, role, pgdb)
 }
