@@ -43,6 +43,7 @@ type RootMutations {
   signOut: Boolean!
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
   updateUser(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput, userId: ID!): User!
+  updateEmail(userId: ID, email: String!): User!
   addUserToRole(userId: ID!, role: String!): User!
   removeUserFromRole(userId: ID!, role: String!): User!
 
