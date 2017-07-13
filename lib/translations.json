@@ -1,5 +1,5 @@
 {
-  "updated": "2017-07-07T09:57:01.294Z",
+  "updated": "2017-07-13T12:30:05.432Z",
   "title": "live",
   "data": [
     {
@@ -1934,6 +1934,10 @@
     {
       "key": "api/users/404",
       "value": "Der User konnte nicht gefunden werden."
+    },
+    {
+      "key": "api/email/change/confirmation/subject",
+      "value": "Ihre E-Mail-Adresse wurde geändert"
     }
   ]
 }
