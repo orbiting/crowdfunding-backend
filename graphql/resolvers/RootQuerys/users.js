@@ -32,7 +32,8 @@ module.exports = async (
             a.line1::text,
             a.line2::text,
             a.city::text,
-            a.country::text
+            a.country::text,
+            m."sequenceNumber"::text
           ) <->> :search AS word_sim,
           concat_ws(' ',
             u."firstName"::text,
@@ -42,7 +43,8 @@ module.exports = async (
             a.line1::text,
             a.line2::text,
             a.city::text,
-            a.country::text
+            a.country::text,
+            m."sequenceNumber"::text
           ) <-> :search AS dist
         FROM
           users u
