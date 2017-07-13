@@ -33,7 +33,8 @@ module.exports = async (
             a.line2::text,
             a.city::text,
             a.country::text,
-            m."sequenceNumber"::text
+            m."sequenceNumber"::text,
+            ps."pspId"::text
           ) <->> :search AS word_sim,
           concat_ws(' ',
             u."firstName"::text,
@@ -44,7 +45,8 @@ module.exports = async (
             a.line2::text,
             a.city::text,
             a.country::text,
-            m."sequenceNumber"::text
+            m."sequenceNumber"::text,
+            ps."pspId"::text
           ) <-> :search AS dist
         FROM
           users u
@@ -54,6 +56,9 @@ module.exports = async (
         LEFT JOIN
           memberships m
           ON m."userId" = u.id
+        LEFT JOIN
+          "paymentSources" ps
+          ON ps."userId" = u.id
         ORDER BY
           word_sim, dist
         OFFSET :offset
