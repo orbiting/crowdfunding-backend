@@ -273,6 +273,7 @@ type PledgePayment {
   total: Int!
   status: PaymentStatus!
   hrid: String
+  pspId: String
   dueDate: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
