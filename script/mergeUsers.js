@@ -107,6 +107,9 @@ PgDb.connect().then(async (pgdb) => {
     console.log('NEW USER')
     console.log(newUserWithEmail)
 
+    console.log('----------------------------------------------------')
+    console.log('TRANSFERED BELONGINGS')
+
     console.log('PAYMENT SOURCES')
     console.log(paymentSources)
     console.log('PLEDGES')
