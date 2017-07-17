@@ -1,5 +1,5 @@
 {
-  "updated": "2017-07-13T12:30:05.432Z",
+  "updated": "2017-07-17T12:40:24.922Z",
   "title": "live",
   "data": [
     {
@@ -1938,6 +1938,22 @@
     {
       "key": "api/email/change/confirmation/subject",
       "value": "Ihre E-Mail-Adresse wurde geändert"
+    },
+    {
+      "key": "api/email/change/exists",
+      "value": "Es existiert bereits jemand mit der gewünschten E-Mail-Adresse."
+    },
+    {
+      "key": "api/pledge/404",
+      "value": "Der Pledge konnte nicht gefunden werden."
+    },
+    {
+      "key": "api/pledge/edit/payed",
+      "value": "Der Pledge kann nicht geändert werden, da bereits Zahlungen vorliegen."
+    },
+    {
+      "key": "api/pledge/reason",
+      "value": "Bitte geben Sie eine Begründung für den reduzierten Preis an."
     }
   ]
 }
