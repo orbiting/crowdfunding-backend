@@ -46,6 +46,8 @@ type RootMutations {
   updateEmail(userId: ID, email: String!): User!
   addUserToRole(userId: ID!, role: String!): User!
   removeUserFromRole(userId: ID!, role: String!): User!
+  # merges the belongings from source to target
+  mergeUsers(targetUserId: ID!, sourceUserId: ID!): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
