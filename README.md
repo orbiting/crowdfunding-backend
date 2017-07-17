@@ -99,6 +99,9 @@ COOKIE_DOMAIN=
 # whitelist requests from a specific domain
 CORS_WHITELIST_URL=http://localhost:3003
 
+# used by cancelPledge to transfer canceled memberships
+PARKING_PLEDGE_ID=
+PARKING_USER_ID=
 
 # mandrill api key, used to send mail
 MANDRILL_API_KEY=

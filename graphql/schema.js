@@ -51,6 +51,7 @@ type RootMutations {
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
   reclaimPledge(pledgeId: ID!): Boolean!
   claimMembership(voucherCode: String!): Boolean!
+  cancelPledge(pledgeId: ID!): Pledge!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
@@ -264,6 +265,7 @@ enum PaymentMethod {
 enum PaymentStatus {
   WAITING
   PAID
+  WAITING_FOR_REFUND
   REFUNDED
   CANCELLED
 }
