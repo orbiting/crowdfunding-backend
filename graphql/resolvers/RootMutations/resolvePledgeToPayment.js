@@ -1,10 +1,12 @@
 const Roles = require('../../../lib/Roles')
 const logger = require('../../../lib/logger')
 const {minTotal, regularTotal} = require('../../../lib/Pledge')
+const generateMemberships = require('../../../lib/generateMemberships')
+const sendPaymentSuccessful = require('../../../lib/sendPaymentSuccessful')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')
-  const { pledgeId, total, reason } = args
+  const { pledgeId, reason } = args
   const now = new Date()
   const transaction = await pgdb.transactionBegin()
   try {
@@ -12,6 +14,10 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     if (!pledge) {
       logger.error('pledge not found', { req: req._log(), pledgeId })
       throw new Error(t('api/pledge/404'))
+    }
+    if (pledge.status !== 'PAID_INVESTIGATE') {
+      logger.error('pledge must have status PAID_INVESTIGATE to be eligitable for resolving', { req: req._log(), args, pledge })
+      throw new Error(t('api/pledge/resolve/status'))
     }
 
     // check for payments
@@ -31,12 +37,16 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     `, {
       pledgeId
     })
-    for (let payment of payments) {
-      if (payment.status !== 'WAITING') {
-        logger.error('pledge has payments', { req: req._log(), pledgeId })
-        throw new Error(t('api/pledge/edit/payed'))
-      }
+    if (payments.length > 1) {
+      logger.error('pledge has multiple payments, this is not supported', { req: req._log(), args, payments })
+      throw new Error(t('api/pledge/resolve/multiplePayments'))
     }
+    const payment = payments[0]
+    if (payment.status !== 'PAID') {
+      logger.error('pledge payment must be PAID', { req: req._log(), args, payment })
+      throw new Error(t('api/pledge/resolve/payment/status'))
+    }
+    const newTotal = payment.total
 
     // load original of chosen packageOptions
     const pledgeOptions = await transaction.public.pledgeOptions.find({
@@ -46,35 +56,39 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     const packageOptions = await transaction.public.packageOptions.find({
       id: pledgeOptionsTemplateIds
     })
-    console.log(pledgeOptions)
-    console.log(packageOptions)
 
     // check total
     const pledgeMinTotal = minTotal(pledgeOptions, packageOptions)
-    if (total < pledgeMinTotal) {
-      logger.error(`total (${total}) must be >= (${pledgeMinTotal})`, { req: req._log(), args, pledgeMinTotal })
-      throw new Error(t('api/unexpected'))
+    if (newTotal < pledgeMinTotal) {
+      logger.error(`total (${payment.total}) must be >= (${pledgeMinTotal})`, { req: req._log(), args, payment, pledgeMinTotal })
+      throw new Error(t('api/pledge/resolve/payment/notEnough', {
+        total: newTotal / 100.0,
+        minTotal: pledgeMinTotal / 100.0
+      }))
     }
 
     // calculate donation
     const pledgeRegularTotal = regularTotal(pledgeOptions, packageOptions)
-    const donation = total - pledgeRegularTotal
-    // check reason
-    if (donation < 0 && !reason) {
-      logger.error('you must provide a reason for reduced pledges', { req: req._log(), args, donation })
-      throw new Error(t('api/pledge/reason'))
+    const donation = newTotal - pledgeRegularTotal
+
+    const prefixedReason = 'Support: ' + reason
+    await transaction.public.pledges.updateOne({
+      id: pledge.id
+    }, {
+      status: 'SUCCESSFUL',
+      total: newTotal,
+      donation,
+      updatedAt: now,
+      reason: pledge.reason
+        ? pledge.reason + '\n' + prefixedReason
+        : prefixedReason
+    })
+
+    if (pledge.total > 100000 && newTotal <= 100000) {
+      await generateMemberships(pledge.id, transaction, t)
     }
 
-    await transaction.public.pledges.updateOne({
-      id: pledgeId
-    }, {
-      total: total,
-      donation,
-      reason,
-      updatedAt: now
-    }, {
-      skipUndefined: true
-    })
+    await sendPaymentSuccessful(pledge.id, transaction, t)
 
     await transaction.transactionCommit()
   } catch (e) {
