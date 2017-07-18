@@ -48,7 +48,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     })
 
     if (status === 'PAID') {
-      const pledge = await transaction.query(`
+      const pledge = (await transaction.query(`
         SELECT
           p.*
         FROM
@@ -60,7 +60,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
           pp."paymentId" = :paymentId
       `, {
         paymentId
-      })
+      }))[0]
 
       const prefixedReason = 'Support: ' + reason
       await transaction.public.pledges.updateOne({
