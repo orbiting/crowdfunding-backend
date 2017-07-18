@@ -56,6 +56,7 @@ type RootMutations {
   claimMembership(voucherCode: String!): Boolean!
   cancelPledge(pledgeId: ID!): Pledge!
   resolvePledgeToPayment(pledgeId: ID!, reason: String!): Pledge!
+  updatePayment(paymentId: ID!, status: PaymentStatus!, reason: String): PledgePayment!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
