@@ -11,6 +11,7 @@ type RootQuerys {
   me: User
   users(limit: Int!, offset: Int, orderBy: String, search: String): Users!
   user(id: String): User
+  roles: [Role!]!
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
@@ -44,8 +45,8 @@ type RootMutations {
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
   updateUser(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput, userId: ID!): User!
   updateEmail(userId: ID, email: String!): User!
-  addUserToRole(userId: ID!, role: String!): User!
-  removeUserFromRole(userId: ID!, role: String!): User!
+  addUserToRole(userId: ID!, role: Role!): User!
+  removeUserFromRole(userId: ID!, role: Role!): User!
   # merges the belongings from source to target
   mergeUsers(targetUserId: ID!, sourceUserId: ID!): User!
 
@@ -103,6 +104,12 @@ type User {
 type Users {
   items: [User]
   count: Int!
+}
+
+enum Role {
+  admin
+  supporter
+  accountant
 }
 
 type Crowdfunding {
