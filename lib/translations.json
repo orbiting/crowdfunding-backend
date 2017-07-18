@@ -1,5 +1,5 @@
 {
-  "updated": "2017-07-17T12:40:24.922Z",
+  "updated": "2017-07-18T13:36:30.421Z",
   "title": "live",
   "data": [
     {
@@ -48,7 +48,7 @@
     },
     {
       "key": "menu/join",
-      "value": "Mitglied werden"
+      "value": "Beitreten"
     },
     {
       "key": "header/button",
@@ -1929,7 +1929,7 @@
     },
     {
       "key": "package/PRESALE/BENEFACTOR/description",
-      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch energisch dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen besonderen Anstecker und ein signiertes Manual für Journalismus im 21. Jahrhundert."
+      "value": "Sie wollen nicht nur ein unabhängiges Magazin lesen, sondern Sie wollen sich auch mit Nachdruck dafür einsetzen, dass dieses existiert. Wie alle werden Sie automatisch Mitglied der Project R Genossenschaft. Und damit Verleger oder Verlegerin der Republik. Um uns für Ihre Grosszügigkeit zu revanchieren, schicken wir Ihnen das Start-up-Verleger-Paket: ein Manifest, einen besonderen Anstecker und ein signiertes Manual für Journalismus im 21. Jahrhundert."
     },
     {
       "key": "api/users/404",
@@ -1948,12 +1948,20 @@
       "value": "Der Pledge konnte nicht gefunden werden."
     },
     {
-      "key": "api/pledge/edit/payed",
-      "value": "Der Pledge kann nicht geändert werden, da bereits Zahlungen vorliegen."
+      "key": "api/pledge/resolve/status",
+      "value": "Der Pledge muss im status PAID_INVESTIGATE sein um gelöst werden zu können."
     },
     {
-      "key": "api/pledge/reason",
-      "value": "Bitte geben Sie eine Begründung für den reduzierten Preis an."
+      "key": "api/pledge/resolve/multiplePayments",
+      "value": "Dieser Pledge kann nicht editiert werden, da mehrere Zahlungen dazu vorliegen."
+    },
+    {
+      "key": "api/pledge/resolve/payment/status",
+      "value": "Die Zahlung dieses Pledges muss den status 'PAID' haben."
+    },
+    {
+      "key": "api/pledge/resolve/payment/notEnough",
+      "value": "Die Zahlung reicht nicht aus um den Pledge zu begleichen (min: {minTotal})."
     }
   ]
 }
