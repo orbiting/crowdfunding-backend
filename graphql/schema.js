@@ -26,7 +26,7 @@ type RootQuerys {
   # required role: supporter
   payments(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PledgePayments!
   # required role: supporter
-  postfinancePayments(limit: Int!, offset: Int, orderBy: String, search: String): PostfinancePayments!
+  postfinancePayments(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PostfinancePayments!
 
   faqs: [Faq!]!
   events: [Event!]!
