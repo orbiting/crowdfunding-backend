@@ -25,6 +25,8 @@ type RootQuerys {
 
   # required role: supporter
   payments(limit: Int!, offset: Int, orderBy: String, search: String): PledgePayments!
+  # required role: supporter
+  postfinancePayments(limit: Int!, offset: Int, orderBy: String, search: String): PostfinancePayments!
 
   faqs: [Faq!]!
   events: [Event!]!
@@ -311,6 +313,25 @@ type PledgePayments {
   items: [PledgePayment!]!
   count: Int!
 }
+
+
+type PostfinancePayment {
+  id: ID!
+  buchungsdatum: Date!
+  valuta: Date!
+  avisierungstext: String!
+  gutschrift: Int!
+  mitteilung: String
+  matched: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PostfinancePayments {
+  items: [PostfinancePayment!]!
+  count: Int!
+}
+
 
 type Faq {
   category: String
