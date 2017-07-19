@@ -26,7 +26,7 @@ module.exports = async (
     }
   }
 
-  const items = !(search || dateRangeFilter)
+  const items = !(search || dateRangeFilter || stringArrayFilter || booleanFilter)
     ? await pgdb.public.payments.findAll(options)
     : await pgdb.public.payments.findWhere(`
       ${searchWhere(search)}
@@ -34,7 +34,7 @@ module.exports = async (
       ${stringArrayFilterWhere(stringArrayFilter, 'AND')}
       ${booleanFilterWhere(booleanFilter, 'AND')}
     `, {
-      search: `${search}%`,
+      search: `${search.trim()}%`,
       fromDate: dateRangeFilter ? dateRangeFilter.from : null,
       toDate: dateRangeFilter ? dateRangeFilter.to : null,
       stringArray: stringArrayFilter ? stringArrayFilter.values : null,
