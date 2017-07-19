@@ -9,8 +9,10 @@ schema {
 
 type RootQuerys {
   me: User
+  # required role: supporter
   users(limit: Int!, offset: Int, orderBy: String, search: String): Users!
-  user(id: String): User
+  # required role: supporter
+  user(id: ID!): User
   roles: [Role!]!
 
   crowdfundings: [Crowdfunding]
@@ -43,19 +45,28 @@ type RootMutations {
   signIn(email: String!, context: String): SignInResponse!
   signOut: Boolean!
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
+  # required role: supporter
   updateUser(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput, userId: ID!): User!
+  # if userId is null, the logged in user's email is changed
+  # required role to change other's email: supporter
   updateEmail(userId: ID, email: String!): User!
+  # required role: admin
   addUserToRole(userId: ID!, role: Role!): User!
+  # required role: admin
   removeUserFromRole(userId: ID!, role: Role!): User!
   # merges the belongings from source to target
+  # required role: admin
   mergeUsers(targetUserId: ID!, sourceUserId: ID!): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
   reclaimPledge(pledgeId: ID!): Boolean!
   claimMembership(voucherCode: String!): Boolean!
+  # required role: supporter
   cancelPledge(pledgeId: ID!): Pledge!
+  # required role: supporter
   resolvePledgeToPayment(pledgeId: ID!, reason: String!): Pledge!
+  # required role: supporter
   updatePayment(paymentId: ID!, status: PaymentStatus!, reason: String): PledgePayment!
 
   remindEmail(email: String!): Boolean!
