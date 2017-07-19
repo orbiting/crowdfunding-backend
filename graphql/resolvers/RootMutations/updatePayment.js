@@ -17,6 +17,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       throw new Error(t('api/payment/404'))
     }
 
+    // check if state transform is allowed
     if (status === 'PAID') {
       if (payment.status !== 'WAITING') {
         logger.error('only payments with status WAITING can be set to PAID',
@@ -47,6 +48,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       updatedAt: now
     })
 
+    // update pledge status
     if (status === 'PAID') {
       const pledge = (await transaction.query(`
         SELECT
