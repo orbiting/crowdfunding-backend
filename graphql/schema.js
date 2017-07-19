@@ -69,6 +69,9 @@ type RootMutations {
   claimMembership(voucherCode: String!): Boolean!
   # required role: supporter
   cancelPledge(pledgeId: ID!): Pledge!
+  # tries to resolve the amount of a pledge to the total of it's PAID payment.
+  # This comes handy if e.g. the payment is off by some cents (foreign wire transfer)
+  # and the backoffice decides to not demand an additional wire transfer.
   # required role: supporter
   resolvePledgeToPayment(pledgeId: ID!, reason: String!): Pledge!
   # required role: supporter
