@@ -41,11 +41,18 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       throw new Error(t('api/unexpected'))
     }
 
+    let prefixedReason
+    if (reason) {
+      prefixedReason = 'Support: ' + reason
+    }
     await transaction.public.payments.updateOne({
       id: payment.id
     }, {
       status,
+      pspPayload: prefixedReason,
       updatedAt: now
+    }, {
+      skipUndefined: true
     })
 
     // update pledge status
@@ -64,16 +71,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         paymentId
       }))[0]
 
-      const prefixedReason = 'Support: ' + reason
-      await transaction.public.pledges.updateOne({
-        id: pledge.id
-      }, {
-        status: 'SUCCESSFUL',
-        updatedAt: now,
-        reason: pledge.reason
-          ? pledge.reason + '\n' + prefixedReason
-          : prefixedReason
-      })
+      if (pledge.reason !== 'SUCCESSFUL') {
+        await transaction.public.pledges.updateOne({
+          id: pledge.id
+        }, {
+          status: 'SUCCESSFUL',
+          updatedAt: now
+        })
+      }
 
       if (pledge.total > 100000) {
         await generateMemberships(pledge.id, transaction, t)
