@@ -2,7 +2,7 @@
 // This script adds/removes a role to/from a user.
 //
 // usage
-// cf_server  node script/addRoleToUser.js supporter patrick.recher@project-r.construction [remove]
+// cf_server  node script/roleToUser.js supporter patrick.recher@project-r.construction [remove]
 //
 
 const PgDb = require('../lib/pgdb')
