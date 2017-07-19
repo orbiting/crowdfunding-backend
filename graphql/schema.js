@@ -23,6 +23,9 @@ type RootQuerys {
 
   memberships: [Pledge]
 
+  # required role: supporter
+  payments(limit: Int!, offset: Int, orderBy: String, search: String): PledgePayments!
+
   faqs: [Faq!]!
   events: [Event!]!
   updates: [Update!]!
@@ -114,7 +117,7 @@ type User {
 }
 
 type Users {
-  items: [User]
+  items: [User!]!
   count: Int!
 }
 
@@ -302,6 +305,11 @@ type PledgePayment {
   dueDate: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type PledgePayments {
+  items: [PledgePayment!]!
+  count: Int!
 }
 
 type Faq {

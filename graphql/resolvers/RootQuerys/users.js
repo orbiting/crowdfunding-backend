@@ -1,11 +1,5 @@
 const Roles = require('../../../lib/Roles')
-
-const deserializeOrderBy = str => {
-  const [key, direction] = str.split(':')
-  return {
-    [key]: direction.toLowerCase()
-  }
-}
+const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 module.exports = async (
   _,
