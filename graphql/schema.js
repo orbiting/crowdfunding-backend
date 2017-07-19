@@ -24,7 +24,7 @@ type RootQuerys {
   memberships: [Pledge]
 
   # required role: supporter
-  payments(limit: Int!, offset: Int, orderBy: String, search: String): PledgePayments!
+  payments(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PledgePayments!
   # required role: supporter
   postfinancePayments(limit: Int!, offset: Int, orderBy: String, search: String): PostfinancePayments!
 
@@ -96,6 +96,29 @@ type MutationResult {
 
 type SignInResponse {
   phrase: String!
+}
+
+
+input DateRangeFilter {
+  field: Field!
+  from: DateTime!
+  to: DateTime!
+}
+input StringArrayFilter {
+  field: Field!
+  values: [String!]!
+}
+input BooleanFilter {
+  field: Field!
+  value: Boolean!
+}
+
+enum Field {
+  createdAt
+  dueDate
+  status
+  matched
+  paperInvoice
 }
 
 
