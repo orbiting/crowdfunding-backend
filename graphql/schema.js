@@ -28,6 +28,10 @@ type RootQuerys {
   # required role: supporter
   postfinancePayments(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PostfinancePayments!
 
+  # This exports a CSV containing all payments IN paymentIds
+  # required role: accountant
+  paymentsCSV(paymentIds: [ID!]): String!
+
   faqs: [Faq!]!
   events: [Event!]!
   updates: [Update!]!
