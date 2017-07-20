@@ -2,7 +2,7 @@
   "name": "cf-server",
   "version": "0.0.1",
   "engines": {
-    "node": "8.1.2"
+    "node": "8.2.0"
   },
   "private": true,
   "author": "Patrick Recher <p@tte.io>",
