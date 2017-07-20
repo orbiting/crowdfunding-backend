@@ -25,31 +25,33 @@ module.exports = async (
     })
     : await pgdb.query(`
         SELECT
-          u.*,
-          concat_ws(' ',
-            u."firstName"::text,
-            u."lastName"::text,
-            u.email::text,
-            a.name::text,
-            a.line1::text,
-            a.line2::text,
-            a.city::text,
-            a.country::text,
-            m."sequenceNumber"::text,
-            ps."pspId"::text
-          ) <->> :search AS word_sim,
-          concat_ws(' ',
-            u."firstName"::text,
-            u."lastName"::text,
-            u.email::text,
-            a.name::text,
-            a.line1::text,
-            a.line2::text,
-            a.city::text,
-            a.country::text,
-            m."sequenceNumber"::text,
-            ps."pspId"::text
-          ) <-> :search AS dist
+          u.*
+          ${search ? `,
+            concat_ws(' ',
+              u."firstName"::text,
+              u."lastName"::text,
+              u.email::text,
+              a.name::text,
+              a.line1::text,
+              a.line2::text,
+              a.city::text,
+              a.country::text,
+              m."sequenceNumber"::text,
+              ps."pspId"::text
+            ) <->> :search AS word_sim,
+            concat_ws(' ',
+              u."firstName"::text,
+              u."lastName"::text,
+              u.email::text,
+              a.name::text,
+              a.line1::text,
+              a.line2::text,
+              a.city::text,
+              a.country::text,
+              m."sequenceNumber"::text,
+              ps."pspId"::text
+            ) <-> :search AS dist
+          ` : ''}
         FROM
           users u
         LEFT JOIN
