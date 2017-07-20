@@ -137,6 +137,7 @@ type User {
   phoneNumber: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  verified: Boolean!
 
   pledges: [Pledge!]!
   memberships: [Membership!]!
