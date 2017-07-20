@@ -1,5 +1,8 @@
 const Roles = require('../../../lib/Roles')
-const {dateRangeFilterWhere, stringArrayFilterWhere, booleanFilterWhere} = require('../../../lib/Filters')
+const {dateRangeFilterWhere,
+  stringArrayFilterWhere,
+  booleanFilterWhere,
+  andFilters} = require('../../../lib/Filters')
 const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 const searchWhere = (search, prefix) => {
@@ -29,12 +32,14 @@ module.exports = async (
   const items = !(search || dateRangeFilter || stringArrayFilter || booleanFilter)
     ? await pgdb.public.payments.findAll(options)
     : await pgdb.public.payments.findWhere(`
-      ${searchWhere(search)}
-      ${dateRangeFilterWhere(dateRangeFilter, 'AND')}
-      ${stringArrayFilterWhere(stringArrayFilter, 'AND')}
-      ${booleanFilterWhere(booleanFilter, 'AND')}
+      ${andFilters([
+        searchWhere(search),
+        dateRangeFilterWhere(dateRangeFilter),
+        stringArrayFilterWhere(stringArrayFilter),
+        booleanFilterWhere(booleanFilter)
+      ])}
     `, {
-      search: `${search.trim()}%`,
+      search: search ? `${search.trim()}%` : null,
       fromDate: dateRangeFilter ? dateRangeFilter.from : null,
       toDate: dateRangeFilter ? dateRangeFilter.to : null,
       stringArray: stringArrayFilter ? stringArrayFilter.values : null,

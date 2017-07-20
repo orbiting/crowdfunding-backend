@@ -10,7 +10,7 @@ schema {
 type RootQuerys {
   me: User
   # required role: supporter
-  users(limit: Int!, offset: Int, orderBy: String, search: String): Users!
+  users(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): Users!
   # required role: supporter
   user(id: ID!): User
   roles: [Role!]!
@@ -122,6 +122,7 @@ enum Field {
   status
   matched
   paperInvoice
+  verified
 }
 
 

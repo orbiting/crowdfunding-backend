@@ -1,5 +1,8 @@
 const Roles = require('../../../lib/Roles')
-const {dateRangeFilterWhere, stringArrayFilterWhere, booleanFilterWhere} = require('../../../lib/Filters')
+const {dateRangeFilterWhere,
+  stringArrayFilterWhere,
+  booleanFilterWhere,
+  andFilters} = require('../../../lib/Filters')
 const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 module.exports = async (
@@ -12,7 +15,6 @@ module.exports = async (
   const orderByTerm = (orderBy && deserializeOrderBy(orderBy)) || {
     createdAt: 'asc'
   }
-  console.log(`${search ? 'word_sim' : ':orderBy'}`)
 
   const filterActive = (dateRangeFilter || stringArrayFilter || booleanFilter)
   const items = !(search || filterActive)
@@ -31,9 +33,11 @@ module.exports = async (
         FROM
           "postfinancePayments" pfp
         ${filterActive ? 'WHERE' : ''}
-          ${dateRangeFilterWhere(dateRangeFilter)}
-          ${stringArrayFilterWhere(stringArrayFilter, 'AND')}
-          ${booleanFilterWhere(booleanFilter, 'AND')}
+          ${andFilters([
+            dateRangeFilterWhere(dateRangeFilter),
+            stringArrayFilterWhere(stringArrayFilter),
+            booleanFilterWhere(booleanFilter)
+          ])}
         ORDER BY
           ${search ? 'word_sim' : ':orderBy'}
         OFFSET :offset
