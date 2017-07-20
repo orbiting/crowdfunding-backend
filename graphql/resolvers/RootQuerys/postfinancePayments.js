@@ -13,7 +13,7 @@ module.exports = async (
 
   const orderByTerm = orderBy
     ? `"${orderBy.field}" ${orderBy.direction}`
-    : 'createdAt ASC'
+    : '"createdAt" ASC'
 
   const filterActive = (dateRangeFilter || stringArrayFilter || booleanFilter)
   const items = !(search || filterActive)
