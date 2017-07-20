@@ -76,6 +76,8 @@ type RootMutations {
   resolvePledgeToPayment(pledgeId: ID!, reason: String!): Pledge!
   # required role: supporter
   updatePayment(paymentId: ID!, status: PaymentStatus!, reason: String): PledgePayment!
+  # required role: supporter
+  updatePostfinancePayment(pfpId: ID!, mitteilung: String!): PostfinancePayment!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
