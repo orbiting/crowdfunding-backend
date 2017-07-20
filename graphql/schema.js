@@ -33,7 +33,7 @@ type RootQuerys {
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
   lastTestimonial: Testimonial!
-  nextTestimonial(sequenceNumber: Int!, orderBy: OrderBy!): Testimonial!
+  nextTestimonial(sequenceNumber: Int!, orderDirection: OrderDirection!): Testimonial!
 
   membershipStats: MembershipStats!
   testimonialStats: TestimonialStats!
@@ -125,6 +125,10 @@ enum Field {
   verified
 }
 
+enum OrderDirection {
+  ASC
+  DESC
+}
 
 type User {
   id: ID!
@@ -482,10 +486,6 @@ enum OrderType {
   HOT
   NEW
   TOP
-}
-enum OrderBy {
-  ASC
-  DESC
 }
 
 type Feed {

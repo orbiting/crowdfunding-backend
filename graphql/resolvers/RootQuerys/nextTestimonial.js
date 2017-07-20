@@ -1,6 +1,6 @@
 module.exports = async (_, args, {pgdb, t}) => {
-  const {sequenceNumber, orderBy} = args
-  const isAsc = orderBy === 'ASC'
+  const {sequenceNumber, orderDirection} = args
+  const isAsc = orderDirection === 'ASC'
   const testimonial = await pgdb.query(`
     SELECT
       t.*,
