@@ -10,7 +10,7 @@ schema {
 type RootQuerys {
   me: User
   # required role: supporter
-  users(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): Users!
+  users(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): Users!
   # required role: supporter
   user(id: ID!): User
   roles: [Role!]!
@@ -24,9 +24,9 @@ type RootQuerys {
   memberships: [Pledge]
 
   # required role: supporter
-  payments(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PledgePayments!
+  payments(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PledgePayments!
   # required role: supporter
-  postfinancePayments(limit: Int!, offset: Int, orderBy: String, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PostfinancePayments!
+  postfinancePayments(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PostfinancePayments!
 
   faqs: [Faq!]!
   events: [Event!]!
@@ -123,12 +123,19 @@ enum Field {
   matched
   paperInvoice
   verified
+  email
 }
 
 enum OrderDirection {
   ASC
   DESC
 }
+
+input OrderBy {
+  field: Field!
+  direction: OrderDirection!
+}
+
 
 type User {
   id: ID!

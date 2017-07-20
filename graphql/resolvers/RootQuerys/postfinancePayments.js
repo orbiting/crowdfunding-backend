@@ -3,7 +3,6 @@ const {dateRangeFilterWhere,
   stringArrayFilterWhere,
   booleanFilterWhere,
   andFilters} = require('../../../lib/Filters')
-const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 module.exports = async (
   _,
@@ -12,9 +11,9 @@ module.exports = async (
 ) => {
   Roles.ensureUserHasRole(user, 'supporter')
 
-  const orderByTerm = (orderBy && deserializeOrderBy(orderBy)) || {
-    createdAt: 'asc'
-  }
+  const orderByTerm = orderBy
+    ? `"${orderBy.field}" ${orderBy.direction}`
+    : 'createdAt ASC'
 
   const filterActive = (dateRangeFilter || stringArrayFilter || booleanFilter)
   const items = !(search || filterActive)
@@ -39,7 +38,7 @@ module.exports = async (
             booleanFilterWhere(booleanFilter)
           ])}
         ORDER BY
-          ${search ? 'word_sim' : ':orderBy'}
+          ${search ? 'word_sim' : orderByTerm}
         OFFSET :offset
         LIMIT :limit
       `, {

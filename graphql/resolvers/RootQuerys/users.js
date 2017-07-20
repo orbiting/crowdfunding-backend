@@ -3,7 +3,6 @@ const {dateRangeFilterWhere,
   stringArrayFilterWhere,
   booleanFilterWhere,
   andFilters} = require('../../../lib/Filters')
-const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 module.exports = async (
   _,
@@ -12,16 +11,16 @@ module.exports = async (
 ) => {
   Roles.ensureUserHasRole(user, 'supporter')
 
-  const orderByTerm = (orderBy && deserializeOrderBy(orderBy)) || {
-    createdAt: 'asc'
-  }
+  const orderByTerm = orderBy
+    ? `"${orderBy.field}" ${orderBy.direction}`
+    : 'u."createdAt" ASC'
 
   const filterActive = (dateRangeFilter || stringArrayFilter || booleanFilter)
   const items = !(search || filterActive)
     ? await pgdb.public.users.findAll({
       limit,
       offset,
-      orderByTerm
+      orderBy: orderByTerm
     })
     : await pgdb.query(`
         SELECT
@@ -70,7 +69,7 @@ module.exports = async (
             booleanFilterWhere(booleanFilter)
           ])}
         ORDER BY
-          ${search ? 'word_sim, dist' : ':orderBy'}
+          ${search ? 'word_sim, dist' : orderByTerm}
         OFFSET :offset
         LIMIT :limit
      `, {
@@ -80,8 +79,7 @@ module.exports = async (
        stringArray: stringArrayFilter ? stringArrayFilter.values : null,
        booleanValue: booleanFilter ? booleanFilter.value : null,
        limit,
-       offset,
-       orderBy: orderByTerm // TODO fixme
+       offset
      })
   const count = await pgdb.public.users.count()
   return { items, count }

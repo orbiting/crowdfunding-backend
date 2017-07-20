@@ -3,7 +3,6 @@ const {dateRangeFilterWhere,
   stringArrayFilterWhere,
   booleanFilterWhere,
   andFilters} = require('../../../lib/Filters')
-const deserializeOrderBy = require('../../../lib/deserializeOrderBy')
 
 const searchWhere = (search, prefix) => {
   if (!search) { return '' }
@@ -21,12 +20,14 @@ module.exports = async (
 ) => {
   Roles.ensureUserHasRole(user, 'supporter')
 
+  const orderByTerm = orderBy
+    ? `"${orderBy.field}" ${orderBy.direction}`
+    : '"createdAt" ASC'
+
   const options = {
     limit,
     offset,
-    orderBy: (orderBy && deserializeOrderBy(orderBy)) || {
-      createdAt: 'asc'
-    }
+    orderBy: orderByTerm
   }
 
   const items = !(search || dateRangeFilter || stringArrayFilter || booleanFilter)
