@@ -60,7 +60,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       .filter(u => u.addressId && u.addressId !== newUser.addressId)
       .map(u => u.addressId)
     if (addressIds.length) {
-      await transaction.public.addresses.deleteOne({id: addressIds})
+      await transaction.public.addresses.deleteOne({id: addressIds[0]})
     }
 
     // remove old user
