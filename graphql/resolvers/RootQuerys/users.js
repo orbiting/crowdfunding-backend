@@ -11,16 +11,14 @@ module.exports = async (
 ) => {
   Roles.ensureUserHasRole(user, 'supporter')
 
-  const orderByTerm = orderBy
-    ? `"${orderBy.field}" ${orderBy.direction}`
-    : 'u."createdAt" ASC'
-
   const filterActive = (dateRangeFilter || stringArrayFilter || booleanFilter)
   const items = !(search || filterActive)
     ? await pgdb.public.users.findAll({
       limit,
       offset,
-      orderBy: orderByTerm
+      orderBy: orderBy
+        ? `"${orderBy.field}" ${orderBy.direction}`
+        : '"createdAt" ASC'
     })
     : await pgdb.query(`
         SELECT
@@ -69,7 +67,10 @@ module.exports = async (
             booleanFilterWhere(booleanFilter)
           ])}
         ORDER BY
-          ${search ? 'word_sim, dist' : orderByTerm}
+          ${search ? 'word_sim, dist' : orderBy
+            ? `"${orderBy.field}" ${orderBy.direction}`
+            : 'u."createdAt" ASC'
+           }
         OFFSET :offset
         LIMIT :limit
      `, {
