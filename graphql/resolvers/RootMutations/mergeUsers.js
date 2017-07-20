@@ -29,6 +29,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       firstName: users.map(u => u.firstName).filter(Boolean)[0],
       lastName: users.map(u => u.lastName).filter(Boolean)[0],
       birthday: users.map(u => u.birthday).filter(Boolean)[0],
+      phoneNumber: users.map(u => u.phoneNumber).filter(Boolean)[0],
       addressId: users.map(u => u.addressId).filter(Boolean)[0],
       createdAt: users.map(u => u.createdAt).sort((a, b) => ascending(a.createdAt, b.createdAt))[0],
       updatedAt: now
@@ -42,7 +43,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     await transaction.public.memberships.update(from, to)
     await transaction.public.ballots.update(from, to)
     await transaction.public.comments.update(from, to)
-    if (!transaction.public.testimonials.findFirst(from)) {
+    if (!transaction.public.testimonials.findFirst(to)) {
       await transaction.public.testimonials.update(from, to)
     }
 
