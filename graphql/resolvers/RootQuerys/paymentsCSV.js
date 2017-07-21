@@ -1,10 +1,9 @@
 const {dsvFormat} = require('d3-dsv')
 const csvFormat = dsvFormat(';').format
+const {timeFormat, formatPrice} = require('../../../lib/formats')
 const Roles = require('../../../lib/Roles')
 
-const formatPrice = (price) => {
-  return (price / 100.0).toFixed(2)
-}
+const dateTimeFormat = timeFormat('%x %H:%M') // %x - the locale’s date
 
 module.exports = async (_, args, {pgdb, user}) => {
   Roles.ensureUserHasRole(user, 'accountant')
@@ -80,17 +79,24 @@ module.exports = async (_, args, {pgdb, user}) => {
       pay.id, p.id, u.id
     ORDER BY
       u.email
-  `)).map(payment => {
-    const {pledgeOptions} = payment
+  `)).map(result => {
+    const {pledgeOptions} = result
 
-    const regularAbos = pledgeOptions.filter(plo => {
-      const pkg = aboPkgo.find(pko => pko.id === plo.templateId)
-      return (pkg && pkg.price === plo.price)
-    })
-    const reducedAbos = pledgeOptions.filter(plo => {
-      const pkg = aboPkgo.find(pko => pko.id === plo.templateId)
-      return (pkg && pkg.price < plo.price)
-    })
+    const abos = pledgeOptions.filter(plo =>
+      !!aboPkgo.find(pko => pko.id === plo.templateId)
+    )
+
+    // the only way to determine if the abo was reduced
+    // is to check if pledge.donation is < 0
+    // If that's the case, it's the only product
+    // bought in that pledge.
+    const regularAbos = result.donation >= 0
+      ? abos
+      : []
+    const reducedAbos = result.donation < 0
+      ? abos
+      : []
+
     const benefactorAbos = pledgeOptions.filter(plo =>
       !!aboBenefactorPkgos.find(pko => pko.id === plo.templateId)
     )
@@ -103,23 +109,23 @@ module.exports = async (_, args, {pgdb, user}) => {
     )
     const numDonations = donations.reduce((sum, d) => sum + d.amount, 0)
     const donation = numDonations > 0
-      ? payment.donation + 100 // minPrice of donation is 1
-      : payment.donation
+      ? result.donation + 100 // minPrice of donation is 1
+      : result.donation
 
     return {
-      paymentId: payment.paymentId.substring(0, 13),
-      pledgeId: payment.pledgeId.substring(0, 13),
-      userId: payment.userId.substring(0, 13),
-      email: payment.email,
-      firstName: payment.firstName,
-      lastName: payment.lastName,
-      pledgeStatus: payment.pledgeStatus,
-      pledgeCreatedAt: payment.pledgeCreatedAt,
-      pledgeTotal: formatPrice(payment.pledgeTotal),
-      paymentMethod: payment.paymentMethod,
-      paymentStatus: payment.paymentStatus,
-      paymentTotal: formatPrice(payment.paymentTotal),
-      paymentUpdatedAt: payment.paymentUpdatedAt,
+      paymentId: result.paymentId.substring(0, 13),
+      pledgeId: result.pledgeId.substring(0, 13),
+      userId: result.userId.substring(0, 13),
+      email: result.email,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      pledgeStatus: result.pledgeStatus,
+      pledgeCreatedAt: dateTimeFormat(result.pledgeCreatedAt),
+      pledgeTotal: formatPrice(result.pledgeTotal),
+      paymentMethod: result.paymentMethod,
+      paymentStatus: result.paymentStatus,
+      paymentTotal: formatPrice(result.paymentTotal),
+      paymentUpdatedAt: dateTimeFormat(result.paymentUpdatedAt),
       'ABO #': regularAbos.reduce((sum, d) => sum + d.amount, 0),
       'ABO total': formatPrice(regularAbos.reduce((sum, d) => sum + d.price, 0)),
       'ABO_REDUCED #': reducedAbos.reduce((sum, d) => sum + d.amount, 0),
