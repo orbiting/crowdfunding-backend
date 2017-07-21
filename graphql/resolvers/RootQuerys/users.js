@@ -28,25 +28,25 @@ module.exports = async (
               u."firstName"::text,
               u."lastName"::text,
               u.email::text,
-              a.name::text,
-              a.line1::text,
-              a.line2::text,
-              a.city::text,
-              a.country::text,
-              m."sequenceNumber"::text,
-              ps."pspId"::text
+              string_agg(a.name, ' '::text),
+              string_agg(a.line1, ' '::text),
+              string_agg(a.line2, ' '::text),
+              string_agg(a.city, ' '::text),
+              string_agg(a.country, ' '::text),
+              string_agg(m."sequenceNumber"::text, ' '::text),
+              string_agg(ps."pspId", ' '::text)
             ) <->> :search AS word_sim,
             concat_ws(' ',
               u."firstName"::text,
               u."lastName"::text,
               u.email::text,
-              a.name::text,
-              a.line1::text,
-              a.line2::text,
-              a.city::text,
-              a.country::text,
-              m."sequenceNumber"::text,
-              ps."pspId"::text
+              string_agg(a.name, ' '::text),
+              string_agg(a.line1, ' '::text),
+              string_agg(a.line2, ' '::text),
+              string_agg(a.city, ' '::text),
+              string_agg(a.country, ' '::text),
+              string_agg(m."sequenceNumber"::text, ' '::text),
+              string_agg(ps."pspId", ' '::text)
             ) <-> :search AS dist
           ` : ''}
         FROM
@@ -62,13 +62,15 @@ module.exports = async (
           ON ps."userId" = u.id
         ${filterActive ? 'WHERE' : ''}
           ${andFilters([
-            dateRangeFilterWhere(dateRangeFilter),
-            stringArrayFilterWhere(stringArrayFilter),
-            booleanFilterWhere(booleanFilter)
+            dateRangeFilterWhere(dateRangeFilter, 'u'),
+            stringArrayFilterWhere(stringArrayFilter, 'u'),
+            booleanFilterWhere(booleanFilter, 'u')
           ])}
+        GROUP BY
+          u.id
         ORDER BY
           ${search ? 'word_sim, dist' : orderBy
-            ? `"${orderBy.field}" ${orderBy.direction}`
+            ? `u."${orderBy.field}" ${orderBy.direction}`
             : 'u."createdAt" ASC'
            }
         OFFSET :offset
