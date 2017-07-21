@@ -107,7 +107,14 @@ PARKING_USER_ID=
 MANDRILL_API_KEY=
 # mails are not send in DEV, except SEND_MAILS is true
 # mails are suppressed in production if SEND_MAILS is false
+# this is a kill switch, if SEND_MAILS is false, no mails will be sent
+# instead they are printed to console.
 SEND_MAILS=true
+# if set, mails are only sent to the specified domain, others are filtered
+# out and printed to console instead.
+# This is handy if you want to test internally with real mails
+# but you must make sure not to send mails to customers.
+SEND_MAILS_DOMAIN_FILTER=project-r.construction
 
 # where to send auth mails from
 AUTH_MAIL_FROM_ADDRESS="kontakt@republik.ch"
