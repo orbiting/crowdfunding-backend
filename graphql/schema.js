@@ -124,12 +124,23 @@ input BooleanFilter {
 
 enum Field {
   createdAt
+  updatedAt
   dueDate
   status
   matched
   paperInvoice
   verified
   email
+  buchungsdatum
+  valuta
+  avisierungstext
+  gutschrift
+  mitteilung
+  hrid
+  total
+  method
+  firstName
+  lastName
 }
 
 enum OrderDirection {
