@@ -2,6 +2,10 @@ const {dsvFormat} = require('d3-dsv')
 const csvFormat = dsvFormat(';').format
 const Roles = require('../../../lib/Roles')
 
+const formatPrice = (price) => {
+  return (price / 100.0).toFixed(2)
+}
+
 module.exports = async (_, args, {pgdb, user}) => {
   Roles.ensureUserHasRole(user, 'accountant')
 
@@ -34,7 +38,7 @@ module.exports = async (_, args, {pgdb, user}) => {
       (pkgo.reward && pkgo.reward.name === 'ABO')
   )
   const aboBenefactorPkgos = pkgOptions.filter(pkgo =>
-      (pkgo.reward && pkgo.reward.name === 'ABO_BENEFACTOR')
+      (pkgo.reward && pkgo.reward.name === 'BENEFACTOR_ABO')
   )
   const notebookPkgos = pkgOptions.filter(pkgo =>
       (pkgo.reward && pkgo.reward.name === 'NOTEBOOK')
@@ -88,20 +92,20 @@ module.exports = async (_, args, {pgdb, user}) => {
       return (pkg && pkg.price < plo.price)
     })
     const benefactorAbos = pledgeOptions.filter(plo =>
-        !!aboBenefactorPkgos.find(pko => pko.id === plo.templateId)
+      !!aboBenefactorPkgos.find(pko => pko.id === plo.templateId)
     )
     const notebooks = pledgeOptions.filter(plo =>
-        !!notebookPkgos.find(pko => pko.id === plo.templateId)
+      !!notebookPkgos.find(pko => pko.id === plo.templateId)
     )
+
     const donations = pledgeOptions.filter(plo =>
-        !!donationPkgos.find(pko => pko.id === plo.templateId)
+      !!donationPkgos.find(pko => pko.id === plo.templateId)
     )
+    const numDonations = donations.reduce((sum, d) => sum + d.amount, 0)
+    const donation = numDonations > 0
+      ? payment.donation + 100 // minPrice of donation is 1
+      : payment.donation
 
-    const formatPrice = (price) => {
-      return (price / 100.0).toFixed(2)
-    }
-
-    delete payment.pledgeOptions
     return {
       paymentId: payment.paymentId.substring(0, 13),
       pledgeId: payment.pledgeId.substring(0, 13),
@@ -111,10 +115,10 @@ module.exports = async (_, args, {pgdb, user}) => {
       lastName: payment.lastName,
       pledgeStatus: payment.pledgeStatus,
       pledgeCreatedAt: payment.pledgeCreatedAt,
-      pledgeTotal: payment.pledgeTotal,
+      pledgeTotal: formatPrice(payment.pledgeTotal),
       paymentMethod: payment.paymentMethod,
       paymentStatus: payment.paymentStatus,
-      paymentTotal: payment.paymentTotal,
+      paymentTotal: formatPrice(payment.paymentTotal),
       paymentUpdatedAt: payment.paymentUpdatedAt,
       'ABO #': regularAbos.reduce((sum, d) => sum + d.amount, 0),
       'ABO total': formatPrice(regularAbos.reduce((sum, d) => sum + d.price, 0)),
@@ -124,9 +128,9 @@ module.exports = async (_, args, {pgdb, user}) => {
       'ABO_BENEFACTOR total': formatPrice(benefactorAbos.reduce((sum, d) => sum + d.price, 0)),
       'NOTEBOOK #': notebooks.reduce((sum, d) => sum + d.amount, 0),
       'NOTEBOOK total': formatPrice(notebooks.reduce((sum, d) => sum + d.price, 0)),
-      'DONATION #': donations.reduce((sum, d) => sum + d.amount, 0),
-      'DONATION total': formatPrice(donations.reduce((sum, d) => sum + d.price, 0)),
-      donation: payment.donation
+      'DONATION #': numDonations,
+      // 'DONATION total': formatPrice(donations.reduce((sum, d) => sum + d.price, 0)),
+      donation: formatPrice(donation)
     }
   })
 
