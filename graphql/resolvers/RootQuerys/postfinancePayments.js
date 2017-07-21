@@ -24,7 +24,15 @@ module.exports = async (
     })
     : await pgdb.query(`
         SELECT
-          pfp.*,
+          pfp.id AS id,
+          pfp.buchungsdatum AS buchungsdatum,
+          pfp.valuta AS valuta,
+          pfp.avisierungstext AS avisierungstext,
+          pfp.gutschrift AS gutschrift,
+          pfp.mitteilung AS mitteilung,
+          pfp.matched AS matched,
+          pfp."createdAt" AS "createdAt",
+          pfp."updatedAt" AS "updatedAt",
           concat_ws(' ',
             pfp.mitteilung::text,
             pfp.avisierungstext::text
@@ -48,8 +56,7 @@ module.exports = async (
         stringArray: stringArrayFilter ? stringArrayFilter.values : null,
         booleanValue: booleanFilter ? booleanFilter.value : null,
         limit,
-        offset,
-        orderBy: orderByTerm // TODO fixme
+        offset
       })
 
   const count = await pgdb.public.postfinancePayments.count()
