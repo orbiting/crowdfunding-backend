@@ -10,7 +10,7 @@
     "@slack/client": "^3.10.0",
     "aws-sign": "^0.1.2",
     "body-parser": "^1.17.2",
-    "connect-pg-simple": "^4.2.0",
+    "connect-pg-simple": "^3.1.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "d3-array": "^1.2.0",
