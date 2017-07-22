@@ -8,8 +8,10 @@ const dateTimeFormat = timeFormat('%x %H:%M') // %x - the locale’s date
 module.exports = async (_, args, {pgdb, user}) => {
   Roles.ensureUserHasRole(user, 'accountant')
 
-  // TODO honour
-  // const {paymentIds} = args
+  let {paymentIds} = args
+  if (!paymentIds) {
+    paymentIds = await pgdb.queryOneColumn(`SELECT id FROM payments`)
+  }
 
   const goodies = await pgdb.public.goodies.findAll()
   const membershipTypes = await pgdb.public.membershipTypes.findAll()
@@ -75,11 +77,15 @@ module.exports = async (_, args, {pgdb, user}) => {
     JOIN
       users u
       ON p."userId" = u.id
+    WHERE
+      ARRAY[pay.id] && :paymentIds
     GROUP BY
       pay.id, p.id, u.id
     ORDER BY
       u.email
-  `)).map(result => {
+  `, {
+    paymentIds
+  })).map(result => {
     const {pledgeOptions} = result
 
     const abos = pledgeOptions.filter(plo =>
