@@ -15,6 +15,7 @@
     "cors": "^2.8.4",
     "d3-array": "^1.2.0",
     "d3-collection": "^1.0.4",
+    "d3-dsv": "^1.0.5",
     "d3-format": "^1.2.0",
     "d3-time-format": "^2.0.5",
     "db-migrate": "^0.10.0-beta.21",
@@ -73,7 +74,6 @@
   },
   "devDependencies": {
     "concurrently": "^3.5.0",
-    "d3-dsv": "^1.0.5",
     "http-proxy": "^1.16.2",
     "husky": "^0.14.3",
     "lint-staged": "^4.0.2",
