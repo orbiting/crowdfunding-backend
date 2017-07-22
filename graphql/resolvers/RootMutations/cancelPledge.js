@@ -13,6 +13,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       logger.error('pledge not found', { req: req._log(), pledgeId })
       throw new Error(t('api/pledge/404'))
     }
+    if (pledge.id === PARKING_PLEDGE_ID || pledge.userId === PARKING_USER_ID) {
+      const message = 'pledge PARKING_PLEDGE_ID by PARKING_USER_ID can not be cancelled'
+      logger.error(message, { req: req._log(), pledge })
+      throw new Error(message)
+    }
     await transaction.public.pledges.updateOne({id: pledgeId}, {
       status: 'CANCELLED',
       updatedAt: now
