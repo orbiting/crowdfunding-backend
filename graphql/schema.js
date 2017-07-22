@@ -87,6 +87,8 @@ type RootMutations {
   importPostfinanceCSV(csv: String!): String!
   # required role: supporter
   rematchPayments: String!
+  # required role: supporter
+  sendPaymentReminders(paymentIds: [ID!]): Int!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
