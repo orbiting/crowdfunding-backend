@@ -366,6 +366,7 @@ type PledgePayment {
   hrid: String
   pspId: String
   dueDate: DateTime
+  user: User!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
