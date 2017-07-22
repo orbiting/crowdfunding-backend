@@ -127,7 +127,7 @@ create index "pledgeOptions_pledgeId_idx" on "pledgeOptions" ("pledgeId");
 
 
 create type "paymentMethod" as ENUM ('STRIPE', 'POSTFINANCECARD', 'PAYPAL', 'PAYMENTSLIP');
-create type "paymentStatus" as ENUM ('WAITING', 'PAID', 'REFUNDED', 'CANCELLED');
+create type "paymentStatus" as ENUM ('WAITING', 'PAID', 'WAITING_FOR_REFUND', 'REFUNDED', 'CANCELLED');
 create type "paymentType" as ENUM ('PLEDGE');
 create table "payments" (
   "id"            uuid primary key not null default uuid_generate_v4(),

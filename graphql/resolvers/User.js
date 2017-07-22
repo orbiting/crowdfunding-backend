@@ -1,3 +1,5 @@
+const Roles = require('../../lib/Roles')
+
 module.exports = {
   name (user) {
     return [user.firstName, user.lastName].join(' ')
@@ -20,5 +22,10 @@ module.exports = {
       })
     }
     return null
+  },
+  async roles (user, _, {pgdb, req}) {
+    if (Roles.userHasRole(req.user, 'admin')) {
+      return user.roles
+    }
   }
 }

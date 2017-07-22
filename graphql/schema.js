@@ -9,6 +9,11 @@ schema {
 
 type RootQuerys {
   me: User
+  # required role: supporter
+  users(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): Users!
+  # required role: supporter
+  user(id: ID!): User
+  roles: [Role!]!
 
   crowdfundings: [Crowdfunding]
   crowdfunding(name: String!): Crowdfunding!
@@ -18,12 +23,21 @@ type RootQuerys {
 
   memberships: [Pledge]
 
+  # required role: supporter
+  payments(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PledgePayments!
+  # required role: supporter
+  postfinancePayments(limit: Int!, offset: Int, orderBy: OrderBy, search: String, dateRangeFilter: DateRangeFilter, stringArrayFilter: StringArrayFilter, booleanFilter: BooleanFilter): PostfinancePayments!
+
+  # This exports a CSV containing all payments IN paymentIds
+  # required role: accountant
+  paymentsCSV(paymentIds: [ID!]): String!
+
   faqs: [Faq!]!
   events: [Event!]!
   updates: [Update!]!
   testimonials(offset: Int, limit: Int, seed: Float, search: String, firstId: ID, videosOnly: Boolean): [Testimonial!]!
   lastTestimonial: Testimonial!
-  nextTestimonial(sequenceNumber: Int!, orderBy: OrderBy!): Testimonial!
+  nextTestimonial(sequenceNumber: Int!, orderDirection: OrderDirection!): Testimonial!
 
   membershipStats: MembershipStats!
   testimonialStats: TestimonialStats!
@@ -40,11 +54,41 @@ type RootMutations {
   signIn(email: String!, context: String): SignInResponse!
   signOut: Boolean!
   updateMe(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput): User!
+  # required role: supporter
+  updateUser(firstName: String, lastName: String, birthday: Date, phoneNumber: String, address: AddressInput, userId: ID!): User!
+  # if userId is null, the logged in user's email is changed
+  # required role to change other's email: supporter
+  updateEmail(userId: ID, email: String!): User!
+  # required role: admin
+  addUserToRole(userId: ID!, role: Role!): User!
+  # required role: admin
+  removeUserFromRole(userId: ID!, role: Role!): User!
+  # merges the belongings from source to target
+  # required role: admin
+  mergeUsers(targetUserId: ID!, sourceUserId: ID!): User!
 
   submitPledge(pledge: PledgeInput): PledgeResponse!
   payPledge(pledgePayment: PledgePaymentInput): PledgeResponse!
   reclaimPledge(pledgeId: ID!): Boolean!
   claimMembership(voucherCode: String!): Boolean!
+  # required role: supporter
+  cancelPledge(pledgeId: ID!): Pledge!
+  # Tries to resolve the amount of a pledge to the total of it's PAID payment.
+  # This comes handy if e.g. the payment is off by some cents (foreign wire transfer)
+  # and the backoffice decides to not demand an additional wire transfer.
+  # Required role: supporter
+  resolvePledgeToPayment(pledgeId: ID!, reason: String!): Pledge!
+  # required role: supporter
+  updatePayment(paymentId: ID!, status: PaymentStatus!, reason: String): PledgePayment!
+  # required role: supporter
+  updatePostfinancePayment(pfpId: ID!, mitteilung: String!): PostfinancePayment!
+  # This imports a CSV exported by PostFinance
+  # required role: accountant
+  importPostfinanceCSV(csv: String!): String!
+  # required role: supporter
+  rematchPayments: String!
+  # required role: supporter
+  sendPaymentReminders(paymentIds: [ID!]!): Int!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
@@ -71,6 +115,52 @@ type SignInResponse {
 }
 
 
+input DateRangeFilter {
+  field: Field!
+  from: DateTime!
+  to: DateTime!
+}
+input StringArrayFilter {
+  field: Field!
+  values: [String!]!
+}
+input BooleanFilter {
+  field: Field!
+  value: Boolean!
+}
+
+enum Field {
+  createdAt
+  updatedAt
+  dueDate
+  status
+  matched
+  paperInvoice
+  verified
+  email
+  buchungsdatum
+  valuta
+  avisierungstext
+  gutschrift
+  mitteilung
+  hrid
+  total
+  method
+  firstName
+  lastName
+}
+
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+input OrderBy {
+  field: Field!
+  direction: OrderDirection!
+}
+
+
 type User {
   id: ID!
   name: String
@@ -82,12 +172,25 @@ type User {
   phoneNumber: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  verified: Boolean!
 
   pledges: [Pledge!]!
   memberships: [Membership!]!
   testimonial: Testimonial
+
+  roles: [String!]
 }
 
+type Users {
+  items: [User!]!
+  count: Int!
+}
+
+enum Role {
+  admin
+  supporter
+  accountant
+}
 
 type Crowdfunding {
   id: ID!
@@ -252,6 +355,7 @@ enum PaymentMethod {
 enum PaymentStatus {
   WAITING
   PAID
+  WAITING_FOR_REFUND
   REFUNDED
   CANCELLED
 }
@@ -262,10 +366,40 @@ type PledgePayment {
   total: Int!
   status: PaymentStatus!
   hrid: String
+  pspId: String
   dueDate: DateTime
+  # every payment should link to
+  # a user, but there is some cleanup
+  # to do, to make that reality
+  user: User
+  remindersSentAt: [DateTime!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+type PledgePayments {
+  items: [PledgePayment!]!
+  count: Int!
+}
+
+
+type PostfinancePayment {
+  id: ID!
+  buchungsdatum: Date!
+  valuta: Date!
+  avisierungstext: String!
+  gutschrift: Int!
+  mitteilung: String
+  matched: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PostfinancePayments {
+  items: [PostfinancePayment!]!
+  count: Int!
+}
+
 
 type Faq {
   category: String
@@ -388,10 +522,6 @@ enum OrderType {
   HOT
   NEW
   TOP
-}
-enum OrderBy {
-  ASC
-  DESC
 }
 
 type Feed {

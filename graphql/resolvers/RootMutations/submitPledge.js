@@ -1,6 +1,7 @@
 const logger = require('../../../lib/logger')
 const postfinanceSHA = require('../../../lib/postfinanceSHA')
 const uuid = require('uuid/v4')
+const {minTotal, regularTotal} = require('../../../lib/Pledge')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
@@ -48,35 +49,19 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     }
 
     // check total
-    const minTotal = Math.max(pledgeOptions.reduce(
-      (amount, plo) => {
-        const pko = packageOptions.find((pko) => pko.id === plo.templateId)
-        return amount + (pko.userPrice
-          ? (pko.minUserPrice * plo.amount)
-          : (pko.price * plo.amount))
-      }
-      , 0
-    ), 100)
-
-    if (pledge.total < minTotal) {
-      logger.error(`pledge.total (${pledge.total}) must be >= (${minTotal})`, { req: req._log(), args, minTotal })
+    const pledgeMinTotal = minTotal(pledgeOptions, packageOptions)
+    if (pledge.total < pledgeMinTotal) {
+      logger.error(`pledge.total (${pledge.total}) must be >= (${pledgeMinTotal})`, { req: req._log(), args, pledgeMinTotal })
       throw new Error(t('api/unexpected'))
     }
 
     // calculate donation
-    const regularTotal = Math.max(pledgeOptions.reduce(
-      (amount, plo) => {
-        const pko = packageOptions.find((pko) => pko.id === plo.templateId)
-        return amount + (pko.price * plo.amount)
-      }
-      , 0
-    ), 100)
-
-    const donation = pledge.total - regularTotal
+    const pledgeRegularTotal = regularTotal(pledgeOptions, packageOptions)
+    const donation = pledge.total - pledgeRegularTotal
     // check reason
     if (donation < 0 && !pledge.reason) {
       logger.error('you must provide a reason for reduced pledges', { req: req._log(), args, donation })
-      throw new Error(t('api/unexpected'))
+      throw new Error(t('api/pledge/reason'))
     }
 
     // check user

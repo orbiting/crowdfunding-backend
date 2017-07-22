@@ -10,7 +10,7 @@ const PgDb = require('../lib/pgdb')
 const rw = require('rw')
 const {dsvFormat} = require('d3-dsv')
 const csvFormat = dsvFormat(';').format
-const {timeFormat} = require('../lib/formats')
+const {formatPrice, timeFormat} = require('../lib/formats')
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 
@@ -19,8 +19,6 @@ const t = getFormatter(MESSAGES)
 const dateTimeFormat = timeFormat('%x %H:%M') // %x - the locale’s date
 
 require('dotenv').config()
-
-const formatPrice = (price) => price / 100
 
 PgDb.connect().then(async (pgdb) => {
   // console.log('starting export...')
