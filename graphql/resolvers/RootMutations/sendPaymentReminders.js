@@ -1,60 +1,80 @@
 const Roles = require('../../../lib/Roles')
+const logger = require('../../../lib/logger')
 const sendMailTemplate = require('../../../lib/sendMailTemplate')
 const {formatPrice} = require('../../../lib/formats')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')
 
-  // TODO remember reminder was sent
-
-  const now = new Date()
-  let {paymentIds} = args
-  if (!paymentIds) {
-    paymentIds = await pgdb.queryOneColumn(`SELECT id FROM payments`)
+  const {paymentIds} = args
+  if (!paymentIds.length) {
+    return 0
   }
 
-  const payments = await pgdb.query(`
-      SELECT
-        u.email,
-        pay.total,
-        pay.hrid
-      FROM
+  const now = new Date()
+  const transaction = await pgdb.transactionBegin()
+  try {
+    const payments = await pgdb.query(`
+        SELECT
+          u.email,
+          pay.total,
+          pay.hrid
+        FROM
+          payments pay
+        JOIN
+          "pledgePayments" pp
+          ON pay.id=pp."paymentId"
+        JOIN
+          pledges p
+          ON pp."pledgeId"=p.id
+        JOIN
+          users u
+          ON p."userId"=u.id
+        WHERE
+          pay.status = 'WAITING' AND
+          pay.method = 'PAYMENTSLIP' AND
+          pay."dueDate" < :now AND
+          ARRAY[pay.id] && :paymentIds
+      `, {
+        now,
+        paymentIds
+      })
+
+    for (let payment of payments) {
+      await sendMailTemplate({
+        to: payment.email,
+        fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
+        subject: t('api/email/payment/reminder/subject'),
+        templateName: 'cf_payment_reminder',
+        globalMergeVars: [
+          { name: 'TOTAL',
+            content: formatPrice(payment.total)
+          },
+          { name: 'HRID',
+            content: payment.hrid
+          }
+        ]
+      })
+    }
+
+    await pgdb.query(`
+      UPDATE
         payments pay
-      JOIN
-        "pledgePayments" pp
-        ON pay.id=pp."paymentId"
-      JOIN
-        pledges p
-        ON pp."pledgeId"=p.id
-      JOIN
-        users u
-        ON p."userId"=u.id
+      SET
+        "remindersSentAt" = COALESCE("remindersSentAt", '[]'::jsonb)::jsonb || :now::jsonb
       WHERE
-        pay.status = 'WAITING' AND
-        pay.method = 'PAYMENTSLIP' AND
-        pay."dueDate" < :now AND
         ARRAY[pay.id] && :paymentIds
     `, {
-      now,
+      now: JSON.stringify([now]),
       paymentIds
     })
 
-  for (let payment of payments) {
-    await sendMailTemplate({
-      to: payment.email,
-      fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
-      subject: t('api/email/payment/reminder/subject'),
-      templateName: 'cf_payment_reminder',
-      globalMergeVars: [
-        { name: 'TOTAL',
-          content: formatPrice(payment.total)
-        },
-        { name: 'HRID',
-          content: payment.hrid
-        }
-      ]
-    })
-  }
+    await transaction.transactionCommit()
 
-  return payments.length
+    return payments.length
+  } catch (e) {
+    await transaction.transactionRollback()
+    logger.error('error in transaction', { req: req._log(), args, error: e })
+    throw e
+  }
 }
