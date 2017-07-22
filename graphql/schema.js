@@ -88,7 +88,7 @@ type RootMutations {
   # required role: supporter
   rematchPayments: String!
   # required role: supporter
-  sendPaymentReminders(paymentIds: [ID!]): Int!
+  sendPaymentReminders(paymentIds: [ID!]!): Int!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
@@ -368,7 +368,11 @@ type PledgePayment {
   hrid: String
   pspId: String
   dueDate: DateTime
-  user: User!
+  # every payment should link to
+  # a user, but there is some cleanup
+  # to do, to make that reality
+  user: User
+  remindersSentAt: [DateTime!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
