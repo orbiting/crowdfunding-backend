@@ -11,14 +11,17 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       numMatchedPayments,
       numUpdatedPledges,
       numPaymentsSuccessful
-    } = matchPayments(transaction, t)
+    } = await matchPayments(transaction, t)
 
     await transaction.transactionCommit()
-    return `
+    const result = `
+rematchPayments result:
 num matched payments: ${numMatchedPayments}
 num updated pledges: ${numUpdatedPledges}
 num payments successfull: ${numPaymentsSuccessful}
     `
+    console.log(result)
+    return result
   } catch (e) {
     await transaction.transactionRollback()
     logger.info('transaction rollback', { req: req._log(), args, error: e })
