@@ -25,6 +25,8 @@ module.exports = {
     `, {
       paymentId: payment.id
     })
+    // TODO remove after payments cleanup
+    if (!users.length) { return null }
     return users[0]
   }
 }

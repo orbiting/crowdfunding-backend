@@ -368,7 +368,10 @@ type PledgePayment {
   hrid: String
   pspId: String
   dueDate: DateTime
-  user: User!
+  # every payment should link to
+  # a user, but there is some cleanup
+  # to do, to make that reality
+  user: User
   createdAt: DateTime!
   updatedAt: DateTime!
 }
