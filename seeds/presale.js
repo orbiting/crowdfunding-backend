@@ -2,7 +2,7 @@ exports.default = {
   crowdfundings: [
     {
       name: 'PRESALE',
-      beginDate: new Date('2017-07-03T06:00:00.000Z'),
+      beginDate: new Date('2017-07-24T06:00:00.000Z'),
       endDate: new Date('2018-01-31T00:00:00.000Z'),
       goals: [
         {
