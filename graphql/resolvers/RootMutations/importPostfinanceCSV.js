@@ -4,6 +4,9 @@ const matchPayments = require('../../../lib/matchPayments')
 const {dsvFormat} = require('d3-dsv')
 const csvParse = dsvFormat(';').parse
 
+const {timeParse} = require('d3-time-format')
+const dateParser = timeParse('%d.%m.%y %H %Z')
+
 const parsePostfinanceExport = (inputFile) => {
   // sanitize input
   // keys to lower case
@@ -25,7 +28,7 @@ const parsePostfinanceExport = (inputFile) => {
         if (includeColumns.indexOf(key) > -1) {
           const newKey = key.toLowerCase()
           if (parseDate.indexOf(key) > -1) {
-            newRow[newKey] = new Date(value)
+            newRow[newKey] = dateParser(value + ' 12 Z')
           } else if (parseAmount.indexOf(key) > -1) {
             newRow[newKey] = parseInt(parseFloat(value) * 100)
           } else {
