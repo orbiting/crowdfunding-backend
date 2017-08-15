@@ -9,6 +9,7 @@ const dateParser = timeParse('%d.%m.%y %H %Z')
 
 const parsePostfinanceExport = (inputFile) => {
   // sanitize input
+  // trash first 4 lines as they contain another table with (Buchungsart, Konto, etc)
   // keys to lower case
   // trash uninteresting columns
   // parse columns
@@ -16,7 +17,8 @@ const parsePostfinanceExport = (inputFile) => {
   const includeColumns = ['Buchungsdatum', 'Valuta', 'Avisierungstext', 'Gutschrift']
   const parseDate = ['Buchungsdatum', 'Valuta']
   const parseAmount = ['Gutschrift']
-  return csvParse(inputFile)
+
+  return csvParse(inputFile.split('\n').slice(4).join('\n'))
     .filter(row => row.Gutschrift) // trash rows without gutschrift (such as lastschrift and footer)
     .filter(row => !/^EINZAHLUNGSSCHEIN/g.exec(row.Avisierungstext)) // trash useless EINZAHLUNGSSCHEIN
     .filter(row => !/^GUTSCHRIFT E-PAYMENT TRANSAKTION POSTFINANCE CARD/g.exec(row.Avisierungstext)) // trash PF CARD
