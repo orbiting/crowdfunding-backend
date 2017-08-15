@@ -89,6 +89,8 @@ type RootMutations {
   rematchPayments: String!
   # required role: supporter
   sendPaymentReminders(paymentIds: [ID!]!): Int!
+  # required role: supporter
+  hidePostfinancePayment(id: ID!): PostfinancePayment!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
@@ -391,6 +393,7 @@ type PostfinancePayment {
   gutschrift: Int!
   mitteilung: String
   matched: Boolean!
+  hidden: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
