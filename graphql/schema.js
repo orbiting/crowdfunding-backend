@@ -91,6 +91,8 @@ type RootMutations {
   sendPaymentReminders(paymentIds: [ID!]!): Int!
   # required role: supporter
   hidePostfinancePayment(id: ID!): PostfinancePayment!
+  # required role: supporter
+  manuallyMatchPostfinancePayment(id: ID!): PostfinancePayment!
 
   remindEmail(email: String!): Boolean!
   submitQuestion(question: String!): MutationResult
