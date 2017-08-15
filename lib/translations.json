@@ -1,5 +1,5 @@
 {
-  "updated": "2017-08-15T09:12:03.139Z",
+  "updated": "2017-08-15T09:41:31.212Z",
   "title": "live",
   "data": [
     {
@@ -1978,6 +1978,18 @@
     {
       "key": "api/postfinancePayment/hide/matched",
       "value": "Postfinance Zahlungen mit Status \"matched\" können nicht versteckt werden."
+    },
+    {
+      "key": "api/postfinancePayment/match/noPayment",
+      "value": "Es konnte keine Zahlung mit der HRID {hrid} und dem status \"PAID\" gefunden werden."
+    },
+    {
+      "key": "api/postfinancePayment/match/duplicate",
+      "value": "Es liegt bereits eine gematchte Postfinance Zahlung mit der HRID {hrid} vor."
+    },
+    {
+      "key": "api/postfinancePayment/match/noChange",
+      "value": "Diese Postfinance Zahlung ist bereits gematched."
     }
   ]
 }
