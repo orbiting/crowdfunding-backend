@@ -1,5 +1,5 @@
 {
-  "updated": "2017-07-22T14:41:52.328Z",
+  "updated": "2017-08-15T09:12:03.139Z",
   "title": "live",
   "data": [
     {
@@ -253,6 +253,10 @@
     {
       "key": "merci/payment/status/generic/PAID",
       "value": "{formattedTotal} bezahlt mit {method}"
+    },
+    {
+      "key": "merci/payment/status/generic/WAITING_FOR_REFUND",
+      "value": "{formattedTotal} wird zurückerstattet"
     },
     {
       "key": "merci/payment/status/generic/REFUNDED",
@@ -1104,7 +1108,7 @@
     },
     {
       "key": "events/pageTitle",
-      "value": "Veranstaltungen — Republik"
+      "value": "Veranstaltungen – Republik"
     },
     {
       "key": "events/title",
@@ -1112,7 +1116,7 @@
     },
     {
       "key": "events/metaDescription",
-      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
+      "value": "Das digitale Magazin von Project R – jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "events/upcoming",
@@ -1144,7 +1148,7 @@
     },
     {
       "key": "updates/pageTitle",
-      "value": "Neues — Republik"
+      "value": "Neues – Republik"
     },
     {
       "key": "updates/title",
@@ -1152,7 +1156,7 @@
     },
     {
       "key": "updates/metaDescription",
-      "value": "Das digitale Magazin von Project R — jetzt unser Crowdfunding unterstützen."
+      "value": "Das digitale Magazin von Project R – jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "updates/404",
@@ -1164,7 +1168,7 @@
     },
     {
       "key": "faq/pageTitle",
-      "value": "Fragen — Republik"
+      "value": "Fragen – Republik"
     },
     {
       "key": "faq/title",
@@ -1176,7 +1180,7 @@
     },
     {
       "key": "faq/before/title",
-      "value": "FAQ — Ihre häufigsten Fragen"
+      "value": "FAQ – Ihre häufigsten Fragen"
     },
     {
       "key": "faq/before/support/title",
@@ -1312,7 +1316,7 @@
     },
     {
       "key": "testimonial/meta/pageTitle",
-      "value": "Community — Republik"
+      "value": "Community – Republik"
     },
     {
       "key": "testimonial/meta/title",
@@ -1328,7 +1332,7 @@
     },
     {
       "key": "testimonial/meta/single/pageTitle",
-      "value": "{name} — Community — Republik"
+      "value": "{name} – Community – Republik"
     },
     {
       "key": "testimonial/meta/single/description",
@@ -1356,7 +1360,7 @@
     },
     {
       "key": "crew/pageTitle",
-      "value": "Crew — Republik"
+      "value": "Crew – Republik"
     },
     {
       "key": "crew/title",
@@ -1364,7 +1368,7 @@
     },
     {
       "key": "crew/description",
-      "value": "Die Crew stellt sich vor — jetzt unser Crowdfunding unterstützen."
+      "value": "Die Crew stellt sich vor – jetzt unser Crowdfunding unterstützen."
     },
     {
       "key": "crew/lead",
@@ -1376,7 +1380,7 @@
     },
     {
       "key": "notifications/pageTitle",
-      "value": "Mitteilung — Republik"
+      "value": "Mitteilung – Republik"
     },
     {
       "key": "notifications/email-confirmed/title",
@@ -1970,6 +1974,10 @@
     {
       "key": "api/payment/404",
       "value": "Die Zahlung konnte nicht gefunden werden."
+    },
+    {
+      "key": "api/postfinancePayment/hide/matched",
+      "value": "Postfinance Zahlungen mit Status \"matched\" können nicht versteckt werden."
     }
   ]
 }
