@@ -41,10 +41,12 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     await transaction.public.paymentSources.update(from, to)
     await transaction.public.pledges.update(from, to)
     await transaction.public.memberships.update(from, to)
-    await transaction.public.ballots.update(from, to)
     await transaction.public.comments.update(from, to)
     if (!transaction.public.testimonials.findFirst(to)) {
       await transaction.public.testimonials.update(from, to)
+    }
+    if (!transaction.public.ballots.findFirst(to)) {
+      await transaction.public.ballots.update(from, to)
     }
 
     let sessions = await transaction.public.sessions.find({'sess @>': {passport: {user: sourceUser.id}}})
