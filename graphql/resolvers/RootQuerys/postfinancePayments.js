@@ -31,6 +31,7 @@ module.exports = async (
           pfp.gutschrift AS gutschrift,
           pfp.mitteilung AS mitteilung,
           pfp.matched AS matched,
+          pfp.hidden AS hidden,
           pfp."createdAt" AS "createdAt",
           pfp."updatedAt" AS "updatedAt",
           concat_ws(' ',
