@@ -152,6 +152,7 @@ enum Field {
   method
   firstName
   lastName
+  hidden
 }
 
 enum OrderDirection {
