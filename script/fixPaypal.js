@@ -26,6 +26,11 @@ const {
 PgDb.connect().then(async (pgdb) => {
   const transaction = await pgdb.transactionBegin()
 
+  const jefferson = await transaction.public.users.findOne({email: 'jefferson@project-r.construction'})
+  const pledgeIdsByJefferson = (await transaction.public.pledges.find({
+    userId: jefferson.id
+  })).map(pledge => pledge.id)
+
   try {
     const paypalPayments = await pgdb.public.query(`
       select
@@ -53,8 +58,10 @@ PgDb.connect().then(async (pgdb) => {
     return
     */
 
-    let counter = 0
+    let counterVoucher = 0
+    let counterNew = 0
     for (let paypalPayment of paypalPayments) {
+      // get payment from paypal
       const transactionDetails = {
         'METHOD': 'GetTransactionDetails',
         'TRANSACTIONID': paypalPayment.tx,
@@ -74,6 +81,7 @@ PgDb.connect().then(async (pgdb) => {
         body: form
       })
       const responseDict = querystring.parse(await response.text())
+
       if (responseDict.PAYMENTSTATUS === 'Completed') {
         // load pledge
         const pledge = await transaction.public.pledges.findOne({
@@ -82,10 +90,23 @@ PgDb.connect().then(async (pgdb) => {
         if (pledge.status === 'SUCCESSFUL') {
           console.log('pledge already SUCCESSFUL', pledge)
           console.log(responseDict)
+          console.log('-----')
+          continue
+        }
+        const membershipsGivenByJefferson = await transaction.public.memberships.find({
+          userId: pledge.userId,
+          pledgeId: pledgeIdsByJefferson
+        })
+        if (membershipsGivenByJefferson.length > 0) {
+          console.log('user was already given a voucher')
+          console.log(await transaction.public.users.findOne({id: pledge.userId}))
+          console.log(membershipsGivenByJefferson)
+          console.log('-----')
+          counterVoucher += 1
           continue
         }
 
-        counter += 1
+        counterNew += 1
 
         // get paypal amount (is decimal)
         const amount = parseFloat(responseDict.AMT) * 100
@@ -129,9 +150,11 @@ PgDb.connect().then(async (pgdb) => {
       } else {
         console.log('payment not Completed, ignoring:')
         console.log(responseDict)
+        console.log('-----')
       }
     }
-    console.log(counter + ' pledges updated')
+    console.log(counterNew + ' payments inserted')
+    console.log(counterVoucher + ' users where already given a voucher')
 
     await transaction.transactionCommit()
   } catch (e) {
