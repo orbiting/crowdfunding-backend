@@ -1,6 +1,6 @@
 const Roles = require('../../../lib/Roles')
 const logger = require('../../../lib/logger')
-const matchPayments = require('../../../lib/matchPayments')
+const matchPayments = require('../../../lib/payments/matchPayments')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')

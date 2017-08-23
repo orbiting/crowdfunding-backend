@@ -1,7 +1,7 @@
 const Roles = require('../../../lib/Roles')
 const logger = require('../../../lib/logger')
 const generateMemberships = require('../../../lib/generateMemberships')
-const sendPaymentSuccessful = require('../../../lib/sendPaymentSuccessful')
+const sendPaymentSuccessful = require('../../../lib/payments/sendPaymentSuccessful')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')

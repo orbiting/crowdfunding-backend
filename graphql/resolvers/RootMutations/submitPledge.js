@@ -1,5 +1,5 @@
 const logger = require('../../../lib/logger')
-const postfinanceSHA = require('../../../lib/postfinanceSHA')
+const postfinanceSHA = require('../../../lib/payments/postfinance/sha')
 const uuid = require('uuid/v4')
 const {minTotal, regularTotal} = require('../../../lib/Pledge')
 
