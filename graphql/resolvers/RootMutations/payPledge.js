@@ -27,6 +27,32 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       throw new Error(t('api/unexpected'))
     }
     if (pledge.status === 'SUCCESSFUL') {
+      // check if the pledge was paid with the same paypal transaction
+      // happens if the webhook is faster than redirect
+      const payment = (await transaction.query(`
+        SELECT
+          pay.*
+        FROM
+          "pledgePayments" pp
+        JOIN
+          payments pay
+          ON pp."paymentId" = pay.id
+        WHERE
+          pp."pledgeId" = :pledgeId
+      `, {
+        pledgeId: pledge.id
+      }))[0]
+      let pspPayload
+      try {
+        pspPayload = JSON.parse(pledgePayment.pspPayload)
+      } catch (e) { }
+      if (
+        payment && payment.pspPayload && pspPayload &&
+        payment.pspPayload.TRANSACTIONID === pspPayload.tx) {
+        return {
+          pledgeId: pledge.id
+        }
+      }
       logger.error('pledge is already paid', { req: req._log(), args, pledge, pledgePayment })
       throw new Error(t('api/pledge/alreadyPaid'))
     }
