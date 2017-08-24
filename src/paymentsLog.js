@@ -38,50 +38,61 @@ module.exports = (pgdb, t) => {
         const pledgeId = body.item_name
 
         const transaction = await pgdb.transactionBegin()
-        // load pledge
-        // FOR UPDATE to wait on other transactions
-        const pledge = (await transaction.query(`
-          SELECT *
-          FROM pledges
-          WHERE id = :pledgeId
-          FOR UPDATE
-        `, {
-          pledgeId
-        }))[0]
+        let userId
+        try {
+          // load pledge
+          // FOR UPDATE to wait on other transactions
+          const pledge = (await transaction.query(`
+            SELECT *
+            FROM pledges
+            WHERE id = :pledgeId
+            FOR UPDATE
+          `, {
+            pledgeId
+          }))[0]
 
-        if (pledge.status !== 'SUCCESSFUL') {
-          const pspPayload = {
-            tx: body.txn_id, // normalize with redirect params
-            webhook: true,
-            ...body
-          }
-          const pledgeStatus = await payPledgePaypal({
-            pledgeId: pledge.id,
-            total: pledge.total,
-            pspPayloadRaw: pspPayload,
-            transaction,
-            t,
-            logger
-          })
-          if (pledge.status !== pledgeStatus) {
-            // generate Memberships
-            if (pledgeStatus === 'SUCCESSFUL') {
-              await generateMemberships(pledge.id, transaction, t, logger)
+          if (pledge && pledge.status !== 'SUCCESSFUL') {
+            userId = pledge.userId
+
+            const pspPayload = {
+              tx: body.txn_id, // normalize with redirect params
+              webhook: true,
+              ...body
             }
-
-            // update pledge status
-            await transaction.public.pledges.updateOne({
-              id: pledge.id
-            }, {
-              status: pledgeStatus,
-              sendConfirmMail: true
+            const pledgeStatus = await payPledgePaypal({
+              pledgeId: pledge.id,
+              total: pledge.total,
+              pspPayloadRaw: pspPayload,
+              transaction,
+              t,
+              logger
             })
-          }
-        }
-        await transaction.transactionCommit()
+            if (pledge.status !== pledgeStatus) {
+              // generate Memberships
+              if (pledgeStatus === 'SUCCESSFUL') {
+                await generateMemberships(pledge.id, transaction, t, logger)
+              }
 
-        // send mail immediately
-        await sendPendingPledgeConfirmations(pledge.userId, pgdb, t)
+              // update pledge status
+              await transaction.public.pledges.updateOne({
+                id: pledge.id
+              }, {
+                status: pledgeStatus,
+                sendConfirmMail: true
+              })
+            }
+          }
+          await transaction.transactionCommit()
+        } catch (e) {
+          await transaction.transactionRollback()
+          logger.info('transaction rollback', { req: req._log(), error: e })
+          throw e
+        }
+
+        if (userId) {
+          // send mail immediately
+          await sendPendingPledgeConfirmations(userId, pgdb, t)
+        }
       }
     })
 
