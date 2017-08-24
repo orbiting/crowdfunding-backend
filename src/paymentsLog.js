@@ -1,7 +1,11 @@
 const server = require('express').Router()
 const bodyParser = require('body-parser')
+const logger = require('../lib/logger')
+const payPledgePaypal = require('../lib/payments/paypal/payPledge')
+const generateMemberships = require('../lib/generateMemberships')
+const sendPendingPledgeConfirmations = require('../lib/sendPendingPledgeConfirmations')
 
-module.exports = (pgdb) => {
+module.exports = (pgdb, t) => {
   // https://stripe.com/docs/webhooks
   server.post('/payments/stripe',
     bodyParser.json(),
@@ -17,11 +21,68 @@ module.exports = (pgdb) => {
   server.post('/payments/paypal',
     bodyParser.urlencoded({extended: true}),
     async (req, res) => {
+      const { body } = req
       await pgdb.public.paymentsLog.insert({
         method: 'PAYPAL',
-        pspPayload: req.body
+        pspPayload: body
       })
-      return res.sendStatus(200)
+
+      // end connection
+      res.sendStatus(200)
+
+      // payPledge in case that didn't happen already:
+      // in case users close the paypal tab before being redirected back to us,
+      // we only get notified about the payment via this webhook.
+      // we ignore non Completed status changes for now
+      if (body.payment_status === 'Completed') {
+        const pledgeId = body.item_name
+
+        const transaction = await pgdb.transactionBegin()
+        // load pledge
+        // FOR UPDATE to wait on other transactions
+        const pledge = (await transaction.query(`
+          SELECT *
+          FROM pledges
+          WHERE id = :pledgeId
+          FOR UPDATE
+        `, {
+          pledgeId
+        }))[0]
+
+        if (pledge.status !== 'SUCCESSFUL') {
+          const pspPayload = {
+            tx: body.txn_id, // normalize with redirect params
+            webhook: true,
+            ...body
+          }
+          const pledgeStatus = await payPledgePaypal({
+            pledgeId: pledge.id,
+            total: pledge.total,
+            pspPayloadRaw: pspPayload,
+            transaction,
+            t,
+            logger
+          })
+          if (pledge.status !== pledgeStatus) {
+            // generate Memberships
+            if (pledgeStatus === 'SUCCESSFUL') {
+              await generateMemberships(pledge.id, transaction, t, logger)
+            }
+
+            // update pledge status
+            await transaction.public.pledges.updateOne({
+              id: pledge.id
+            }, {
+              status: pledgeStatus,
+              sendConfirmMail: true
+            })
+          }
+        }
+        await transaction.transactionCommit()
+
+        // send mail immediately
+        await sendPendingPledgeConfirmations(pledge.userId, pgdb, t)
+      }
     })
 
   // https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback

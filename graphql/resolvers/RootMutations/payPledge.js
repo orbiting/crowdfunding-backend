@@ -12,8 +12,16 @@ module.exports = async (_, args, {pgdb, req, t}) => {
   try {
     const { pledgePayment } = args
 
-    // check pledgeId
-    const pledge = await transaction.public.pledges.findOne({id: pledgePayment.pledgeId})
+    // load pledge
+    // FOR UPDATE to wait on other transactions
+    const pledge = (await transaction.query(`
+      SELECT *
+      FROM pledges
+      WHERE id = :pledgeId
+      FOR UPDATE
+    `, {
+      pledgeId: pledgePayment.pledgeId
+    }))[0]
     if (!pledge) {
       logger.error(`pledge (${pledgePayment.pledgeId}) not found`, { req: req._log(), args, pledge })
       throw new Error(t('api/unexpected'))
@@ -84,7 +92,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       }
 
       // update pledge status
-      await transaction.public.pledges.updateAndGetOne({
+      await transaction.public.pledges.updateOne({
         id: pledge.id
       }, {
         status: pledgeStatus

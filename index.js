@@ -56,7 +56,7 @@ PgDb.connect().then((pgdb) => {
   server.use(requestLog)
   server.use(newsletter(t))
   server.use(gsheets(pgdb, logger))
-  server.use(paymentsLog(pgdb))
+  server.use(paymentsLog(pgdb, t))
 
   if (process.env.BASIC_AUTH_PASS) {
     server.use(basicAuth({
