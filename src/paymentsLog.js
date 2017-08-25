@@ -55,9 +55,9 @@ module.exports = (pgdb, t) => {
             userId = pledge.userId
 
             const pspPayload = {
+              ...body,
               tx: body.txn_id, // normalize with redirect params
-              webhook: true,
-              ...body
+              webhook: true
             }
             const pledgeStatus = await payPledgePaypal({
               pledgeId: pledge.id,
