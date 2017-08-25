@@ -18,7 +18,7 @@ const graphql = require('./graphql')
 const newsletter = require('./src/newsletter')
 const requestLog = require('./src/requestLog')
 const gsheets = require('./src/gsheets')
-const paymentsLog = require('./src/paymentsLog')
+const paymentWebhooks = require('./src/paymentWebhooks')
 
 const t = getFormatter(MESSAGES)
 
@@ -56,7 +56,7 @@ PgDb.connect().then((pgdb) => {
   server.use(requestLog)
   server.use(newsletter(t))
   server.use(gsheets(pgdb, logger))
-  server.use(paymentsLog(pgdb, t))
+  server.use(paymentWebhooks(pgdb, t))
 
   if (process.env.BASIC_AUTH_PASS) {
     server.use(basicAuth({
