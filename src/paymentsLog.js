@@ -17,6 +17,15 @@ module.exports = (pgdb, t) => {
       return res.sendStatus(200)
     })
 
+  // https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback
+  server.get('/payments/pf', async (req, res) => {
+    await pgdb.public.paymentsLog.insert({
+      method: 'POSTFINANCECARD',
+      pspPayload: req.query
+    })
+    return res.sendStatus(200)
+  })
+
   // https://developer.paypal.com/docs/integration/direct/webhooks/rest-webhooks/
   server.post('/payments/paypal',
     bodyParser.urlencoded({extended: true}),
@@ -95,15 +104,6 @@ module.exports = (pgdb, t) => {
         }
       }
     })
-
-  // https://e-payment-postfinance.v-psp.com/de/guides/integration%20guides/e-commerce/transaction-feedback#servertoserver-feedback
-  server.get('/payments/pf', async (req, res) => {
-    await pgdb.public.paymentsLog.insert({
-      method: 'POSTFINANCECARD',
-      pspPayload: req.query
-    })
-    return res.sendStatus(200)
-  })
 
   return server
 }
