@@ -53,18 +53,6 @@ PgDb.connect().then(async (pgdb) => {
           SELECT id::text from pledges p where p.status != 'SUCCESSFUL'
         )
     `)
-    /* investigate Transaktionscode <-> Artikelbezeichnung relationship
-    let pledgeIds = []
-    let _paypalPayments = {}
-    for(let paypalPayment of paypalPayments) {
-      if (pledgeIds.indexOf(paypalPayment.pledgeId)> -1) {
-        console.log('conflict!!', paypalPayment, _paypalPayments[paypalPayment.pledgeId])
-      }
-      pledgeIds.push(paypalPayment.pledgeId)
-      _paypalPayments[paypalPayment.pledgeId] = paypalPayment
-    }
-    return
-    */
 
     let counterVoucher = 0
     let counterNew = 0
@@ -137,6 +125,9 @@ PgDb.connect().then(async (pgdb) => {
           updatedAt: now,
           createdAt
         })
+        console.log('insert new payment')
+        console.log(payment)
+        console.log('-----')
 
         let pledgeStatus = 'SUCCESSFUL'
         // check if amount is correct
@@ -166,11 +157,11 @@ PgDb.connect().then(async (pgdb) => {
             status: pledgeStatus
           })
         }
-      } else {
+      }/* else {
         console.log('payment not Completed, ignoring:')
         console.log(responseDict)
         console.log('-----')
-      }
+      } */
     }
     console.log(counterNew + ' payments inserted')
     console.log(counterVoucher + ' users where already given a voucher')
