@@ -3,8 +3,10 @@
 // rejected and didn't result in a successfull pledge.
 //
 // usage
-// read paypal's export into pg public.paypal
-// cf_server   node script/fixPaypal.js
+// read paypal's activity export into pg public.paypal with pgfutter
+// pgfutter --username XXX --schema public csv paypal.csv
+//
+// cf_server   node script/fixPaypal.js > paypal.log
 //
 require('dotenv').config()
 const querystring = require('querystring')
