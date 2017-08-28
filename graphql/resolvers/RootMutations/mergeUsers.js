@@ -21,6 +21,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       throw new Error(t('api/users/404'))
     }
 
+    if (targetUser.id === sourceUser.id) {
+      logger.error('source- and target-user must not be the same', { req: req._log(), sourceUser, targetUser })
+      throw new Error(t('api/users/merge/sourceAndTargetIdentical'))
+    }
+
     const users = [targetUser, sourceUser]
 
     const newUser = await transaction.public.users.updateAndGetOne({
