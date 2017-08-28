@@ -11,10 +11,13 @@ const querystring = require('querystring')
 const fetch = require('isomorphic-unfetch')
 const PgDb = require('../lib/pgdb')
 const generateMemberships = require('../lib/generateMemberships')
+const {timeParse} = require('d3-time-format')
 
 const {getFormatter} = require('../lib/translate')
 const MESSAGES = require('../lib/translations.json').data
 const t = getFormatter(MESSAGES)
+
+const datetimeParser = timeParse('%d.%m.%YT%H:%M:%S %Z')
 
 const {
   PAYPAL_USER,
@@ -30,12 +33,17 @@ PgDb.connect().then(async (pgdb) => {
   const pledgeIdsByJefferson = (await transaction.public.pledges.find({
     userId: jefferson.id
   })).map(pledge => pledge.id)
+  const now = new Date()
 
   try {
+    // paypal puts a "zero width no-break space" into the first column (date) name
     const paypalPayments = await pgdb.public.query(`
       select
         distinct(Transaktionscode) as tx,
-        Artikelbezeichnung as "pledgeId"
+        Artikelbezeichnung as "pledgeId",
+        "\uFEFFdatum" as date,
+        uhrzeit as time,
+        zeitzone as timezone
       from
         paypal pp
       where
@@ -111,6 +119,13 @@ PgDb.connect().then(async (pgdb) => {
         // get paypal amount (is decimal)
         const amount = parseFloat(responseDict.AMT) * 100
 
+        // parse date
+        const { date, time, timezone } = paypalPayment
+        if (timezone !== 'CEST') {
+          throw new Error('timezone in paypal export not CEST, please adapt this script')
+        }
+        const createdAt = datetimeParser(`${date}T${time} +02`)
+
         // save payment
         const payment = await transaction.public.payments.insertAndGet({
           type: 'PLEDGE',
@@ -118,7 +133,9 @@ PgDb.connect().then(async (pgdb) => {
           total: amount,
           status: 'PAID',
           pspId: paypalPayments.tx,
-          pspPayload: responseDict
+          pspPayload: responseDict,
+          updatedAt: now,
+          createdAt
         })
 
         let pledgeStatus = 'SUCCESSFUL'
@@ -132,7 +149,9 @@ PgDb.connect().then(async (pgdb) => {
         await transaction.public.pledgePayments.insert({
           pledgeId: pledge.id,
           paymentId: payment.id,
-          paymentType: 'PLEDGE'
+          paymentType: 'PLEDGE',
+          updatedAt: now,
+          createdAt
         })
 
         if (pledge.status !== pledgeStatus) {
