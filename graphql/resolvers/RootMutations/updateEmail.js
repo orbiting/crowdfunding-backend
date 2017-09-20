@@ -4,6 +4,7 @@ const ensureSignedIn = require('../../../lib/ensureSignedIn')
 const sendMailTemplate = require('../../../lib/sendMailTemplate')
 const isEmail = require('email-validator').validate
 const querystring = require('querystring')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
@@ -74,6 +75,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         content: loginLink
       }
     ]
+  })
+
+  await updateUserOnMailchimp({
+    userId: user.id,
+    pgdb
   })
 
   return pgdb.public.users.findOne({email})

@@ -1,5 +1,6 @@
 const logger = require('../../../lib/logger')
 const ensureSignedIn = require('../../../lib/ensureSignedIn')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
@@ -23,11 +24,16 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
     // commit transaction
     await transaction.transactionCommit()
-
-    return true
   } catch (e) {
     await transaction.transactionRollback()
     logger.info('transaction rollback', { req: req._log(), args, error: e })
     throw e
   }
+
+  await updateUserOnMailchimp({
+    userId: req.user.id,
+    pgdb
+  })
+
+  return true
 }
