@@ -17,7 +17,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
   const now = new Date()
   const transaction = await pgdb.transactionBegin()
   try {
-    const payments = await pgdb.query(`
+    const payments = await transaction.query(`
         SELECT
           u.email,
           pay.total,
@@ -60,7 +60,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       })
     }
 
-    await pgdb.query(`
+    await transaction.query(`
       UPDATE
         payments pay
       SET
