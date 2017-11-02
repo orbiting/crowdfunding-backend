@@ -12,9 +12,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
   const {voucherCode} = args
   const transaction = await pgdb.transactionBegin()
+  let giverId
   try {
     const membership = await transaction.public.memberships.findOne({voucherCode})
     if (!membership) { throw new Error(t('api/membership/claim/invalidToken')) }
+    giverId = membership.userId
 
     // transfer membership and remove voucherCode
     await transaction.public.memberships.updateOne({id: membership.id}, {
@@ -30,10 +32,19 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     throw e
   }
 
-  await updateUserOnMailchimp({
-    userId: req.user.id,
-    pgdb
-  })
+  if (giverId) {
+    await Promise.all([
+      updateUserOnMailchimp({
+        userId: giverId,
+        pgdb
+      }),
+      updateUserOnMailchimp({
+        userId: req.user.id,
+        pgdb
+      })
+
+    ])
+  }
 
   return true
 }
