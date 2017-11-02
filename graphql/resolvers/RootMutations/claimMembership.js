@@ -42,7 +42,6 @@ module.exports = async (_, args, {pgdb, req, t}) => {
         userId: req.user.id,
         pgdb
       })
-
     ])
   }
 
