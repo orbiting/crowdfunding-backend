@@ -1,6 +1,7 @@
 const Roles = require('../../../lib/Roles')
 const logger = require('../../../lib/logger')
 const {ascending} = require('d3-array')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'admin')
@@ -79,6 +80,15 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     logger.info('transaction rollback', { req: req._log(), args, error: e })
     throw e
   }
+
+  updateUserOnMailchimp({
+    userId: targetUserId,
+    pgdb
+  })
+  updateUserOnMailchimp({
+    userId: sourceUserId,
+    pgdb
+  })
 
   return pgdb.public.users.findOne({id: targetUserId})
 }

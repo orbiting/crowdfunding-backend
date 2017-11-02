@@ -1,5 +1,6 @@
 const Roles = require('../../../lib/Roles')
 const logger = require('../../../lib/logger')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')
@@ -71,6 +72,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     })
 
     await transaction.transactionCommit()
+
+    updateUserOnMailchimp({
+      userId: pledge.userId,
+      pgdb
+    })
   } catch (e) {
     await transaction.transactionRollback()
     logger.info('transaction rollback', { req: req._log(), args, error: e })

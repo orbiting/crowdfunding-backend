@@ -6,6 +6,7 @@ const payPledgePaymentslip = require('../../../lib/payments/paymentslip/payPledg
 const payPledgePaypal = require('../../../lib/payments/paypal/payPledge')
 const payPledgePostfinance = require('../../../lib/payments/postfinance/payPledge')
 const payPledgeStripe = require('../../../lib/payments/stripe/payPledge')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   const transaction = await pgdb.transactionBegin()
@@ -139,6 +140,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     if (req.user) {
       await sendPendingPledgeConfirmations(pledge.userId, pgdb, t)
     }
+
+    updateUserOnMailchimp({
+      userId: pledge.userId,
+      pgdb
+    })
 
     return {
       pledgeId: pledge.id

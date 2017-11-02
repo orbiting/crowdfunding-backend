@@ -1,5 +1,6 @@
 const logger = require('../../../lib/logger')
 const ensureSignedIn = require('../../../lib/ensureSignedIn')
+const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
@@ -11,9 +12,11 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
   const {voucherCode} = args
   const transaction = await pgdb.transactionBegin()
+  let giverId
   try {
     const membership = await transaction.public.memberships.findOne({voucherCode})
     if (!membership) { throw new Error(t('api/membership/claim/invalidToken')) }
+    giverId = membership.userId
 
     // transfer membership and remove voucherCode
     await transaction.public.memberships.updateOne({id: membership.id}, {
@@ -23,11 +26,22 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
     // commit transaction
     await transaction.transactionCommit()
-
-    return true
   } catch (e) {
     await transaction.transactionRollback()
     logger.info('transaction rollback', { req: req._log(), args, error: e })
     throw e
   }
+
+  if (giverId) {
+    updateUserOnMailchimp({
+      userId: giverId,
+      pgdb
+    })
+    updateUserOnMailchimp({
+      userId: req.user.id,
+      pgdb
+    })
+  }
+
+  return true
 }

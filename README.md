@@ -125,10 +125,15 @@ DEFAULT_MAIL_FROM_ADDRESS="kontakt@republik.ch"
 DEFAULT_MAIL_FROM_NAME=Republik
 
 # mailchimp is used to subscribe people to lists
+MAILCHIMP_URL=https://us14.api.mailchimp.com
 MAILCHIMP_API_KEY=
 REMIND_ME_LIST_ID=
 # random secret: used to sign the subscription link send by mail
 SUBSCRIBE_SECRET=
+# mailchimp group/interest ids, see script/getMailchimpInterests.js
+MAILCHIMP_INTEREST_PLEDGE=
+MAILCHIMP_INTEREST_MEMBER=
+MAILCHIMP_INTEREST_MEMBER_BENEFACTOR=
 
 # if truthy, @project-r.construction mail addresses get automatically
 # signedin and no mail is sent (used for automated testing)
