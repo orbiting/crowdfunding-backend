@@ -81,16 +81,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     throw e
   }
 
-  await Promise.all([
-    updateUserOnMailchimp({
-      userId: targetUserId,
-      pgdb
-    }),
-    updateUserOnMailchimp({
-      userId: sourceUserId,
-      pgdb
-    })
-  ])
+  updateUserOnMailchimp({
+    userId: targetUserId,
+    pgdb
+  })
+  updateUserOnMailchimp({
+    userId: sourceUserId,
+    pgdb
+  })
 
   return pgdb.public.users.findOne({id: targetUserId})
 }

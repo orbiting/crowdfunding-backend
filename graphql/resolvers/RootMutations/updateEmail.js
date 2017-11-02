@@ -77,7 +77,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     ]
   })
 
-  await updateUserOnMailchimp({
+  updateUserOnMailchimp({
     userId: user.id,
     pgdb
   })

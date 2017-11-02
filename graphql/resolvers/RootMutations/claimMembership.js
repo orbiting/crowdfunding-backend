@@ -33,16 +33,14 @@ module.exports = async (_, args, {pgdb, req, t}) => {
   }
 
   if (giverId) {
-    await Promise.all([
-      updateUserOnMailchimp({
-        userId: giverId,
-        pgdb
-      }),
-      updateUserOnMailchimp({
-        userId: req.user.id,
-        pgdb
-      })
-    ])
+    updateUserOnMailchimp({
+      userId: giverId,
+      pgdb
+    })
+    updateUserOnMailchimp({
+      userId: req.user.id,
+      pgdb
+    })
   }
 
   return true

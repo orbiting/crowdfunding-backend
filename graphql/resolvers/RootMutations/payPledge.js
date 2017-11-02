@@ -141,7 +141,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       await sendPendingPledgeConfirmations(pledge.userId, pgdb, t)
     }
 
-    await updateUserOnMailchimp({
+    updateUserOnMailchimp({
       userId: pledge.userId,
       pgdb
     })

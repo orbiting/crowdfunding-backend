@@ -93,7 +93,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
 
     await transaction.transactionCommit()
 
-    await updateUserOnMailchimp({
+    updateUserOnMailchimp({
       userId: pledge.userId,
       pgdb
     })
