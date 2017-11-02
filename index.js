@@ -2,6 +2,7 @@ const PgDb = require('./lib/pgdb')
 const cors = require('cors')
 const express = require('express')
 const basicAuth = require('express-basic-auth')
+const { Engine } = require('apollo-engine')
 const logger = require('./lib/logger')
 const {getFormatter} = require('./lib/translate')
 const MESSAGES = require('./lib/translations.json').data
@@ -12,6 +13,11 @@ if (DEV) {
 }
 
 process.env.PORT = process.env.PORT || 3001
+
+const {
+  PORT,
+  ENGINE_API_KEY
+} = process.env
 
 const auth = require('./src/auth')
 const graphql = require('./graphql')
@@ -28,8 +34,29 @@ process.on('unhandledRejection', (reason, promise) => {
   throw new Error(t('api/unexpected'))
 })
 
+// init apollo engine
+const engine = ENGINE_API_KEY
+  ? new Engine({
+    engineConfig: {
+      apiKey: ENGINE_API_KEY,
+      logging: {
+        level: 'INFO'   // Engine Proxy logging level. DEBUG, INFO, WARN or ERROR
+      }
+    },
+    graphqlPort: PORT
+  })
+  : null
+if (engine) {
+  engine.start()
+}
+
 PgDb.connect().then((pgdb) => {
   const server = express()
+
+  // apollo engine middleware
+  if (engine) {
+    server.use(engine.expressMiddleware())
+  }
 
   // redirect to https
   if (!DEV) {

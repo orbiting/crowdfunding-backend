@@ -6,7 +6,10 @@ const {formatPrice} = require('../../../lib/formats')
 module.exports = async (_, args, {pgdb, req, t}) => {
   Roles.ensureUserHasRole(req.user, 'supporter')
 
-  const {paymentIds} = args
+  const {
+    paymentIds,
+    emailSubject
+  } = args
   if (!paymentIds.length) {
     return 0
   }
@@ -14,7 +17,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
   const now = new Date()
   const transaction = await pgdb.transactionBegin()
   try {
-    const payments = await pgdb.query(`
+    const payments = await transaction.query(`
         SELECT
           u.email,
           pay.total,
@@ -44,7 +47,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       await sendMailTemplate({
         to: payment.email,
         fromEmail: process.env.DEFAULT_MAIL_FROM_ADDRESS,
-        subject: t('api/email/payment/reminder/subject'),
+        subject: emailSubject || t('api/email/payment/reminder/subject'),
         templateName: 'cf_payment_reminder',
         globalMergeVars: [
           { name: 'TOTAL',
@@ -57,7 +60,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
       })
     }
 
-    await pgdb.query(`
+    await transaction.query(`
       UPDATE
         payments pay
       SET

@@ -88,7 +88,7 @@ type RootMutations {
   # required role: supporter
   rematchPayments: String!
   # required role: supporter
-  sendPaymentReminders(paymentIds: [ID!]!): Int!
+  sendPaymentReminders(paymentIds: [ID!]!, emailSubject: String): Int!
   # required role: supporter
   hidePostfinancePayment(id: ID!): PostfinancePayment!
   # required role: supporter
