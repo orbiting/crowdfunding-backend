@@ -5,6 +5,7 @@ const sendMailTemplate = require('../../../lib/sendMailTemplate')
 const isEmail = require('email-validator').validate
 const querystring = require('querystring')
 const updateUserOnMailchimp = require('../../../lib/updateUserOnMailchimp')
+const unsubscribeFromMailchimp = require('../../../lib/unsubscribeFromMailchimp')
 
 module.exports = async (_, args, {pgdb, req, t}) => {
   ensureSignedIn(req, t)
@@ -77,6 +78,9 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     ]
   })
 
+  unsubscribeFromMailchimp({
+    email: user.email
+  })
   updateUserOnMailchimp({
     userId: user.id,
     pgdb
