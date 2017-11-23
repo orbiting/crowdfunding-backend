@@ -8,7 +8,7 @@
   "author": "Patrick Recher <p@tte.io>",
   "dependencies": {
     "@slack/client": "^3.14.1",
-    "apollo-engine": "^0.5.2",
+    "apollo-engine": "^0.5.6",
     "aws-sign": "^0.1.2",
     "body-parser": "^1.18.2",
     "connect-pg-simple": "^3.1.2",
