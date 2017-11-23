@@ -8,6 +8,7 @@
   "author": "Patrick Recher <p@tte.io>",
   "dependencies": {
     "@slack/client": "^3.14.1",
+    "apollo-engine": "^0.5.2",
     "aws-sign": "^0.1.2",
     "body-parser": "^1.18.2",
     "connect-pg-simple": "^3.1.2",
@@ -37,7 +38,6 @@
     "maxmind": "^2.3.0",
     "minimist": "^1.2.0",
     "mz": "^2.7.0",
-    "optics-agent": "^1.1.8",
     "passport": "^0.4.0",
     "pg": "^7.3.0",
     "pogi": "^2.4.0",
