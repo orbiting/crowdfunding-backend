@@ -10,12 +10,11 @@ require('dotenv').config()
 const PgDb = require('../lib/pgdb')
 
 PgDb.connect().then(async (pgdb) => {
-  const transaction = await pgdb.transactionBegin()
-
-  if (await transaction.public.goodies.findFirst({name: 'TOADBAG'})) {
-    console.error('TOADBAG already found in goodies table, aborting!')
+  if (await pgdb.public.goodies.findFirst({name: 'TOADBAG'})) {
+    throw new Error('TOADBAG already found in goodies table, aborting!')
   }
 
+  const transaction = await pgdb.transactionBegin()
   try {
     // insert toadbag
     const toadbagReward = await transaction.public.rewards.insertAndGet({
