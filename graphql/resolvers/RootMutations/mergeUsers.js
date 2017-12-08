@@ -75,7 +75,7 @@ module.exports = async (_, args, {pgdb, req, t}) => {
     // remove old user
     await transaction.public.users.deleteOne({id: sourceUser.id})
 
-    // await transaction.transactionCommit()
+    await transaction.transactionCommit()
 
     try {
       unsubscribeFromMailchimp({
