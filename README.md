@@ -1,4 +1,6 @@
-# Crowdfunding Server - Project R
+# [DEPRECATED] Crowdfunding Server - Project R
+
+This repository evolved into [republik-backend](https://github.com/orbiting/republik-backend) which in turn has been merged into the [orbiting/backends](https://github.com/orbiting/backends) monorepo. Most of the functionality of this backend is still avilable in the monorepo.
 
 ## Introduction
 This [NodeJS](https://nodejs.org) server provides an [GraphQL](http://graphql.org) API to power your next crowdfunding. It works best together with [crowdfunding-frontend](https://github.com/orbiting/crowdfunding-frontend). This software is developped by [Project R](https://project-r.construction) and was used to power our crowdfunding at [Republik](https://www.republik.ch).
